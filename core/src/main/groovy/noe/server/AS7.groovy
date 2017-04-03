@@ -22,6 +22,7 @@ import noe.eap.server.as7.AS7Solaris
 import noe.eap.server.as7.AS7Windows
 import noe.eap.utils.CLILib
 import noe.eap.utils.XSLTStaticLib
+import noe.server.jk.WorkerServer
 
 import javax.net.ssl.SSLSocketFactory
 
@@ -31,7 +32,7 @@ import javax.net.ssl.SSLSocketFactory
  * TODO: We need to take a look at the Domain mode with Libor.
  */
 @Slf4j
-class AS7 extends ServerAbstract {
+class AS7 extends ServerAbstract implements WorkerServer {
 
   public static final String WELCOME_ROOT_CONTEXT = "Welcome to"
   public static final String ADDITIONAL_PARAMETERS_LIST = "ADDITIONAL_PARAMETERS_LIST"
