@@ -93,9 +93,7 @@ class UriWorkerMapProperties implements Configurator {
     defaultContentIfWouldBeEmpty(content)
 
     log.debug "${fileName}:"
-    log.debug "------------"
     log.debug content.toString()
-    log.debug "------------"
 
     return content.toString()
   }

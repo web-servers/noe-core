@@ -205,9 +205,7 @@ class ModJkConf implements Configurator {
     additionalLines.each { String line -> content.append(line) + nl }
 
     log.debug "${fileName}:"
-    log.debug "------------"
     log.debug content.toString()
-    log.debug "------------"
 
     return content.toString()
   }
