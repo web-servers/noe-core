@@ -1,7 +1,7 @@
 package noe.server.jk
 
 /**
- * TODO
+ * Specify operations over worker nodes within JK scenarios.
  */
 interface WorkerServer {
 

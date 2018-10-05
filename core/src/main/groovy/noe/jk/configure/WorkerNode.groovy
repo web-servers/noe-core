@@ -71,9 +71,15 @@ class WorkerNode<T extends WorkerServer> implements JkNode {
   }
 
   String getHost() {
-    if (host != null) return host
-    else if (server.getHost() != null && !server.getHost().isEmpty()) return server.getHost()
-    else return null
+    if (host != null) {
+      return host
+    }
+    else if (server.getHost()) {
+      return server.getHost()
+    }
+    else {
+      return null
+    }
   }
 
   WorkerNode setHost(String host) {

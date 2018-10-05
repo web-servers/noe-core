@@ -5,6 +5,14 @@ package noe.jk.configure
  */
 interface Configurator<E extends Configurator> {
 
+  /**
+   * Perform configuration
+   */
   E configure()
+
+  /**
+   * Revert to configured state before any configuration.
+   */
+  E revertAll()
 
 }

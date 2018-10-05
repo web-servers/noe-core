@@ -10,7 +10,7 @@ import groovy.util.logging.Slf4j
  */
 @Slf4j
 class BalancerNode implements JkNode {
-  public static final String DEFAULT_ID_PREFIX = 'balancer_'
+  protected static final String DEFAULT_ID_PREFIX = 'balancer_'
   private static int numberOfBalancers = 0
 
   String id

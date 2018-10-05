@@ -4,8 +4,8 @@ import groovy.util.logging.Slf4j
 import noe.server.ServerAbstract
 
 /**
- * Configure facing server in JK scenarios.<br/>
- * Specific FacingServer is given via 2nd paramenter `configurator` in constructor.
+ * The server acting as a load balancer for the worker server.<br/>
+ * Specific FacingServer is given via 2nd parameter `configurator` in constructor.
  *
  * @see DefaultHttpdConfigurator
  */
@@ -14,6 +14,7 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
 
   JkScenario jkScenario
   Class<? extends Configurator> configurator
+  List<Configurator> configurators = []
 
 
   FacingServerConfigurator(JkScenario jkScenario, Class<? extends Configurator> configurator) {
@@ -24,31 +25,43 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
   @Override
   FacingServerConfigurator configure() {
     if (jkScenario?.getFacingServerNode()?.getServer() == null) {
-      throw new IllegalStateException("Server was not set. Connector can not be configured.")
+      throw new IllegalStateException("Server was not set. Connector cannot be configured.")
     }
 
-    configurator.newInstance(jkScenario.getFacingServerNode()).configure()
+    configurators << configurator
+      .newInstance(jkScenario.getFacingServerNode())
+      .configure()
 
-    configureUriWorkersmap()
+    configureUriWorkerMap()
     configureWorkersProperties()
     configureFacingServer()
 
     return this
   }
 
-  private configureUriWorkersmap() {
+  @Override
+  FacingServerConfigurator revertAll() {
+    configurators.each { Configurator c -> c.revertAll() }
+
+    return this
+  }
+
+  private configureUriWorkerMap() {
     ServerAbstract facingServer = jkScenario.getFacingServerNode().getServer()
     List<BalancerNode> balancers = jkScenario.getBalancers()
     UriWorkerMapProperties uriWorkerMapProperties = jkScenario.getFacingServerNode().getUriWorkerMapProperties()
 
-    if (uriWorkerMapProperties.getFacingServer() == null) uriWorkerMapProperties.setFacingServer(facingServer)
+    if (uriWorkerMapProperties.getFacingServer() == null) {
+      uriWorkerMapProperties.setFacingServer(facingServer)
+    }
+
     uriWorkerMapProperties
         .setBalancers(balancers)
         .setWorkers(jkScenario.getWorkers())
         .setStatusWorkers(jkScenario.getStatusWorkers())
         .setAdditionalUrlMaps(jkScenario.getAdditionalUrlMaps())
 
-    uriWorkerMapProperties.configure()
+    configurators << uriWorkerMapProperties.configure()
   }
 
   private configureWorkersProperties() {
@@ -56,20 +69,23 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
     List<BalancerNode> balancers = jkScenario.getBalancers()
     WorkersProperties workersProperties = jkScenario.getFacingServerNode().getWorkersProperties()
 
-    if (workersProperties.getFacingServer() == null) workersProperties.setFacingServer(facingServer)
+    if (workersProperties.getFacingServer() == null) {
+      workersProperties.setFacingServer(facingServer)
+    }
+
     workersProperties
         .setBalancers(balancers)
         .setWorkers(jkScenario.getWorkers())
         .setStatusWorkers(jkScenario.getStatusWorkers())
 
-    workersProperties.configure()
+    configurators << workersProperties.configure()
   }
 
   private configureFacingServer() {
     FacingServerNode facingServerNode = jkScenario.getFacingServerNode()
 
     facingServerNode.getConfigurators().each { Configurator configurator ->
-      configurator.configure()
+      configurators << configurator.configure()
     }
   }
 

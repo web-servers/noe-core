@@ -1,6 +1,7 @@
 package noe.jk.configure
 
 import groovy.util.logging.Slf4j
+import noe.common.utils.FileStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.Platform
 import noe.server.ServerAbstract
@@ -30,6 +31,8 @@ class WorkersProperties implements Configurator {
   List<BalancerNode> balancers = []
   List<WorkerNode> workers = []
   List<StatusWorkerNode> statusWorkers = []
+
+  FileStateVault vault = new FileStateVault()
 
 
   String getFileName() {
@@ -74,7 +77,17 @@ class WorkersProperties implements Configurator {
 
   @Override
   WorkersProperties configure() {
-    JBFile.createFile(new File(retrieveFacingServerConfDeploymentPath(), fileName), content())
+    File workersProperties = new File(retrieveFacingServerConfDeploymentPath(), fileName)
+
+    vault.push(workersProperties)
+    JBFile.createFile(workersProperties, content())
+
+    return this
+  }
+
+  @Override
+  WorkersProperties revertAll() {
+    vault.popAll()
 
     return this
   }
@@ -127,10 +140,18 @@ class WorkersProperties implements Configurator {
     content.append(nl)
     content.append("worker.${worker.getId()}.type=${transformWorkerType(worker.getType())}" + nl)
 
-    if (worker.getHost() != null) content.append("worker.${worker.getId()}.host=${worker.getHost()}" + nl)
-    if (worker.getAjpPort() != null) content.append("worker.${worker.getId()}.port=${worker.getAjpPort()}" + nl)
-    if (worker.getlbFactor() != null) content.append("worker.${worker.getId()}.lbfactor=${worker.getlbFactor()}" + nl)
-    if (worker.getSocketTimeout() != null) content.append("worker.${worker.getId()}.socket_timeout=${worker.getSocketTimeout()}" + nl)
+    if (worker.getHost() != null) {
+      content.append("worker.${worker.getId()}.host=${worker.getHost()}" + nl)
+    }
+    if (worker.getAjpPort() != null) {
+      content.append("worker.${worker.getId()}.port=${worker.getAjpPort()}" + nl)
+    }
+    if (worker.getlbFactor() != null) {
+      content.append("worker.${worker.getId()}.lbfactor=${worker.getlbFactor()}" + nl)
+    }
+    if (worker.getSocketTimeout() != null) {
+      content.append("worker.${worker.getId()}.socket_timeout=${worker.getSocketTimeout()}" + nl)
+    }
   }
 
   private String transformWorkerType(WorkerNode.Type type) {
@@ -149,7 +170,9 @@ class WorkersProperties implements Configurator {
       content.append(nl)
       content.append("worker.${balancer.getId()}.type=lb" + nl)
       content.append("worker.${balancer.getId()}.balance_workers=${getBalancedWorkerIds(balancer).join(',')}" + nl)
-      if (balancer.getStickySession() != null) content.append("worker.${balancer.getId()}.sticky_session=${balancer.getStickySession()}" + nl)
+      if (balancer.getStickySession() != null) {
+        content.append("worker.${balancer.getId()}.sticky_session=${balancer.getStickySession()}" + nl)
+      }
 
       balancer.getWorkers().each { WorkerNode worker -> prepareWorker(content, worker) }
     }
@@ -165,8 +188,12 @@ class WorkersProperties implements Configurator {
     getStatusWorkers().each { StatusWorkerNode statusWorker ->
       content.append(nl)
       content.append("worker.${statusWorker.getId()}.type=status" + nl)
-      if (statusWorker.getCss() != null) content.append("worker.${statusWorker.getId()}.css=${statusWorker.getCss()}" + nl)
-      if (statusWorker.getReadOnly() != null) content.append("worker.${statusWorker.getId()}.read_only=${statusWorker.getReadOnly()}" + nl)
+      if (statusWorker.getCss() != null) {
+        content.append("worker.${statusWorker.getId()}.css=${statusWorker.getCss()}" + nl)
+      }
+      if (statusWorker.getReadOnly() != null) {
+        content.append("worker.${statusWorker.getId()}.read_only=${statusWorker.getReadOnly()}" + nl)
+      }
     }
   }
 

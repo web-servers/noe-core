@@ -11,15 +11,17 @@ import noe.tomcat.configure.TomcatConfigurator
 class DefaultTomcatWorkerConfigurator implements Configurator<DefaultTomcatWorkerConfigurator> {
 
   WorkerNode<Tomcat> workerNode
+  TomcatConfigurator configurator
 
 
   DefaultTomcatWorkerConfigurator(WorkerNode workerNode) {
     this.workerNode = workerNode
+    this.configurator = new TomcatConfigurator(workerNode.getServer())
   }
 
   @Override
   DefaultTomcatWorkerConfigurator configure() {
-    new TomcatConfigurator(workerNode.getServer())
+    configurator
         .httpConnector(new NonSecureHttpConnectorTomcat().setAddress(workerNode.getHost()))
         .ajpConnector(new AjpConnectorTomcat().setPort(workerNode.getAjpPort()))
         .jvmRoute(workerNode.getId())
@@ -27,4 +29,10 @@ class DefaultTomcatWorkerConfigurator implements Configurator<DefaultTomcatWorke
     return this
   }
 
+  @Override
+  DefaultTomcatWorkerConfigurator revertAll() {
+    configurator.revertAllConfiguration()
+
+    return this
+  }
 }

@@ -167,8 +167,12 @@ class StatusWorkerOperation {
   StatusWorkerOperation build() {
     StringBuilder c = new StringBuilder("?")
 
-    if (action != null) c.append("cmd=${transformAction(action)}&")
-    if (outputFormat != null) c.append("mime=${transformOutputType(outputFormat)}&")
+    if (action != null) {
+      c.append("cmd=${transformAction(action)}&")
+    }
+    if (outputFormat != null) {
+      c.append("mime=${transformOutputType(outputFormat)}&")
+    }
 
     if (balancerId != null) {
       c.append("w=${balancerId}&")

@@ -1,6 +1,7 @@
 package noe.jk.configure
 
 import groovy.util.logging.Slf4j
+import noe.common.utils.FileStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.Platform
 import noe.server.ServerAbstract
@@ -24,6 +25,10 @@ class UriWorkerMapProperties implements Configurator {
   Map<String, String> additionalUrlMaps = [:]
 
   DefaultEmptyUriWorkerMapProperties defaultEmptyUriWorkerMapProperties = new DefaultEmptyUriWorkerMapProperties()
+
+  String nl = new Platform().nl
+
+  FileStateVault vault = new FileStateVault()
 
 
   String getFileName() {
@@ -78,7 +83,17 @@ class UriWorkerMapProperties implements Configurator {
 
   @Override
   Configurator configure() {
-    JBFile.createFile(new File(retrieveFacingServerConfDeploymentPath(), fileName), content())
+    File uriWorkerMap = new File(retrieveFacingServerConfDeploymentPath(), fileName)
+
+    vault.push(uriWorkerMap)
+    JBFile.createFile(uriWorkerMap, content())
+
+    return this
+  }
+
+  @Override
+  UriWorkerMapProperties revertAll() {
+    vault.popAll()
 
     return this
   }
@@ -101,7 +116,7 @@ class UriWorkerMapProperties implements Configurator {
   private void workersContent(StringBuilder content) {
     getWorkers().each { WorkerNode worker ->
       worker.getUrlsMap().each { String url ->
-        content.append("${url}=${worker.getId()}" + new Platform().nl)
+        content.append("${url}=${worker.getId()}" + nl)
       }
     }
   }
@@ -109,21 +124,21 @@ class UriWorkerMapProperties implements Configurator {
   private void balancersContent(StringBuilder content) {
     getBalancers().each { BalancerNode balancer ->
       balancer.getUrlsMap().each { String url ->
-        content.append("${url}=${balancer.getId()}" + new Platform().nl)
+        content.append("${url}=${balancer.getId()}" + nl)
       }
     }
   }
 
   private void additionalUrlMapContent(StringBuilder content) {
     getAdditionalUrlMaps().each { String url, String workerName ->
-      content.append("${url}=${workerName}" + new Platform().nl)
+      content.append("${url}=${workerName}" + nl)
     }
   }
 
   private void statusWorkerContent(StringBuilder content) {
     getStatusWorkers().each { StatusWorkerNode statusWorker ->
       statusWorker.getUrlsMap().each { String url ->
-        content.append("${url}=${statusWorker.getId()}" + new Platform().nl)
+        content.append("${url}=${statusWorker.getId()}" + nl)
       }
     }
   }
@@ -151,7 +166,7 @@ class UriWorkerMapProperties implements Configurator {
         log.debug("No balaner nor worker specified, no url mapping specified.")
       }
 
-      content.append(new Platform().nl)
+      content.append(nl)
 
       return content.toString()
     }
@@ -161,7 +176,7 @@ class UriWorkerMapProperties implements Configurator {
         if (defaultSet) {
           log.warn("Mapping already set, ignoring all other nodes because it is not possible to resolve how to set url mapping. Please set url mapping for specified nodes explicitly.")
         } else {
-          content.append("/*=${worker.getId()}${new Platform().nl}")
+          content.append("/*=${worker.getId()}${nl}")
           defaultSet = true
         }
       }
@@ -173,7 +188,7 @@ class UriWorkerMapProperties implements Configurator {
           if (defaultSet) {
             log.warn("Mapping already set, ignoring all other balancers because it is not possible to resolve how to set url mapping. Please set url mapping for specified nodes explicitly.")
           } else {
-            content.append("/*=${balancer.getId()}${new Platform().nl}")
+            content.append("/*=${balancer.getId()}${nl}")
             defaultSet = true
           }
         }

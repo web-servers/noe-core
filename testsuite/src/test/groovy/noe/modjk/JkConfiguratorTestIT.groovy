@@ -12,11 +12,11 @@ import noe.jk.configure.DefaultHttpdConfigurator
 import noe.jk.configure.FacingServerNode
 import noe.jk.configure.JkScenario
 import noe.jk.configure.FacingServerConfigurator
+import noe.jk.configure.JkScenarioConfigurator
 import noe.jk.configure.NodeOperations
 import noe.jk.configure.StatusWorkerNode
 import noe.jk.configure.DefaultTomcatWorkerConfigurator
 import noe.jk.configure.StatusWorkerOperation
-import noe.jk.configure.WorkersConfigurator
 import noe.jk.configure.WorkerNode
 import noe.jk.configure.BalancerNode
 import noe.jk.configure.modjk.ModJkConf
@@ -28,6 +28,7 @@ import noe.server.ServerAbstract
 import noe.server.Tomcat
 import noe.workspace.IWorkspace
 import noe.workspace.ServersWorkspace
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,6 +44,7 @@ import static org.junit.Assume.assumeTrue
 class JkConfiguratorTestIT extends TestAbstract {
   static List<String> runOncePerParameterSet = []
 
+  JkScenarioConfigurator configurator
   JkClassInstancesCreator np
   boolean executeTest
 
@@ -102,6 +104,11 @@ class JkConfiguratorTestIT extends TestAbstract {
     np.prepareFacingServer()
   }
 
+  @After
+  void after() {
+    configurator?.revertAll()
+  }
+
   @Test
   void testDefaultSimpleProxy() {
     JkScenario scenario = new JkScenario()
@@ -109,6 +116,7 @@ class JkConfiguratorTestIT extends TestAbstract {
       .addWorker(new WorkerNode(workerServer1))
 
     NodeOperations ops = configureFacingServerAndWorkers(scenario)
+
     ops.startAll()
 
     testModJkLoaded(facingServer)
@@ -130,8 +138,8 @@ class JkConfiguratorTestIT extends TestAbstract {
         .addWorker(new WorkerNode(workerServer2)))
 
     NodeOperations ops = configureFacingServerAndWorkers(scenario)
-    ops.startAll()
 
+    ops.startAll()
 
     testModJkLoaded(facingServer)
     testDefaulBalancingtUriWorkersMap(facingServer)
@@ -153,6 +161,7 @@ class JkConfiguratorTestIT extends TestAbstract {
         .addStatusWorker(new StatusWorkerNode())
 
     NodeOperations ops = configureFacingServerAndWorkers(scenario)
+
     ops.startAll()
 
     testModJkLoaded(facingServer)
@@ -190,6 +199,7 @@ class JkConfiguratorTestIT extends TestAbstract {
       .setAdditionalUrlMaps(['!/admin|/admin/*':'*'])
 
     NodeOperations ops = configureFacingServerAndWorkers(scenario)
+
     ops.startAll()
 
     testModJkLoaded(facingServer)
@@ -222,19 +232,21 @@ class JkConfiguratorTestIT extends TestAbstract {
         .addStatusWorker(statusWorker)
 
     NodeOperations ops = configureFacingServerAndWorkers(scenario)
+
     ops.startAll()
 
     String res = new StatusWorkerOperation()
-        .setAction(StatusWorkerOperation.Action.LIST)
-        .setOutputFormat(StatusWorkerOperation.OutputFormat.TEXT)
-        .setBalancerId(balancerId)
-        .setAutomaticRefresh(1)
-        .setHost(facingServer.getHost())
-        .setPort(facingServer.getMainHttpPort())
-        .buildAndExecute()
-        .getLastResult()
+      .setAction(StatusWorkerOperation.Action.LIST)
+      .setOutputFormat(StatusWorkerOperation.OutputFormat.TEXT)
+      .setBalancerId(balancerId)
+      .setAutomaticRefresh(1)
+      .setHost(facingServer.getHost())
+      .setPort(facingServer.getMainHttpPort())
+      .buildAndExecute()
+      .getLastResult()
 
     assertTrue res.contains("name=${balancerId}")
+
     ops.stopAll()
   }
 
@@ -260,8 +272,12 @@ class JkConfiguratorTestIT extends TestAbstract {
   }
 
   private NodeOperations configureFacingServerAndWorkers(JkScenario scenario) {
-    new FacingServerConfigurator(scenario, np.retrieveFacingServerNodeConfiguratorClass()).configure()
-    new WorkersConfigurator(scenario, np.retrieveWorkerNodeConfiguratorClass()).configure()
+    this.configurator = new JkScenarioConfigurator(
+      scenario,
+      np.retrieveFacingServerNodeConfiguratorClass(),
+      np.retrieveWorkerNodeConfiguratorClass()
+    ).configure()
+
     new NodeOperations(scenario)
   }
 
@@ -514,7 +530,7 @@ class JkConfiguratorTestIT extends TestAbstract {
 
     String retrievePropertiesFileName() {
       if (workerServerClass == Tomcat.class) return "ews-test.properties"
-      else return "eap7-jbcs-test.properties"
+      else return "eap6-test.properties"
     }
 
     IWorkspace retrieveWorkspaceInstance() {

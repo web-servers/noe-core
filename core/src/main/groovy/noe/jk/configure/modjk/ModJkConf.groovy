@@ -1,6 +1,7 @@
 package noe.jk.configure.modjk
 
 import groovy.util.logging.Slf4j
+import noe.common.utils.FileStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.Platform
 import noe.jk.configure.Configurator
@@ -36,6 +37,8 @@ class ModJkConf implements Configurator {
   File jkMountFile
   File jkShmFile
   List<String> additionalLines
+
+  FileStateVault vault = new FileStateVault()
 
 
   String getFileName() {
@@ -182,7 +185,17 @@ class ModJkConf implements Configurator {
 
   @Override
   ModJkConf configure() {
-    JBFile.createFile(new File(retrieveHttpdConfDeploymentPath(), fileName), content())
+    File modJkConf = new File(retrieveHttpdConfDeploymentPath(), fileName)
+
+    vault.push(modJkConf)
+    JBFile.createFile(modJkConf, content())
+
+    return this
+  }
+
+  @Override
+  ModJkConf revertAll() {
+    vault.popAll()
 
     return this
   }
