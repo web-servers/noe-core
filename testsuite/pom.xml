@@ -1,0 +1,74 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>noe</groupId>
+        <artifactId>noe-core-parent</artifactId>
+        <version>0.16.10-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>noe-core-testsuite</artifactId>
+    <name>Noe core: Testsuite</name>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>noe</groupId>
+            <artifactId>noe-core</artifactId>
+        </dependency>
+
+        <!--JUnit dependencies-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito2</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
+                <configuration>
+                    <systemProperties>
+                        <logging.level>6</logging.level>
+                        <project.root.path>.</project.root.path>
+                        <host>127.0.0.1</host>
+                    </systemProperties>
+                    <reuseForks>false</reuseForks>
+                    <trimStackTrace>false</trimStackTrace>
+                    <runOrder>reversealphabetical</runOrder>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-eclipse-compiler</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

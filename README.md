@@ -1,2 +1,57 @@
-# noe-core
-Library for instalaltion and management of Java and native processes of Tomcat, Wildfly and Apache HTTP Server on various platforms.
+NOE core
+================
+
+Description
+-----------------
+It is a library containing functionality and abstraction to work with servers (start/stop/kill/configuration) in 
+a unified way.
+It also provides workspace management abstraction which is used to prepare the servers for further testing.
+It also contains common libraries such as file manipulation (copy, move, remove, unzip,..), web access and many more.
+
+
+Coding standards
+---------------------------------------------
+We use same coding standards like wildfly https://github.com/wildfly/wildfly-core/tree/master/ide-configs with these 
+exceptions:
+* indentation size is 2
+* continuation indentation is 4
+* maximum line length is 160 chars
+
+
+Versioning
+---------------------------------------------
+Version numbering is done in accordance to http://semver.org/spec/v2.0.0.html
+
+
+Release a snapshot
+---------------------------------------------
+Release is done using maven to internal JBoss QA maven repositories `mvn clean deploy`
+
+
+Release a new version
+---------------------------------------------
+Before releasing, don't forget to check, that integration tests are passing on all platforms, e.g. by checking CI job if it is set up.
+
+Releasing is done using the maven release plugin to internal JBoss QA maven repositories. To perform the release, use the following commands in a sequence:
+
+`mvn release:prepare -Pcomplete -Darguments="-DskipTests"` 
+
+`mvn release:perform -Pcomplete -Darguments="-DskipTests"`
+
+These commands automatically change versions, tags, and push the
+changes to the `jbossqe-eap/noe-core` repository.  Note that the commands exclude running tests; run the tests yourself before releasing.
+
+The `release:prepare` command generates temporary files. If you need to re-generate the temporary files without pushing new tags and versions, 
+run the following command:
+
+`mvn -DdryRun=true release:prepare -Pcomplete -Darguments="-DskipTests"` 
+
+To successfully perform the release, you must set username and password in the `settings.xml` file for the `jboss-qa-releases` server.
+
+Running integration testsuite
+--------------------------------------------
+`mvn clean verify -Pcomplete` where -Pcomplete stands for also building testsuite module
+
+To run single test run `mvn verify -Pcomplete -Dit.test=SomeTest`
+
+

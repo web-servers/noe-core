@@ -1,0 +1,149 @@
+if [ -d /usr/xpg4/bin ]
+then
+    PATH=/usr/xpg4/bin:$PATH
+    export PATH
+fi
+
+if type printf > /dev/null
+then
+    XBECHO="printf"
+elif [ -x /usr/ucb/echo ]; then
+    XBECHO="/usr/ucb/echo -n"
+else
+    XBECHO="echo"
+fi
+
+check_java_home="no"
+
+setattributes()
+{
+    chmod $1 "$4" 2>/dev/null || true
+    chown $2:$3 "$4" 2>/dev/null || true
+}
+
+dirattributes()
+{
+    if [ -d "$4" ]
+    then
+        chmod $1 "$4" 2>/dev/null || true
+        chown -R $2:$3 "$4" 2>/dev/null || true
+        (
+            cd "$4"
+            find . -type d -exec chmod $1 '{}' \;
+        )
+    fi
+}
+
+createsymlink()
+{
+    rm -rf $2 >/dev/null 2>&1 || true
+    ln -sf "$1" $2
+}
+
+createbasedir()
+{
+    if [ ! -d "$1" ]
+    then
+        mkdir -p "$1"
+        if [ $? -ne 0 ]; then
+            exit $?
+        fi
+    fi
+}
+
+copynoreplace()
+{
+    if [ -f "$1" ]
+    then
+        echo "Preserving file: $1"
+    else
+        sed "s;@installroot@;$INSTALL_ROOT;g" "$1.in" > "$1"
+    fi
+    rm "$1.in" 2> /dev/null || true
+}
+
+if [ ".$INSTALL_ROOT" = . ]
+then
+    c="`pwd`"
+    cd ..
+    INSTALL_ROOT="`pwd`"
+    cd $c
+    if [ "$INSTALL_ROOT" != "/opt/jboss-ews-2.1" ]
+    then
+        echo "WARNING: Using different root directory then \`/opt/jboss-ews-2.1'" >&2
+    fi
+fi
+#
+# Fix directory permissions
+#
+if [ -d "$INSTALL_ROOT" ]
+then
+    if [ -f "$INSTALL_ROOT/etc/.postinstall.done" ]
+    then
+        "Package \`' already installed in : \`$INSTALL_ROOT'" >&2
+        exit 17
+    else
+    (
+        cd "$INSTALL_ROOT"
+        find . -type d -exec chmod 755 '{}' \;
+    )
+    fi
+else
+    "Unknown package base directory : \`$INSTALL_ROOT'" >&2
+    exit 20
+fi
+
+if [ ".$LD_LIBRARY_PATH" = . ]
+then
+    LD_LIBRARY_PATH="$INSTALL_ROOT/lib"
+else
+    LD_LIBRARY_PATH="$INSTALL_ROOT/lib:$LD_LIBRARY_PATH"
+fi
+export LD_LIBRARY_PATH
+
+#
+# Apache Httpd post install script
+#
+
+dirattributes 0775 hudson hudson "$INSTALL_ROOT/var/www"
+createbasedir $INSTALL_ROOT/var/run
+createbasedir $INSTALL_ROOT/var/log/httpd
+createbasedir $INSTALL_ROOT/var/cache/mod_ssl
+createbasedir $INSTALL_ROOT/var/cache/mod_proxy
+createbasedir $INSTALL_ROOT/var/cache/mod_snmp
+createbasedir $INSTALL_ROOT/var/lock/subsys
+setattributes 0700 hudson $SUGID $INSTALL_ROOT/var/cache/mod_ssl
+for i in dir pag sem
+do
+    if [ ! -f $INSTALL_ROOT/var/cache/mod_ssl/scache.$i ]; then
+        touch $INSTALL_ROOT/var/cache/mod_ssl/scache.$i
+        setattributes 0600 hudson $SUGID $INSTALL_ROOT/var/cache/mod_ssl/scache.$i
+    fi
+done
+setattributes 0700 hudson $SUGID $INSTALL_ROOT/var/cache/mod_proxy
+setattributes 0700 hudson $SUGID $INSTALL_ROOT/var/log/httpd
+setattributes 0700 hudson $SUGID $INSTALL_ROOT/var/run
+setattributes 4510 hudson hudson $INSTALL_ROOT/sbin/suexec
+
+(
+    cd httpd
+    createsymlink ../../lib/httpd/modules modules
+    createsymlink $INSTALL_ROOT/var/log/httpd logs
+    createsymlink $INSTALL_ROOT/var/run run
+)
+
+(
+    # Copy .in files preserving existing
+    cd "$INSTALL_ROOT/etc/httpd/conf.d"
+    for f in ssl.conf welcome.conf manual.conf proxy_ajp.conf
+    do
+        copynoreplace $f
+    done
+    copynoreplace "$INSTALL_ROOT/etc/httpd/conf/httpd.conf"
+    copynoreplace "$INSTALL_ROOT/etc/mime.types"
+    copynoreplace "$INSTALL_ROOT/etc/sysconfig/httpd"
+    copynoreplace "$INSTALL_ROOT/etc/logrotate.d/httpd"
+    copynoreplace "$INSTALL_ROOT/var/www/error/noindex.html"
+    copynoreplace "$INSTALL_ROOT/sbin/apachectl"
+    chmod 775 "$INSTALL_ROOT/sbin/apachectl"
+)

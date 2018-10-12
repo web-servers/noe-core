@@ -1,0 +1,311 @@
+#!/bin/sh
+# Copyright(c) 2015 Red Hat, Inc.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library in the file COPYING.LIB;
+# if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+#
+# JBoss Web Server post install script
+#
+
+DEFAULT_LOCATION="/opt/jws-3.0"
+LIB_DIR="lib"
+
+if [ -d /usr/xpg4/bin ]
+then
+    PATH=/usr/xpg4/bin:$PATH
+    export PATH
+fi
+
+if type printf > /dev/null
+then
+    XBECHO="printf"
+elif [ -x /usr/ucb/echo ]; then
+    XBECHO="/usr/ucb/echo -n"
+else
+    XBECHO="echo"
+fi
+
+if [ ".`id -nu`" = .root ]
+then
+    SUGID="root"
+else
+    SUGID="`id -nu`"
+    echo "WARNING: This script should be run as superuser to create user \`tomcat' and directories in \`/var/'." >&2
+fi
+
+check_java_home="no"
+
+setattributes()
+{
+    chmod $1 "$4" 2>/dev/null || true
+    chown $2:$3 "$4" 2>/dev/null || true
+}
+
+dirattributes()
+{
+    if [ -d "$4" ]
+    then
+        chmod $1 "$4" 2>/dev/null || true
+        chown -R $2:$3 "$4" 2>/dev/null || true
+        (
+            cd "$4"
+            find . -type d -exec chmod $1 '{}' \;
+        )
+    fi
+}
+
+createsymlink()
+{
+    rm -rf $2 >/dev/null 2>&1 || true
+    ln -sf "$1" $2
+}
+
+createbasedir()
+{
+    if [ ! -d "$1" ]
+    then
+        mkdir -p "$1"
+        if [ $? -ne 0 ]; then
+            exit $?
+        fi
+    fi
+}
+
+copynoreplace()
+{
+    if [ -f "$1" ]
+    then
+        echo "Preserving file: $1"
+    else
+        sed "s;@installroot@;$INSTALL_ROOT;g" "$1.in" > "$1"
+    fi
+    rm "$1.in" 2> /dev/null || true
+}
+
+if [ ".$INSTALL_ROOT" = . ]
+then
+    c="`pwd`"
+    cd ..
+    INSTALL_ROOT="`pwd`"
+    cd $c
+    if [ "$INSTALL_ROOT" != "$DEFAULT_LOCATION" ]
+    then
+        echo "WARNING: Using different root directory then \`$DEFAULT_LOCATION'" >&2
+    fi
+fi
+#
+# Fix directory permissions
+#
+if [ -d "$INSTALL_ROOT" ]
+then
+    if [ -f "$INSTALL_ROOT/etc/.postinstall.tomcat.done" ]
+    then
+        echo "Skipping post install. Package is already installed in : \`$INSTALL_ROOT'" >&2
+        exit 17
+    else
+    (
+        cd "$INSTALL_ROOT"
+        find . -type d -exec chmod 755 '{}' \;
+    )
+    fi
+else
+    echo "Unknown package base directory : \`$INSTALL_ROOT'" >&2
+    exit 20
+fi
+
+if [ ".$LD_LIBRARY_PATH" = . ]
+then
+    LD_LIBRARY_PATH="$INSTALL_ROOT/$LIB_DIR"
+else
+    LD_LIBRARY_PATH="$INSTALL_ROOT/$LIB_DIR:$LD_LIBRARY_PATH"
+fi
+export LD_LIBRARY_PATH
+
+# Privileged execution
+# Add the "tomcat" user
+if [ ".$SUGID" = ".root" ]
+then
+    if [ ".$tomcat_uid" = . ]; then
+        tomcat_uid=91
+        tomcat_uiv=true
+    else
+        tomcat_uiv=false
+    fi
+    
+    tomcat_osu="`id -u tomcat 2>/dev/null`"
+    tomcat_osg="`id -g tomcat 2>/dev/null`"
+    if [ ".$tomcat_osg" = . ]; then
+        tomcat_osg=$tomcat_uid
+        /usr/sbin/groupadd -g $tomcat_osg tomcat 2> /dev/null || true
+        if [ $? -eq 0 ]; then
+            echo "Tomcat group (id=$tomcat_osg) created."
+        fi
+    elif $tomcat_uiv; then
+        echo "Tomcat group (id=$tomcat_osu) already exists."
+    fi
+    
+    createbasedir "$INSTALL_ROOT/var/tomcat"
+    dirattributes 0775 root tomcat "$INSTALL_ROOT/var/tomcat"
+    
+    if [ ".$tomcat_osu" = . ]; then
+        tomcat_osu=$tomcat_uid
+        /usr/sbin/useradd -c "Apache Tomcat" -u $tomcat_osu -g tomcat \
+            -s /bin/sh -m -d "$INSTALL_ROOT/var/tomcat" tomcat 2> /dev/null || true
+        if [ $? -eq 0 ]; then
+            echo "Tomcat  user (id=$tomcat_osu) created."
+        fi
+    elif $tomcat_uiv; then
+        echo "Tomcat user  (id=$tomcat_osu) already exists."
+    fi
+# Unprivileged execution
+else
+    echo "WARNING: Not a superuser. User and group \`tomcat' will not be created. User \`$SUGID' used instead." >&2
+    echo "WARNING: Not a superuser. Directories in \`/var/' will not be created. Using \`$INSTALL_ROOT/var/' instead." >&2
+fi
+
+#
+# Apache Tomcat7 and Tomcat8 post install script
+#
+TOMCATS="tomcat7 tomcat8"
+for TOMCAT in $TOMCATS
+do
+    if [ ".$JAVA_HOME" = . ]; then
+        check_java_home=yes
+    else
+        echo "Adding JAVA_HOME=$JAVA_HOME to the configuration ..."
+        cat << EOS >> "$INSTALL_ROOT/etc/sysconfig/$TOMCAT"
+
+#
+# Added by postinstall script
+JAVA_HOME="$JAVA_HOME"
+
+EOS
+    fi
+    test ".$INSTALL_ROOT" = "." && INSTALL_ROOT="`cd .. && pwd;`"
+
+    # Privileged execution
+    if [ ".$SUGID" = ".root" ]
+    then
+        createbasedir "/var/log/$TOMCAT"
+        for i in temp work
+        do
+            createbasedir "/var/cache/$TOMCAT/$i"
+            dirattributes 0775 root tomcat "/var/cache/$TOMCAT/$i"
+        done
+        dirattributes 0775 root tomcat "/var/cache/$TOMCAT"
+        setattributes 0775 root tomcat "/var/log/$TOMCAT"
+        setattributes 0775 root tomcat "$INSTALL_ROOT/share/$TOMCAT"
+        dirattributes 0775 root tomcat "$INSTALL_ROOT/share/$TOMCAT/webapps"
+        dirattributes 0775 root tomcat "$INSTALL_ROOT/share/$TOMCAT/server/webapps"
+        dirattributes 0775 root tomcat "$INSTALL_ROOT/share/$TOMCAT/conf"
+        setattributes 0660 root tomcat "$INSTALL_ROOT/share/$TOMCAT/conf/tomcat-users.xml"
+        if [ -d "$INSTALL_ROOT/share/$TOMCAT" ]; then
+            cd "$INSTALL_ROOT/share/$TOMCAT"
+            createsymlink "/var/log/$TOMCAT" logs
+            createsymlink "/var/cache/$TOMCAT/temp" temp
+            createsymlink "/var/cache/$TOMCAT/work" work
+            cd bin
+            createsymlink '../../java/commons-daemon-*.jar' commons-daemon.jar
+            cd ..
+        fi
+    # Unprivileged execution
+    else
+        createbasedir "$INSTALL_ROOT/var/log/$TOMCAT"
+        for i in temp work
+        do
+            createbasedir "$INSTALL_ROOT/var/cache/$TOMCAT/$i"
+            dirattributes 0775 $SUGID $SUGID "$INSTALL_ROOT/var/cache/$TOMCAT/$i"
+        done
+        dirattributes 0775 $SUGID $SUGID "$INSTALL_ROOT/var/cache/$TOMCAT"
+        setattributes 0775 $SUGID $SUGID "$INSTALL_ROOT/var/log/$TOMCAT"
+        setattributes 0775 $SUGID $SUGID "$INSTALL_ROOT/share/$TOMCAT"
+        dirattributes 0775 $SUGID $SUGID "$INSTALL_ROOT/share/$TOMCAT/webapps"
+        dirattributes 0775 $SUGID $SUGID "$INSTALL_ROOT/share/$TOMCAT/server/webapps"
+        dirattributes 0775 $SUGID $SUGID "$INSTALL_ROOT/share/$TOMCAT/conf"
+        setattributes 0660 $SUGID $SUGID "$INSTALL_ROOT/share/$TOMCAT/conf/tomcat-users.xml"
+        if [ -d "$INSTALL_ROOT/share/$TOMCAT" ]; then
+            cd "$INSTALL_ROOT/share/$TOMCAT"
+            createsymlink "$INSTALL_ROOT/var/log/$TOMCAT" logs
+            createsymlink "$INSTALL_ROOT/var/cache/$TOMCAT/temp" temp
+            createsymlink "$INSTALL_ROOT/var/cache/$TOMCAT/work" work
+            cd bin
+            createsymlink '../../java/commons-daemon-*.jar' commons-daemon.jar
+            cd ..
+        fi
+
+        # Unprivileged execution, set current user as TOMCAT_USER
+        echo "WARNING: Not a superuser. User \`$SUGID' used as TOMCAT_USER in $INSTALL_ROOT/etc/sysconfig/$TOMCAT." >&2
+        echo "TOMCAT_USER=$SUGID" >> "$INSTALL_ROOT/etc/sysconfig/$TOMCAT"
+    fi
+
+    for i in "$INSTALL_ROOT/sbin/$TOMCAT" \
+             "$INSTALL_ROOT/etc/sysconfig/$TOMCAT" \
+             "$INSTALL_ROOT/etc/logrotate.d/$TOMCAT" \
+             "$INSTALL_ROOT/share/$TOMCAT/bin/catalina.sh"
+    do
+        if [ -r "$i" ]
+        then
+          echo "Preserving file: $i"
+        else
+          sed "s;@installroot@;$INSTALL_ROOT;g" "$i.in" > "$i"
+        fi
+        rm "$i.in" 2> /dev/null || true
+    done
+    for i in "$INSTALL_ROOT/sbin/$TOMCAT" \
+             "$INSTALL_ROOT/share/$TOMCAT/bin/catalina.sh"
+    do
+        chmod 775 "$i"
+    done
+done
+
+#
+# Configure Solaris runtime linker environment
+#
+# Privileged execution
+if [ ".$SUGID" = ".root" ]
+then
+    if [ -x /usr/bin/crle ]
+    then
+        if [ ".$LIB_DIR" = ".lib64" ]
+        then
+            /usr/bin/crle -u -64 -l "$INSTALL_ROOT/$LIB_DIR"
+        else
+            /usr/bin/crle -u -l "$INSTALL_ROOT/$LIB_DIR"
+        fi
+    fi
+else
+    echo "WARNING: Not a superuser. Solaris runtime linker environment \`crle' was not updated." >&2
+fi
+
+if [ "$check_java_home" = "yes" ]
+then
+    if [ ".$JAVA_HOME" = . ]
+    then
+        echo ""
+        echo "-----------------------------------------------------------------------"
+        echo " NOTICE"
+        echo "-----------------------------------------------------------------------"
+        echo ""
+        echo " JAVA_HOME environment variable is not set."
+        echo " Either set the  JAVA_HOME  or edit the configuration"
+        echo " scripts inside \`$INSTALL_ROOT/etc/sysconfig' directory"
+        echo " and set the JAVA_HOME to the installed JDK location."
+        echo ""
+    fi
+fi
+
+touch "$INSTALL_ROOT/etc/.postinstall.tomcat.done"
+echo "Done"
+
