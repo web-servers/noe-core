@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>noe</groupId>
+    <artifactId>noe-core-parent</artifactId>
+    <version>0.16.10-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Noe core: Parent</name>
+
+    <modules>
+        <module>core</module>
+    </modules>
+
+    <scm>
+        <connection>scm:git:git@${env.GIT_URL}:${env.GIT_USER}/noe-core.git</connection>
+        <developerConnection>scm:git:git@${env.GIT_URL}:${env.GIT_USER}/noe-core.git</developerConnection>
+        <url>https://${env.GIT_URL}/${env.GIT_USER}/noe-core</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>jboss-qa-snapshots</id>
+            <name>JBoss QA snapshot repository</name>
+            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>jboss-qa-releases</id>
+            <name>JBoss QA release repository</name>
+            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases</url>
+        </repository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>jboss-qa-releases</id>
+            <name>JBoss QA release repository</name>
+            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases/</url>
+        </repository>
+        <repository>
+            <id>jboss-qa-snapshots</id>
+            <name>JBoss QA snapshot repository</name>
+            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots/</url>
+        </repository>
+        <repository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Maven Repository Group</name>
+            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>rh-ga-repository</id>
+            <name>Red Hat GA repository</name>
+            <url>https://maven.repository.redhat.com/ga/</url>
+        </repository>
+    </repositories>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <version.java>1.6</version.java>
+
+
+        <version.checkstyle-plugin>2.10</version.checkstyle-plugin>
+        <version.findbugs-plugin>2.5.5</version.findbugs-plugin>
+        <version.codenarc-plugin>0.18-1</version.codenarc-plugin>
+        <version.source-plugin>2.4</version.source-plugin>
+        <version.javadoc-plugin>2.10.3</version.javadoc-plugin>
+        <version.release-plugin>2.5.3</version.release-plugin>
+        <version.groovy-eclipse-compiler>2.9.0-01</version.groovy-eclipse-compiler>
+        <version.guava>17.0</version.guava>
+        <version.jgit>3.7.1.201504261725-r</version.jgit>
+
+        <version.java.jna>4.1.0</version.java.jna>
+
+        <net.sourceforge.htmlunit.version>2.15</net.sourceforge.htmlunit.version>
+        <!-- https://github.com/Karm/okhttp/tree/add_cipher_suites -->
+        <com.squareup.okhttp3.okhttp.version>3.5.0.l</com.squareup.okhttp3.okhttp.version>
+        <org.apache.ant.version>1.9.4</org.apache.ant.version>
+        <version.org.apache.maven.plugins.maven-surefire-plugin>2.17
+        </version.org.apache.maven.plugins.maven-surefire-plugin>
+        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.17
+        </version.org.apache.maven.plugins.maven-failsafe-plugin>
+        <junit.version>4.11</junit.version>
+        <org.codehaus.groovy.all.version>2.4.12</org.codehaus.groovy.all.version>
+        <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
+        <org.codehaus.groovy.compiler.version>2.9.2-01</org.codehaus.groovy.compiler.version>
+        <org.codehaus.groovy.batch.compiler.version>2.4.3-01</org.codehaus.groovy.batch.compiler.version>
+        <org.codehaus.mojo.build.helper.maven.plugin.version>1.9.1</org.codehaus.mojo.build.helper.maven.plugin.version>
+
+        <version.slfj-api>1.7.6</version.slfj-api>
+        <version.logback>1.1.2</version.logback>
+        <version.powermock>1.6.6</version.powermock>
+
+        <version.org.wildfly.extras.creaper>1.6.1</version.org.wildfly.extras.creaper>
+        <org.wildfly.core.version>4.0.0.Final</org.wildfly.core.version>
+        <org.jboss.as.creaper.dependencies.version>7.5.0.Final-redhat-21</org.jboss.as.creaper.dependencies.version>
+    </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>noe</groupId>
+                <artifactId>noe-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>noe</groupId>
+                <artifactId>noe-core-testsuite</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${version.java.jna}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.ant</groupId>
+                <artifactId>ant</artifactId>
+                <version>${org.apache.ant.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy-all</artifactId>
+                <version>${org.codehaus.groovy.all.version}</version>
+                <type>jar</type>
+            </dependency>
+
+            <dependency>
+                <groupId>net.sourceforge.htmlunit</groupId>
+                <artifactId>htmlunit</artifactId>
+                <version>${net.sourceforge.htmlunit.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${version.guava}</version>
+            </dependency>
+
+            <!-- logging dependencies -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${version.slfj-api}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${version.logback}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${com.squareup.okhttp3.okhttp.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-urlconnection</artifactId>
+                <version>${com.squareup.okhttp3.okhttp.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jgit</groupId>
+                <artifactId>org.eclipse.jgit</artifactId>
+                <version>${version.jgit}</version>
+            </dependency>
+
+
+            <!-- JUnit test dependencies -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${version.powermock}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito2</artifactId>
+                <version>${version.powermock}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Creaper -->
+            <dependency>
+                <groupId>org.wildfly.extras.creaper</groupId>
+                <artifactId>creaper-core</artifactId>
+                <version>${version.org.wildfly.extras.creaper}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.extras.creaper</groupId>
+                <artifactId>creaper-commands</artifactId>
+                <version>${version.org.wildfly.extras.creaper}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <source>${version.java}</source>
+                        <target>${version.java}</target>
+                        <compilerId>groovy-eclipse-compiler</compilerId>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-eclipse-compiler</artifactId>
+                            <version>${org.codehaus.groovy.compiler.version}</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>org.codehaus.groovy</groupId>
+                                    <artifactId>groovy-eclipse-batch</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                        <!--> Added due to groovy-eclipse-compiler with IBM JDK BUG http://jira.codehaus.org/browse/GRECLIPSE-1199 -->
+                        <dependency>
+                            <groupId>org.eclipse.core</groupId>
+                            <artifactId>org.eclipse.core.contenttype</artifactId>
+                            <version>3.4.100.v20100505-1235</version>
+                            <exclusions>
+                                <exclusion>
+                                    <artifactId>org.eclipse.equinox.preferences</artifactId>
+                                    <groupId>org.eclipse.equinox</groupId>
+                                </exclusion>
+                                <exclusion>
+                                    <artifactId>org.eclipse.equinox.registry</artifactId>
+                                    <groupId>org.eclipse.equinox</groupId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-eclipse-batch</artifactId>
+                            <version>${org.codehaus.groovy.batch.compiler.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${org.codehaus.mojo.build.helper.maven.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>add-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/main/groovy</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-test-source</id>
+                            <phase>generate-test-sources</phase>
+                            <goals>
+                                <goal>add-test-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/test/groovy</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${version.source-plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${version.javadoc-plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${version.release-plugin}</version>
+                    <configuration>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <tagNameFormat>v@{project.version}</tagNameFormat>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
+                    <configuration>
+                        <systemPropertyVariables combine.children="append">
+                            <JDBCLoader.URL>http://exampleurl.com</JDBCLoader.URL>
+                        </systemPropertyVariables>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.surefire</groupId>
+                            <artifactId>surefire-junit47</artifactId>
+                            <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.surefire</groupId>
+                            <artifactId>surefire-junit47</artifactId>
+                            <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
+                        </dependency>
+                    </dependencies>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-eclipse-compiler</artifactId>
+                    <version>${version.groovy-eclipse-compiler}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+    </build>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>codenarc-maven-plugin</artifactId>
+                <version>${version.codenarc-plugin}</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <profiles>
+        <!-- profile for CI takes much longer to run -->
+        <profile>
+            <id>complete</id>
+            <modules>
+                <module>testsuite</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>release</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>jdk8</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jdk7_eap6-as7</id>
+            <activation>
+                <jdk>[1.6,1.7]</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-controller-client</artifactId>
+                    <scope>provided</scope>
+                    <version>${org.jboss.as.creaper.dependencies.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jboss.as</groupId>
+                    <artifactId>jboss-as-cli</artifactId>
+                    <scope>provided</scope>
+                    <version>${org.jboss.as.creaper.dependencies.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jdk8_eap7-wildfly12</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.wildfly.core</groupId>
+                    <artifactId>wildfly-controller-client</artifactId>
+                    <scope>provided</scope>
+                    <version>${org.wildfly.core.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.wildfly.core</groupId>
+                    <artifactId>wildfly-cli</artifactId>
+                    <scope>provided</scope>
+                    <version>${org.wildfly.core.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>

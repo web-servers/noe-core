@@ -1,0 +1,304 @@
+#!/bin/sh
+# Copyright(c) 2015 Red Hat, Inc.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library in the file COPYING.LIB;
+# if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+#
+# JBoss Web Server post install script
+#
+
+DEFAULT_LOCATION="/opt/jws-3.0"
+LIB_DIR="lib"
+
+if [ -d /usr/xpg4/bin ]
+then
+    PATH=/usr/xpg4/bin:$PATH
+    export PATH
+fi
+
+if type printf > /dev/null
+then
+    XBECHO="printf"
+elif [ -x /usr/ucb/echo ]; then
+    XBECHO="/usr/ucb/echo -n"
+else
+    XBECHO="echo"
+fi
+
+if [ ".`id -nu`" = .root ]
+then
+    SUGID="root"
+else
+    SUGID="`id -nu`"
+    echo "WARNING: This script should be run as superuser to create user \`apache' and directories in \`/var/'." >&2
+fi
+
+check_java_home="no"
+
+setattributes()
+{
+    chmod $1 "$4" 2>/dev/null || true
+    chown $2:$3 "$4" 2>/dev/null || true
+}
+
+dirattributes()
+{
+    if [ -d "$4" ]
+    then
+        chmod $1 "$4" 2>/dev/null || true
+        chown -R $2:$3 "$4" 2>/dev/null || true
+        (
+            cd "$4"
+            find . -type d -exec chmod $1 '{}' \;
+        )
+    fi
+}
+
+createsymlink()
+{
+    rm -rf $2 >/dev/null 2>&1 || true
+    ln -sf "$1" $2
+}
+
+createbasedir()
+{
+    if [ ! -d "$1" ]
+    then
+        mkdir -p "$1"
+        if [ $? -ne 0 ]; then
+            exit $?
+        fi
+    fi
+}
+
+copynoreplace()
+{
+    if [ -f "$1".in ]
+    then
+        if [ -f "$1" ]
+        then
+            echo "Preserving file: $1"
+        else
+            sed "s;@installroot@;$INSTALL_ROOT;g" "$1.in" > "$1"
+        fi
+        rm "$1.in" 2> /dev/null || true
+    fi
+}
+
+copydoreplace()
+{
+    if [ -f "$1" ]
+    then
+        sed "s;@installroot@;$INSTALL_ROOT;g" "$1" > "$1.tmp"
+        mv "$1.tmp" "$1" 2> /dev/null || true
+    fi
+}
+
+if [ ".$INSTALL_ROOT" = . ]
+then
+    c="`pwd`"
+    cd ..
+    INSTALL_ROOT="`pwd`"
+    cd $c
+    if [ "$INSTALL_ROOT" != "$DEFAULT_LOCATION" ]
+    then
+        echo "WARNING: Using different root directory then \`$DEFAULT_LOCATION'" >&2
+    fi
+fi
+#
+# Fix directory permissions
+#
+if [ -d "$INSTALL_ROOT" ]
+then
+    if [ -f "$INSTALL_ROOT/etc/.postinstall.httpd.done" ]
+    then
+        echo "Skipping post install. Package is already installed in : \`$INSTALL_ROOT'" >&2
+        exit 17
+    else
+    (
+        cd "$INSTALL_ROOT"
+        find . -type d -exec chmod 755 '{}' \;
+    )
+    fi
+else
+    echo "Unknown package base directory : \`$INSTALL_ROOT'" >&2
+    exit 20
+fi
+
+if [ ".$LD_LIBRARY_PATH" = . ]
+then
+    LD_LIBRARY_PATH="$INSTALL_ROOT/$LIB_DIR"
+else
+    LD_LIBRARY_PATH="$INSTALL_ROOT/$LIB_DIR:$LD_LIBRARY_PATH"
+fi
+export LD_LIBRARY_PATH
+
+#
+# Apache Httpd post install script
+
+# Privileged execution
+# Add the "apache" user
+if [ ".$SUGID" = ".root" ]
+then
+    apache_uid=48
+
+    apache_osu="`id -u apache 2>/dev/null`"
+    apache_osg="`id -g apache 2>/dev/null`"
+    if [ ".$apache_osg" = . ]
+    then
+        apache_osg=$apache_uid
+        /usr/sbin/groupadd -g $apache_osg apache 2> /dev/null || true
+        if [ $? -eq 0 ]
+        then
+            echo "Apache group (id=$apache_osg) created."
+        fi
+    else
+        echo "Apache group (id=$apache_osu) already exists."
+    fi
+    dirattributes 0775 root apache "$INSTALL_ROOT/var/www"
+    if [ ".$apache_osu" = . ]
+    then
+        apache_osu=$apache_uid
+        /usr/sbin/useradd -c "Apache" -u $apache_osu -g apache \
+            -s /bin/sh -m -d "$INSTALL_ROOT/var/www" apache  2> /dev/null || true
+        if [ $? -eq 0 ]
+        then
+            echo "Apache user  (id=$apache_osu) created."
+        fi
+    else
+        echo "Apache user  (id=$apache_osu) already exists."
+    fi
+
+    createbasedir /var/log/httpd
+    createbasedir /var/cache/httpd
+    createbasedir /var/lock/subsys
+    createbasedir /var/run/httpd
+
+    setattributes 0700 apache $SUGID /var/cache/httpd
+    for i in dir pag sem
+    do
+        if [ ! -f /var/cache/httpd/sslcache.$i ]; then
+            touch /var/cache/httpd/sslcache.$i
+            setattributes 0600 apache $SUGID /var/cache/httpd/sslcache.$i
+        fi
+    done
+    setattributes 0700 apache $SUGID /var/run/httpd
+    setattributes 0700 root $SUGID /var/log/httpd
+    setattributes 4510 root apache "$INSTALL_ROOT/sbin/suexec"
+    
+    (
+        cd httpd
+        createsymlink "../../$LIB_DIR/httpd/modules" modules
+        createsymlink /var/log/httpd logs
+        createsymlink /var/run/httpd run
+    )
+
+# Unprivileged execution
+else
+    echo "WARNING: Not a superuser. User and group \`apache' will not be created. User \`$SUGID' used instead." >&2
+    echo "WARNING: Not a superuser. Directories in \`/var/' will not be created. Using \`$INSTALL_ROOT/var/' instead." >&2
+
+    dirattributes 0775 $SUGID $SUGID "$INSTALL_ROOT/var/www"
+    createbasedir "$INSTALL_ROOT/var/log/httpd"
+    createbasedir "$INSTALL_ROOT/var/cache/httpd"
+    createbasedir "$INSTALL_ROOT/var/lock/subsys"
+    createbasedir "$INSTALL_ROOT/var/run/httpd"
+    setattributes 0700 $SUGID $SUGID "$INSTALL_ROOT/var/cache/httpd"
+    for i in dir pag sem
+    do
+        if [ ! -f "$INSTALL_ROOT/var/cache/httpd/sslcache.$i" ]; then
+            touch "$INSTALL_ROOT/var/cache/httpd/sslcache.$i"
+            setattributes 0600 $SUGID $SUGID "$INSTALL_ROOT/var/cache/httpd/sslcache.$i"
+        fi
+    done
+    setattributes 0700 $SUGID $SUGID /var/run/httpd
+    setattributes 0700 $SUGID $SUGID /var/log/httpd
+    setattributes 4510 $SUGID $SUGID "$INSTALL_ROOT/sbin/suexec"
+    (
+        cd httpd
+        createsymlink "../../$LIB_DIR/httpd/modules" modules
+        createsymlink "$INSTALL_ROOT/var/log/httpd" logs
+        createsymlink "$INSTALL_ROOT/var/run/httpd" run
+    )
+fi
+
+(
+    sslcert="$INSTALL_ROOT/etc/ssl/certs/localhost.crt"
+    sslpkey="$INSTALL_ROOT/etc/ssl/private/localhost.key"
+    sslconf="$INSTALL_ROOT/etc/ssl/openssl.cnf"
+    sserial=$RANDOM
+    if [ ".$sserial" = . ]
+    then
+        sserial=$$
+    fi
+    umask 077
+    if [ ! -f "$sslpkey" ]
+    then
+        $XBECHO "Generating private RSA key ... "
+        $INSTALL_ROOT/bin/openssl genrsa -rand 1024 > "$sslpkey" 2> /dev/null
+        if [ $? -eq 0 ]; then echo "OK" ; else echo "Failed: -$?" ; fi
+    fi
+    FQDN=`hostname`
+    if [ ".$FQDN" = . ]
+    then
+        FQDN=localhost.localdomain
+    fi
+
+    if [ ! -f "$sslcert" ]
+    then
+        $XBECHO "Generating new $FQDN certificate ... "
+        cat << EOH | $INSTALL_ROOT/bin/openssl req -new -config "$sslconf" -key "$sslpkey" \
+            -x509 -days 365 -set_serial $sserial \
+            -out "$sslcert" 2>/dev/null
+--
+SomeState
+SomeCity
+SomeOrganization
+SomeOrganizationalUnit
+$FQDN
+root@$FQDN
+EOH
+        if [ $? -eq 0 ]; then echo "OK" ; else echo "Failed: -$?" ; fi
+    fi
+)
+
+(
+    # Copy .in files preserving existing
+    cd "$INSTALL_ROOT/etc/httpd/conf.d"
+    for f in ssl.conf welcome.conf manual.conf proxy_ajp.conf mod_cluster.conf
+    do
+        copynoreplace $f
+    done
+    copynoreplace "$INSTALL_ROOT/etc/httpd/conf/httpd.conf"
+    copynoreplace "$INSTALL_ROOT/etc/mime.types"
+    copynoreplace "$INSTALL_ROOT/etc/sysconfig/httpd"
+    copynoreplace "$INSTALL_ROOT/etc/logrotate.d/httpd"
+    copynoreplace "$INSTALL_ROOT/var/www/error/noindex.html"
+    copynoreplace "$INSTALL_ROOT/sbin/apachectl"
+    chmod 775 "$INSTALL_ROOT/sbin/apachectl"
+)
+
+# In case of unprivileged execution, change Apache Httpd server user
+if [ "$SUGID" != "root" ]
+then
+    sed "s;^User apache;User $SUGID;g" "$INSTALL_ROOT/etc/httpd/conf/httpd.conf" > "$INSTALL_ROOT/etc/httpd/conf/httpd.conf.tmp"
+    mv "$INSTALL_ROOT/etc/httpd/conf/httpd.conf.tmp" "$INSTALL_ROOT/etc/httpd/conf/httpd.conf" 2> /dev/null || true
+    sed "s;^Group apache;Group $SUGID;g" "$INSTALL_ROOT/etc/httpd/conf/httpd.conf" > "$INSTALL_ROOT/etc/httpd/conf/httpd.conf.tmp"
+    mv "$INSTALL_ROOT/etc/httpd/conf/httpd.conf.tmp" "$INSTALL_ROOT/etc/httpd/conf/httpd.conf" 2> /dev/null || true
+fi
+
+touch "$INSTALL_ROOT/etc/.postinstall.httpd.done"
+echo "Done."
+

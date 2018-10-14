@@ -1,0 +1,38 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+<!--  Service manifest for Apache Tomcat -->
+<service_bundle type='manifest' name='tomcat6:tomcat6'>
+    <service name='network/tomcat6'
+             type='service'
+             version='1'>
+         <create_default_instance enabled='false' />
+         <single_instance />
+         <dependency name='fs'
+                     grouping='require_all'
+                     restart_on='none'
+                     type='service'>
+              <service_fmri value='svc:/system/filesystem/local' />
+         </dependency>
+         <dependency name='net'
+                     grouping='require_all'
+                     restart_on='none'
+                     type='service'>
+              <service_fmri value='svc:/network/loopback' />
+           </dependency>
+           <exec_method type='method'
+                        name='start'
+                        exec='/opt/jboss-ews-2.0/sbin/tomcat6 start'
+                        timeout_seconds='-1'>
+           </exec_method>
+           <exec_method type='method'
+                        name='stop'
+                        exec='/opt/jboss-ews-2.0/sbin/tomcat6 stop'
+                        timeout_seconds='-1'>
+           </exec_method>
+           <exec_method type='method'
+                        name='restart'
+                        exec='/opt/jboss-ews-2.0/sbin/tomcat6 restart'
+                        timeout_seconds='-1'>
+           </exec_method>
+    </service>
+</service_bundle>

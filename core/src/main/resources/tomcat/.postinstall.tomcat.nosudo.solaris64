@@ -1,0 +1,250 @@
+if [ -d /usr/xpg4/bin ]
+then
+    PATH=/usr/xpg4/bin:$PATH
+    export PATH
+fi
+
+if type printf > /dev/null
+then
+    XBECHO="printf"
+elif [ -x /usr/ucb/echo ]; then
+    XBECHO="/usr/ucb/echo -n"
+else
+    XBECHO="echo"
+fi
+
+check_java_home="no"
+
+setattributes()
+{
+    chmod $1 "$4" 2>/dev/null || true
+    chown $2:$3 "$4" 2>/dev/null || true
+}
+
+dirattributes()
+{
+    if [ -d "$4" ]
+    then
+        chmod $1 "$4" 2>/dev/null || true
+        chown -R $2:$3 "$4" 2>/dev/null || true
+        (
+            cd "$4"
+            find . -type d -exec chmod $1 '{}' \;
+        )
+    fi
+}
+
+createsymlink()
+{
+    rm -rf $2 >/dev/null 2>&1 || true
+    ln -sf "$1" $2
+}
+
+createbasedir()
+{
+    if [ ! -d "$1" ]
+    then
+        mkdir -p "$1"
+        if [ $? -ne 0 ]; then
+            exit $?
+        fi
+    fi
+}
+
+copynoreplace()
+{
+    if [ -f "$1" ]
+    then
+        echo "Preserving file: $1"
+    else
+        sed "s;@installroot@;$INSTALL_ROOT;g" "$1.in" > "$1"
+    fi
+    rm "$1.in" 2> /dev/null || true
+}
+
+if [ ".$INSTALL_ROOT" = . ]
+then
+    c="`pwd`"
+    cd ..
+    INSTALL_ROOT="`pwd`"
+    cd $c
+    if [ "$INSTALL_ROOT" != "/opt/jboss-ews-2.1" ]
+    then
+        echo "WARNING: Using different root directory then \`/opt/jboss-ews-2.1'" >&2
+    fi
+fi
+#
+# Fix directory permissions
+#
+if [ -d "$INSTALL_ROOT" ]
+then
+    if [ -f "$INSTALL_ROOT/etc/.postinstall.done" ]
+    then
+        "Package \`' already installed in : \`$INSTALL_ROOT'" >&2
+        exit 17
+    else
+    (
+        cd "$INSTALL_ROOT"
+        find . -type d -exec chmod 755 '{}' \;
+    )
+    fi
+else
+    "Unknown package base directory : \`$INSTALL_ROOT'" >&2
+    exit 20
+fi
+
+if [ ".$LD_LIBRARY_PATH" = . ]
+then
+    LD_LIBRARY_PATH="$INSTALL_ROOT/lib64"
+else
+    LD_LIBRARY_PATH="$INSTALL_ROOT/lib64:$LD_LIBRARY_PATH"
+fi
+export LD_LIBRARY_PATH
+
+createbasedir "$INSTALL_ROOT/var/tomcat"
+dirattributes 0775 hudson hudson "$INSTALL_ROOT/var/tomcat"
+
+#
+# Apache Tomcat6 post install script
+#
+if [ ".$JAVA_HOME" = . ]; then
+    check_java_home=yes
+else
+    echo "Adding JAVA_HOME=$JAVA_HOME to the configuration ..."
+    cat << EOS >> "$INSTALL_ROOT/etc/sysconfig/tomcat6"
+
+#
+# Added by postinstall script
+JAVA_HOME="$JAVA_HOME"
+
+EOS
+fi
+
+createbasedir $INSTALL_ROOT/var/log/tomcat6
+for i in temp work
+do
+    createbasedir $INSTALL_ROOT/var/cache/tomcat6/$i
+    dirattributes 0775 hudson hudson $INSTALL_ROOT/var/cache/tomcat6/$i
+done
+dirattributes 0775 hudson hudson $INSTALL_ROOT/var/cache/tomcat6
+setattributes 0775 hudson hudson $INSTALL_ROOT/var/log/tomcat6
+setattributes 0775 hudson hudson $INSTALL_ROOT/share/tomcat6
+dirattributes 0775 hudson hudson $INSTALL_ROOT/share/tomcat6/webapps
+dirattributes 0775 hudson hudson $INSTALL_ROOT/share/tomcat6/server/webapps
+dirattributes 0775 hudson hudson $INSTALL_ROOT/share/tomcat6/conf
+setattributes 0660 hudson hudson $INSTALL_ROOT/share/tomcat6/conf/tomcat-users.xml
+if [ -d "$INSTALL_ROOT/share/tomcat6" ]; then
+    cd "$INSTALL_ROOT/share/tomcat6"
+    createsymlink $INSTALL_ROOT/var/log/tomcat6 logs
+    createsymlink $INSTALL_ROOT/var/cache/tomcat6/temp temp
+    createsymlink $INSTALL_ROOT/var/cache/tomcat6/work work
+    cd bin
+    createsymlink ../../java/commons-daemon-1.0.15-redhat-1.jar commons-daemon.jar
+    cd ..
+fi
+
+for i in $INSTALL_ROOT/sbin/tomcat6 \
+         $INSTALL_ROOT/etc/sysconfig/tomcat6 \
+         $INSTALL_ROOT/etc/logrotate.d/tomcat6 \
+         $INSTALL_ROOT/share/tomcat6/bin/catalina.sh
+do
+    if [ -r $i ]
+    then
+      echo "Preserving file: $i"
+    else
+      sed "s;@installroot@;$INSTALL_ROOT;g" $i.in > $i
+    fi
+    rm $i.in 2> /dev/null || true
+done
+for i in $INSTALL_ROOT/sbin/tomcat6 \
+         $INSTALL_ROOT/share/tomcat6/bin/catalina.sh
+do
+    chmod 775 $i
+done
+
+#
+# Apache Tomcat7 post install script
+#
+if [ ".$JAVA_HOME" = . ]; then
+    check_java_home=yes
+else
+    echo "Adding JAVA_HOME=$JAVA_HOME to the configuration ..."
+    cat << EOS >> "$INSTALL_ROOT/etc/sysconfig/tomcat7"
+
+#
+# Added by postinstall script
+JAVA_HOME="$JAVA_HOME"
+
+EOS
+fi
+
+test ".$INSTALL_ROOT" = "." && INSTALL_ROOT="`cd .. && pwd;`"
+createbasedir $INSTALL_ROOT/var/log/tomcat7
+for i in temp work
+do
+    createbasedir $INSTALL_ROOT/var/cache/tomcat7/$i
+    dirattributes 0775 hudson hudson $INSTALL_ROOT/var/cache/tomcat7/$i
+done
+dirattributes 0775 hudson hudson $INSTALL_ROOT/var/cache/tomcat7
+setattributes 0775 hudson hudson $INSTALL_ROOT/var/log/tomcat7
+setattributes 0775 hudson hudson $INSTALL_ROOT/share/tomcat7
+dirattributes 0775 hudson hudson $INSTALL_ROOT/share/tomcat7/webapps
+dirattributes 0775 hudson hudson $INSTALL_ROOT/share/tomcat7/server/webapps
+dirattributes 0775 hudson hudson $INSTALL_ROOT/share/tomcat7/conf
+setattributes 0660 hudson hudson $INSTALL_ROOT/share/tomcat7/conf/tomcat-users.xml
+if [ -d "$INSTALL_ROOT/share/tomcat7" ]; then
+    cd "$INSTALL_ROOT/share/tomcat7"
+    createsymlink $INSTALL_ROOT/var/log/tomcat7 logs
+    createsymlink $INSTALL_ROOT/var/cache/tomcat7/temp temp
+    createsymlink $INSTALL_ROOT/var/cache/tomcat7/work work
+    cd bin
+    createsymlink ../../java/commons-daemon-1.0.15-redhat-1.jar commons-daemon.jar
+    cd ..
+fi
+
+for i in $INSTALL_ROOT/sbin/tomcat7 \
+         $INSTALL_ROOT/etc/sysconfig/tomcat7 \
+         $INSTALL_ROOT/etc/logrotate.d/tomcat7 \
+         $INSTALL_ROOT/share/tomcat7/bin/catalina.sh
+do
+    if [ -r $i ]
+    then
+      echo "Preserving file: $i"
+    else
+      sed "s;@installroot@;$INSTALL_ROOT;g" $i.in > $i
+    fi
+    rm $i.in 2> /dev/null || true
+done
+for i in $INSTALL_ROOT/sbin/tomcat7 \
+         $INSTALL_ROOT/share/tomcat7/bin/catalina.sh
+do
+    chmod 775 $i
+done
+
+#
+# Configure Solaris runtime linker environment
+#
+if [ -x /usr/bin/crle ]
+then
+    /usr/bin/crle -u -64 -l $INSTALL_ROOT/lib64
+fi
+
+if [ "$check_java_home" = "yes" ]
+then
+    if [ ".$JAVA_HOME" = . ]
+    then
+        echo ""
+
+        echo "-----------------------------------------------------------------------"
+        echo " NOTICE"
+        echo "-----------------------------------------------------------------------"
+        echo ""
+        echo " JAVA_HOME environment variable is not set."
+        echo " Either set the  JAVA_HOME  or edit the configuration"
+        echo " scripts inside \`$INSTALL_ROOT/etc/sysconfig' directory"
+        echo " and set the JAVA_HOME to the installed JDK location."
+        echo ""
+    fi
+fi
+
+# End of JBoss Enterprise Web Server post install script
