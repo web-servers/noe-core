@@ -1,6 +1,7 @@
 package noe.common.utils
 
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.StreamConsumer
 import noe.common.newcmd.CmdCommand
 import noe.common.newcmd.KillCmdBuilder
@@ -445,7 +446,7 @@ public class Cmd {
   static Integer getJavaPid(String id) {
     if (!platform.isWindows()) {
       def p
-      def jps = Library.getUniversalProperty('JAVA_HOME') + "${platform.sep}bin${platform.sep}jps"
+      def jps = DefaultProperties.JAVA_HOME + "${platform.sep}bin${platform.sep}jps"
       // This only eaps running under actual user, if sudo allowed, then kills all instances in system.
       try {
         if (!platform.isWindows()) {
@@ -706,7 +707,7 @@ public class Cmd {
       psCommand = ['ps', '-ef']
       psRegExp = ~/^[ a-z]*[ ]*([0-9]*)[ ]*[0-9]*.*/
     }
-    def jps = Library.getUniversalProperty('JAVA_HOME') + "${platform.sep}bin${platform.sep}jps"
+    def jps = DefaultProperties.JAVA_HOME + "${platform.sep}bin${platform.sep}jps"
     def jpsCommand = ['jps', '-mlvV']
     def jpsRegExp = ~/(\d+)\s+.*/
 

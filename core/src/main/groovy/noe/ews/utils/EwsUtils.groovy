@@ -295,7 +295,8 @@ class EwsUtils extends InstallerUtils {
         commands += [
             ['/bin/sh', '-c', "''chmod -R ugo+rwx ${basedir}/${ServerEws.getPrefix()}/tomcat/conf''"],
             ['/bin/sh', '-c', "''chmod g+s ${basedir}/${ServerEws.getPrefix()}/tomcat/webapps''"],
-            ['/bin/sh', '-c', "''chmod o+w ${basedir}/${ServerEws.getPrefix()}/tomcat''"]
+            ['/bin/sh', '-c', "''chmod o+w ${basedir}/${ServerEws.getPrefix()}/tomcat''"],
+            ['/bin/sh', '-c', "''chmod o+w ${basedir}/${ServerEws.getPrefix()}/tomcat/bin/setenv.sh''"]
         ]
       } else {
         commands += [
@@ -448,7 +449,8 @@ class EwsUtils extends InstallerUtils {
    */
   void setJavaHomeTomcatSolaris() {
     File sysConfFile = null
-    String javaHome = Library.getUniversalProperty('JAVA_HOME')
+    String javaHome = (DefaultProperties.SERVER_JAVA_HOME) ?
+        DefaultProperties.SERVER_JAVA_HOME : DefaultProperties.JAVA_HOME
 
     log.debug "JAVA_HOME ${javaHome}"
 
