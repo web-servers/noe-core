@@ -1108,6 +1108,7 @@ class JBFile {
             break
           case 's':
             tmpPerm += 1
+          case 'l':
           case 'S':
           case 'L':
             special += (it == 2) ? 4 : 2
