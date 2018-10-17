@@ -119,12 +119,13 @@ class RpmTomcatEnvVarsFileFactory {
     }
 
     private boolean isCurrentJwsMajorVersion(int majorVersion) {
+      Boolean ret = false
       String versionStr = Library.getUniversalProperty('ews.version')
 
       try {
-        return new Version(versionStr).getMajorVersion() == majorVersion
+        ret = new Version(versionStr).getMajorVersion() == majorVersion
       } finally {
-        return false
+        return ret
       }
     }
   }
