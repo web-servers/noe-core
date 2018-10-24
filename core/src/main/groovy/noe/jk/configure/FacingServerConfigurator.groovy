@@ -4,10 +4,14 @@ import groovy.util.logging.Slf4j
 import noe.server.ServerAbstract
 
 /**
- * The server acting as a load balancer for the worker server.<br/>
- * Specific FacingServer is given via 2nd parameter `configurator` in constructor.
+ * Common configuration for all types of balancers (Httpd, IIS, iPlanet).
+ * Prepares `uriworkermap.conf` and `workers.properties`. And let the server perform
+ * it's specific mod_jk configuration.
+ *
+ * Specific facing server is given via 2nd parameter `configurator` in constructor.
  *
  * @see DefaultHttpdConfigurator
+ * @see DefaultAS7WorkerConfigurator
  */
 @Slf4j
 class FacingServerConfigurator implements Configurator<FacingServerConfigurator> {
@@ -48,7 +52,7 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
 
   private configureUriWorkerMap() {
     ServerAbstract facingServer = jkScenario.getFacingServerNode().getServer()
-    List<BalancerNode> balancers = jkScenario.getBalancers()
+    List<BalancerNode> balancers = jkScenario.getBalancerNodes()
     UriWorkerMapProperties uriWorkerMapProperties = jkScenario.getFacingServerNode().getUriWorkerMapProperties()
 
     if (uriWorkerMapProperties.getFacingServer() == null) {
@@ -57,8 +61,8 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
 
     uriWorkerMapProperties
         .setBalancers(balancers)
-        .setWorkers(jkScenario.getWorkers())
-        .setStatusWorkers(jkScenario.getStatusWorkers())
+        .setWorkers(jkScenario.getWorkerNodes())
+        .setStatusWorkers(jkScenario.getStatusWorkerNodes())
         .setAdditionalUrlMaps(jkScenario.getAdditionalUrlMaps())
 
     configurators << uriWorkerMapProperties.configure()
@@ -66,7 +70,7 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
 
   private configureWorkersProperties() {
     ServerAbstract facingServer = jkScenario.getFacingServerNode().getServer()
-    List<BalancerNode> balancers = jkScenario.getBalancers()
+    List<BalancerNode> balancers = jkScenario.getBalancerNodes()
     WorkersProperties workersProperties = jkScenario.getFacingServerNode().getWorkersProperties()
 
     if (workersProperties.getFacingServer() == null) {
@@ -75,8 +79,8 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
 
     workersProperties
         .setBalancers(balancers)
-        .setWorkers(jkScenario.getWorkers())
-        .setStatusWorkers(jkScenario.getStatusWorkers())
+        .setWorkers(jkScenario.getWorkerNodes())
+        .setStatusWorkers(jkScenario.getStatusWorkerNodes())
 
     configurators << workersProperties.configure()
   }

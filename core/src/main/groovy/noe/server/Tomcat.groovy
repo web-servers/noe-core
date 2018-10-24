@@ -16,8 +16,8 @@ import noe.ews.server.tomcat.TomcatSolaris
 import noe.ews.server.tomcat.TomcatWindows
 import noe.rhel.server.tomcat.TomcatJwsRpmScl
 import noe.rhel.server.tomcat.TomcatRpm
-import noe.tomcat.configure.TomcatConfigurator
 import noe.server.jk.WorkerServer
+import noe.tomcat.configure.TomcatConfigurator
 
 import java.util.concurrent.TimeUnit
 

@@ -113,7 +113,7 @@ class JkConfiguratorTestIT extends TestAbstract {
   void testDefaultSimpleProxy() {
     JkScenario scenario = new JkScenario()
       .setFacingServerNode(facingServerNode)
-      .addWorker(new WorkerNode(workerServer1))
+      .addWorkerNode(new WorkerNode(workerServer1))
 
     NodeOperations ops = configureFacingServerAndWorkers(scenario)
 
@@ -133,7 +133,7 @@ class JkConfiguratorTestIT extends TestAbstract {
   void testDefaultSimpleBalancing() {
     JkScenario scenario = new JkScenario()
       .setFacingServerNode(facingServerNode)
-      .addBalancer(new BalancerNode()
+      .addBalancerNode(new BalancerNode()
         .addWorker(new WorkerNode(workerServer1))
         .addWorker(new WorkerNode(workerServer2)))
 
@@ -155,10 +155,10 @@ class JkConfiguratorTestIT extends TestAbstract {
   void testDefaultSimpleBalancingWithStatusWorker() {
     JkScenario scenario = new JkScenario()
         .setFacingServerNode(facingServerNode)
-        .addBalancer(new BalancerNode()
+        .addBalancerNode(new BalancerNode()
           .addWorker(new WorkerNode(workerServer1))
           .addWorker(new WorkerNode(workerServer2)))
-        .addStatusWorker(new StatusWorkerNode())
+        .addStatusWorkerNode(new StatusWorkerNode())
 
     NodeOperations ops = configureFacingServerAndWorkers(scenario)
 
@@ -182,7 +182,7 @@ class JkConfiguratorTestIT extends TestAbstract {
           .setHttpd(facingServer)
           .setLogLevel('debug')
           .setAdditionalLines(['# This is just test comment'])))
-      .addWorker(new WorkerNode(workerServer1)
+      .addWorkerNode(new WorkerNode(workerServer1)
          .addUrlMap("/proxy_url1"))
       .addWorker(new WorkerNode(workerServer2)
          .addUrlMap("/proxy_url2"))
@@ -226,10 +226,10 @@ class JkConfiguratorTestIT extends TestAbstract {
 
     JkScenario scenario = new JkScenario()
         .setFacingServerNode(facingServerNode)
-        .addBalancer(new BalancerNode(balancerId)
+        .addBalancerNode(new BalancerNode(balancerId)
             .addWorker(new WorkerNode(workerServer1))
             .addWorker(new WorkerNode(workerServer2)))
-        .addStatusWorker(statusWorker)
+        .addStatusWorkerNode(statusWorker)
 
     NodeOperations ops = configureFacingServerAndWorkers(scenario)
 

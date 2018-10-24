@@ -3,7 +3,10 @@ package noe.jk.configure
 import groovy.util.logging.Slf4j
 
 /**
- * Configure workers in JK scenario
+ * Configure workers in JK scenario.
+ *
+ * @see DefaultAS7WorkerConfigurator
+ * @see DefaultTomcatWorkerConfigurator
  */
 @Slf4j
 class WorkersConfigurator implements Configurator<WorkersConfigurator> {
@@ -34,10 +37,10 @@ class WorkersConfigurator implements Configurator<WorkersConfigurator> {
   }
 
   private configureBalancedWorkers() {
-    if (jkScenario.getBalancers().isEmpty()) {
+    if (jkScenario.getBalancerNodes().isEmpty()) {
       log.debug("No balancers has been specified, continuing ...")
     } else {
-      jkScenario.getBalancers().each { BalancerNode balancer ->
+      jkScenario.getBalancerNodes().each { BalancerNode balancer ->
         balancer.getWorkers().each { WorkerNode worker ->
             configurators << configurator
                 .newInstance(worker)
@@ -48,10 +51,10 @@ class WorkersConfigurator implements Configurator<WorkersConfigurator> {
   }
 
   private configureNonBalancedWorkers() {
-    if (jkScenario.getWorkers().isEmpty()) {
+    if (jkScenario.getWorkerNodes().isEmpty()) {
       log.debug("No workers has been specified, continuing ...")
     } else {
-      jkScenario.getWorkers().each { WorkerNode worker ->
+      jkScenario.getWorkerNodes().each { WorkerNode worker ->
           configurators << configurator
               .newInstance(worker)
               .configure()

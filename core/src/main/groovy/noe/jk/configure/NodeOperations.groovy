@@ -1,7 +1,29 @@
 package noe.jk.configure
 
 /**
- * Operations over connector, like starting, stopping
+ * Operations over connector, like starting, stopping.
+ *
+ * Example:<br>
+ *   <code>
+ *     JkScenario scenario = new JkScenario()
+ *       .setFacingServerNode(new FacingServerNode(new Httpd()))
+ *       .addBalancerNode(new BalancerNode()
+ *         .addWorker(new WorkerNode(new Tomcat(...)))
+ *         .addWorker(new WorkerNode(new Tomcat(...))))
+ *
+ *     NodeOperations ops =
+ *       new JkScenarioConfigurator(
+ *         scenario,
+ *         DefaultHttpdConfigurator.class,
+ *         DefaultTomcatWorkerConfigurator.class
+ *       ).configure()
+ *
+ *     ops.startAll()
+ *
+ *     // ...
+ *
+ *     ops.stopAll()
+ *   </code>
  */
 class NodeOperations {
 
@@ -23,9 +45,9 @@ class NodeOperations {
       jkScenario.getFacingServerNode().getServer().start()
     }
 
-    jkScenario.getWorkers().each { WorkerNode worker -> worker.getServer().start() }
+    jkScenario.getWorkerNodes().each { WorkerNode worker -> worker.getServer().start() }
 
-    jkScenario.getBalancers().each { BalancerNode balancer ->
+    jkScenario.getBalancerNodes().each { BalancerNode balancer ->
       balancer.getWorkers().each { WorkerNode worker ->
         worker.getServer().start()
       }
@@ -45,8 +67,8 @@ class NodeOperations {
       jkScenario.getFacingServerNode().getServer().stop()
     }
 
-    jkScenario.getWorkers().each { WorkerNode worker -> worker.getServer().stop()}
-    jkScenario.getBalancers().each { BalancerNode balancer -> balancer.getWorkers()*.getServer()*.stop() }
+    jkScenario.getWorkerNodes().each { WorkerNode worker -> worker.getServer().stop()}
+    jkScenario.getBalancerNodes().each { BalancerNode balancer -> balancer.getWorkers()*.getServer()*.stop() }
 
     return this
   }

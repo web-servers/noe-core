@@ -8,6 +8,33 @@ package noe.jk.configure
  * @link https://tomcat.apache.org/connectors-doc/reference/workers.html
  * @link https://tomcat.apache.org/connectors-doc/reference/status.html
  * @link https://tomcat.apache.org/connectors-doc/common_howto/loadbalancers.html
+ *
+ * @see FacingServerNode
+ * @see BalancerNode
+ * @see StatusWorkerNode
+ *
+ * Example:<br>
+ *   <code>
+ *     JkScenario scenario = new JkScenario()
+ *       .setFacingServerNode(new FacingServerNode(new Httpd()))
+ *       .addBalancerNode(new BalancerNode()
+ *         .addWorker(new WorkerNode(new Tomcat(...)))
+ *         .addWorker(new WorkerNode(new Tomcat(...))))
+ *
+ *     NodeOperations ops =
+ *       new JkScenarioConfigurator(
+ *         scenario,
+ *         DefaultHttpdConfigurator.class,
+ *         DefaultTomcatWorkerConfigurator.class
+ *       ).configure()
+ *
+ *     ops.startAll()
+ *
+ *     // ...
+ *
+ *     ops.stopAll()
+ *   </code>
+ *
  */
 class JkScenario {
 
@@ -15,9 +42,9 @@ class JkScenario {
   Map<String, String> additionalUrlMaps = [:]
 
   // Nodes
-  List<BalancerNode> balancers = []
-  List<WorkerNode> workers = []
-  List<StatusWorkerNode> statusWorkers = []
+  List<BalancerNode> balancerNodes = []
+  List<WorkerNode> workerNodes = []
+  List<StatusWorkerNode> statusWorkerNodes = []
 
 
   /**
@@ -33,50 +60,50 @@ class JkScenario {
     return this
   }
 
-  List<BalancerNode> getBalancers() {
-    return balancers
+  List<BalancerNode> getBalancerNodes() {
+    return balancerNodes
   }
 
-  JkScenario setBalancers(List<BalancerNode> balancers) {
-    this.balancers = balancers
+  JkScenario setBalancerNodes(List<BalancerNode> balancers) {
+    this.balancerNodes = balancers
 
     return this
   }
 
-  JkScenario addBalancer(BalancerNode balancer) {
-    balancers.add(balancer)
+  JkScenario addBalancerNode(BalancerNode balancer) {
+    balancerNodes.add(balancer)
 
     return this
   }
 
-  List<WorkerNode> getWorkers() {
-    return workers
+  List<WorkerNode> getWorkerNodes() {
+    return workerNodes
   }
 
-  JkScenario addWorker(WorkerNode worker) {
-    workers.add(worker)
+  JkScenario addWorkerNode(WorkerNode worker) {
+    workerNodes.add(worker)
 
     return this
   }
 
-  JkScenario setWorkers(List<WorkerNode> worker) {
-    workers = worker
+  JkScenario setWorkerNodes(List<WorkerNode> worker) {
+    workerNodes = worker
 
     return this
   }
 
-  List<StatusWorkerNode> getStatusWorkers() {
-    return statusWorkers
+  List<StatusWorkerNode> getStatusWorkerNodes() {
+    return statusWorkerNodes
   }
 
-  JkScenario addStatusWorker(StatusWorkerNode statusWorker) {
-    statusWorkers.add(statusWorker)
+  JkScenario addStatusWorkerNode(StatusWorkerNode statusWorker) {
+    statusWorkerNodes.add(statusWorker)
 
     return this
   }
 
-  JkScenario setStatusWorkers(List<StatusWorkerNode> statusWorkers) {
-    this.statusWorkers = statusWorkers
+  JkScenario setStatusWorkerNodes(List<StatusWorkerNode> statusWorkers) {
+    this.statusWorkerNodes = statusWorkers
 
     return this
   }

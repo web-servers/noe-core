@@ -6,8 +6,33 @@ package noe.jk.configure
  * IMPORTANT: Not all directives are supported
  *
  * @link https://tomcat.apache.org/connectors-doc/reference/workers.html (section status Worker Directives)
+ *
+ * @see JkScenario
+ *
+ * Example:<br>
+ *   <code>
+ *     JkScenario scenario = new JkScenario()
+ *       .setFacingServerNode(new FacingServerNode(new Httpd()))
+ *       .addBalancerNode(new BalancerNode()
+ *         .addWorker(new WorkerNode(new Tomcat(...)))
+ *         .addWorker(new WorkerNode(new Tomcat(...)))
+ *       .setStatusWorkerNode(new StatusWorkerNode()))
+ *
+ *     NodeOperations ops =
+ *       new JkScenarioConfigurator(
+ *         scenario,
+ *         DefaultHttpdConfigurator.class,
+ *         DefaultTomcatWorkerConfigurator.class
+ *       ).configure()
+ *
+ *     ops.startAll()
+ *
+ *     // ...
+ *
+ *     ops.stopAll()
+ *   </code>
  */
-class StatusWorkerNode implements JkNode {
+class StatusWorkerNode {
   public static final String DEFAULT_ID_PREFIX = 'status_'
   public static final String DEFAULT_URL = '/status'
   private static int numberOfStatusWorkers = 0
@@ -28,12 +53,10 @@ class StatusWorkerNode implements JkNode {
     numberOfStatusWorkers++
   }
 
-  @Override
   String getId() {
     return id
   }
 
-  @Override
   List<String> getUrlsMap() {
     return urlsMap
   }

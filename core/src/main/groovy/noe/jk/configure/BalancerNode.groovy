@@ -3,13 +3,38 @@ package noe.jk.configure
 import groovy.util.logging.Slf4j
 
 /**
- * Jk node responsible for balancing load between workers.
+ * Node responsible for balancing load between workers.
  *
  * @link https://tomcat.apache.org/connectors-doc/reference/workers.html
  * @link https://tomcat.apache.org/connectors-doc/common_howto/loadbalancers.html
+ *
+ * @see WorkerNode
+ * @see JkScenario
+ *
+ * Example:<br>
+ *   <code>
+ *     JkScenario scenario = new JkScenario()
+ *       .setFacingServerNode(new FacingServerNode(new Httpd(...)))
+ *       .addBalancerNode(new BalancerNode()
+ *         .addWorker(new WorkerNode(new Tomcat(...)))
+ *         .addWorker(new WorkerNode(new Tomcat(...))))
+ *
+ *     NodeOperations ops =
+ *       new JkScenarioConfigurator(
+ *         scenario,
+ *         DefaultHttpdConfigurator.class,
+ *         DefaultAS7WorkerConfigurator.class
+ *       ).configure()
+ *
+ *     ops.startAll()
+ *
+ *     // ...
+ *
+ *     ops.stopAll()
+ *   </code>
  */
 @Slf4j
-class BalancerNode implements JkNode {
+class BalancerNode {
   protected static final String DEFAULT_ID_PREFIX = 'balancer_'
   private static int numberOfBalancers = 0
 
@@ -28,7 +53,6 @@ class BalancerNode implements JkNode {
     numberOfBalancers++
   }
 
-  @Override
   String getId() {
     return id
   }
@@ -49,7 +73,6 @@ class BalancerNode implements JkNode {
     return this
   }
 
-  @Override
   List<String> getUrlsMap() {
     return urlsMap
   }

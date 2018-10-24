@@ -1,11 +1,41 @@
 package noe.jk.configure
 
+import noe.server.ServerAbstract
 import noe.server.jk.WorkerServer
 
 /**
- * Represents JK Worker (Tomcat, EAP, ...)
+ * Represent mod_jk worker node abstraction, configured by `WorkersConfigurator`.
+ *
+ * @link https://tomcat.apache.org/connectors-doc/reference/workers.html
+ * @link https://tomcat.apache.org/connectors-doc/common_howto/loadbalancers.html
+ *
+ * @see WorkerServer
+ * @see BalancerNode
+ * @see JkScenario
+ *
+ * Example:<br>
+ *   <code>
+ *     JkScenario scenario = new JkScenario()
+ *       .setFacingServerNode(new FacingServerNode(new Httpd(...)))
+ *       .addBalancerNode(new BalancerNode()
+ *         .addWorker(new WorkerNode(new Tomcat(...)))
+ *         .addWorker(new WorkerNode(new Tomcat(...))))
+ *
+ *     NodeOperations ops =
+ *       new JkScenarioConfigurator(
+ *         scenario,
+ *         DefaultHttpdConfigurator.class,
+ *         DefaultAS7WorkerConfigurator.class
+ *       ).configure()
+ *
+ *     ops.startAll()
+ *
+ *     // ...
+ *
+ *     ops.stopAll()
+ *   </code>
  */
-class WorkerNode<T extends WorkerServer> implements JkNode {
+class WorkerNode {
   public static String DEFAULT_ID_PREFIX = 'worker_'
 
   enum Type {
@@ -16,7 +46,7 @@ class WorkerNode<T extends WorkerServer> implements JkNode {
   }
 
   String id
-  final T server
+  final WorkerServer server
   Integer lbFactor
   Integer ajpPort
   String host
@@ -24,21 +54,20 @@ class WorkerNode<T extends WorkerServer> implements JkNode {
   List<String> urlsMap = []
   Integer socketTimeout
 
-  WorkerNode(T server) {
+  WorkerNode(WorkerServer server) {
     this(server, "${WorkerNode.DEFAULT_ID_PREFIX}${server.getServerId()}")
   }
 
-  WorkerNode(T server, String id) {
+  WorkerNode(WorkerServer server, String id) {
     this.id = id
     this.server = server
   }
 
-  @Override
   String getId() {
     return id
   }
 
-  T getServer() {
+  ServerAbstract getServer() {
     return server
   }
 

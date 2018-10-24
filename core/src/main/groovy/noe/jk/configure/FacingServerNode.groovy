@@ -3,7 +3,31 @@ package noe.jk.configure
 import noe.server.ServerAbstract
 
 /**
- * Represent Facing server in JK scenarios.
+ * Represent mod_jk facing server abstraction, configured by `FacingServerConfigurator`.
+ *
+ * @see FacingServerConfigurator
+ *
+ * Example:<br>
+ *   <code>
+ *     JkScenario scenario = new JkScenario()
+ *       .setFacingServerNode(new FacingServerNode(new Httpd()))
+ *       .addBalancerNode(new BalancerNode()
+ *         .addWorker(new WorkerNode(new Tomcat(...)))
+ *         .addWorker(new WorkerNode(new Tomcat(...))))
+ *
+ *     NodeOperations ops =
+ *       new JkScenarioConfigurator(
+ *         scenario,
+ *         DefaultHttpdConfigurator.class,
+ *         DefaultTomcatWorkerConfigurator.class
+ *       ).configure()
+ *
+ *     ops.startAll()
+ *
+ *     // ...
+ *
+ *     ops.stopAll()
+ *   </code>
  */
 class FacingServerNode {
 
@@ -12,6 +36,10 @@ class FacingServerNode {
   WorkersProperties workersProperties = new WorkersProperties()
   List<Configurator> configurations = []
 
+
+  FacingServerNode(ServerAbstract server) {
+    this.server = server
+  }
 
   ServerAbstract getServer() {
     return server

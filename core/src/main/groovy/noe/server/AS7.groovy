@@ -452,6 +452,7 @@ class AS7 extends ServerAbstract implements WorkerServer {
     }
   }
 
+  @Override
   void undeployByDeleting(String appName) {
     super.undeployByDeleting(appName)
     //AS7 Specific clean-up, yes we use .war with AS7.

@@ -3,14 +3,40 @@ package noe.jk.configure
 import groovy.util.logging.Slf4j
 import noe.common.utils.FileStateVault
 import noe.server.AS7
+import noe.server.ServerController
 
 /**
- * Represents AS7 as worker in JK scenarios
+ * Configure AS server to be a mod_jk workers. Prepares JVM route.
+ *
+ * @see WorkerNode
+ * @see Configurator
+ *
+ * Example:<br>
+ *   <code>
+ *     JkScenario scenario = new JkScenario()
+ *       .setFacingServerNode(new FacingServerNode(new Httpd(...)))
+ *       .addBalancerNode(new BalancerNode()
+ *         .addWorker(new WorkerNode(new AS7(...)))
+ *         .addWorker(new WorkerNode(new AS7(...))))
+ *
+ *     NodeOperations ops =
+ *       new JkScenarioConfigurator(
+ *         scenario,
+ *         DefaultHttpdConfigurator.class,
+ *         DefaultAS7WorkerConfigurator.class
+ *       ).configure()
+ *
+ *     ops.startAll()
+ *
+ *     // ...
+ *
+ *     ops.stopAll()
+ *   </code>
  */
 @Slf4j
 class DefaultAS7WorkerConfigurator implements Configurator<DefaultAS7WorkerConfigurator> {
 
-  WorkerNode<AS7> workerNode
+  WorkerNode workerNode
 
   FileStateVault vault = new FileStateVault()
 
@@ -61,7 +87,7 @@ class DefaultAS7WorkerConfigurator implements Configurator<DefaultAS7WorkerConfi
       throw new IllegalStateException("AS version older than 6 is not supported")
     }
 
-    if (workerNode.getServer().getAs7Cli().runArbitraryCommand("/subsystem=${subsystem}:write-attribute(name=instance-id,value=${workerNode.getId()})").exitValue != 0 ) {
+    if (getAs7Server().getAs7Cli().runArbitraryCommand("/subsystem=${subsystem}:write-attribute(name=instance-id,value=${workerNode.getId()})").exitValue != 0 ) {
       throw new RuntimeException("Configuring of instance-id on EAP worker failed")
     }
 
@@ -69,7 +95,7 @@ class DefaultAS7WorkerConfigurator implements Configurator<DefaultAS7WorkerConfi
   }
 
   private FileStateVault backupServerConfigFile() {
-    vault.push(new File(workerNode.getServer().getConfigFile()))
+    vault.push(new File(getAs7Server().getConfigFile()))
   }
 
   private startIfStoppedMngmt() {
@@ -85,6 +111,10 @@ class DefaultAS7WorkerConfigurator implements Configurator<DefaultAS7WorkerConfi
     if (mgmtStartExecuted) {
       workerNode.getServer().stop()
     }
+  }
+
+  private AS7 getAs7Server() {
+    return ServerController.getInstance().getServerById(workerNode.getServer().getServerId()) as AS7
   }
 
 }

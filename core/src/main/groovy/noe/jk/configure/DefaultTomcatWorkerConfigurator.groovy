@@ -1,16 +1,40 @@
 package noe.jk.configure
 
-import noe.server.Tomcat
 import noe.tomcat.configure.AjpConnectorTomcat
 import noe.tomcat.configure.NonSecureHttpConnectorTomcat
 import noe.tomcat.configure.TomcatConfigurator
 
 /**
- * Represents Tomcat server in JK scenarios.
+ * Configure Tomcat server to be a mod_jk workers. Prepares JVM route and connectors.
+ *
+ * @see WorkerNode
+ * @see Configurator
+ *
+ * Example:<br>
+ *   <code>
+ *     JkScenario scenario = new JkScenario()
+ *       .setFacingServerNode(new FacingServerNode(new Httpd(...)))
+ *       .addBalancerNode(new BalancerNode()
+ *         .addWorker(new WorkerNode(new Tomcat(...)))
+ *         .addWorker(new WorkerNode(new Tomcat(...))))
+ *
+ *     NodeOperations ops =
+ *       new JkScenarioConfigurator(
+ *         scenario,
+ *         DefaultHttpdConfigurator.class,
+ *         DefaultTomcatWorkerConfigurator.class
+ *       ).configure()
+ *
+ *     ops.startAll()
+ *
+ *     // ...
+ *
+ *     ops.stopAll()
+ *   </code>
  */
 class DefaultTomcatWorkerConfigurator implements Configurator<DefaultTomcatWorkerConfigurator> {
 
-  WorkerNode<Tomcat> workerNode
+  WorkerNode workerNode
   TomcatConfigurator configurator
 
 
