@@ -1,10 +1,10 @@
 package noe.server
 
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.newcmd.CmdBuilder
 import noe.common.newcmd.CmdCommand
 import noe.common.utils.Cmd
-import noe.common.utils.Library
 /**
  * @author Jan Stefl     <jstefl@redhat.com>
  */
@@ -24,7 +24,7 @@ class Sahi extends ServerAbstract {
     // Solaris 10 does not support export VARIABLE at one line, but sahi.sh contains it
     // HP-UX is not good with relative paths, which are used in sahi.sh)
     if (platform.isSolaris10() || platform.isHP()) {
-      def javaHome = Library.getUniversalProperty('JAVA_HOME')
+      def javaHome = DefaultProperties.JAVA_HOME
       def sahiClassPath = "${this.basedir}/lib/sahi.jar:${this.basedir}/extlib/rhino/js.jar:${this.basedir}/extlib/apc/commons-codec-1.3.jar"
       def sahiUserdataDirTmp = "${this.basedir}/userdata"
       this.start = ["${javaHome}/bin/java", '-classpath', sahiClassPath, 'net.sf.sahi.Proxy', this.basedir, sahiUserdataDirTmp]

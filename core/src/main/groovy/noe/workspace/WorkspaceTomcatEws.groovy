@@ -20,6 +20,7 @@ import noe.tomcat.configure.TomcatConfigurator
 class WorkspaceTomcatEws extends WorkspaceAbstract {
 
   private final boolean SKIP_POSTINSTALL_DEFAULT = Library.getUniversalProperty('tomcat.skip.postinstall', 'false').toBoolean()
+  private List<TomcatConfigurator> tomcatConfiguratorInstances
   boolean skipTomcatPostInstall = SKIP_POSTINSTALL_DEFAULT
   EwsUtils ewsUtils
   String ewsVersion
@@ -27,6 +28,7 @@ class WorkspaceTomcatEws extends WorkspaceAbstract {
 
   WorkspaceTomcatEws() {
     ewsUtils = new EwsUtils()
+    tomcatConfiguratorInstances = new LinkedList<TomcatConfigurator>()
     this.ewsVersion = DefaultProperties.ewsVersion().toString()
     def basedir = getBasedir()
     this.solarisTomcatAnyone = Boolean.valueOf(Library.getUniversalProperty('ews.solaris.tomcat.anyone', 'false'))
@@ -56,9 +58,22 @@ class WorkspaceTomcatEws extends WorkspaceAbstract {
 
     if (platform.isSolaris()) {
       prepareSolarisSpecificWorkspace()
+    } else {
+      setServerJavaHome()
     }
+
     /// Backup all server state
     serverController.backup()
+  }
+
+  private setServerJavaHome() {
+    if (DefaultProperties.SERVER_JAVA_HOME) {
+
+      TomcatHelper.retrieveAllTomcatInstances().each { Tomcat tomcat ->
+        tomcatConfiguratorInstances.add( new TomcatConfigurator(tomcat)
+            .envVariableByAppend("JAVA_HOME", DefaultProperties.SERVER_JAVA_HOME))
+      }
+    }
   }
 
   private installTomcat(Boolean purge) {
@@ -129,15 +144,35 @@ class WorkspaceTomcatEws extends WorkspaceAbstract {
       }
     }
 
-    // Set -d32 or -d64 to JAVA_OPTS, to use that bit java version
-    serverController.getTomcatServerIds([]).each { tomcat ->
-      ((Tomcat) serverController.getServerById(tomcat)).setSolarisJavaOpts()
+    if (DefaultProperties.SERVER_JAVA_HOME) {
+      if (DefaultProperties.SERVER_JAVA_HOME.contains("jdk11")) {
+        setServerJavaHome()
+      } else if (DefaultProperties.SERVER_JAVA_HOME.contains("jdk1.")) {
+        setServerJavaHome()
+        setSolarisSpecificJavaOpts()
+      } else {
+        throw new UnsupportedOperationException("Not supported JDK version.")
+      }
+    } else {
+      // Set -d32 or -d64 to JAVA_OPTS, to use that bit java version
+      setSolarisSpecificJavaOpts()
+    }
+  }
+
+  private setSolarisSpecificJavaOpts() {
+    TomcatHelper.retrieveAllTomcatInstances().each { Tomcat tomcat ->
+      tomcat.setSolarisJavaOpts()
     }
   }
 
   def destroy() {
     try {
       log.debug('Destroying')
+
+      tomcatConfiguratorInstances.each { TomcatConfigurator tomcatConfigurator ->
+        tomcatConfigurator.revertAllConfiguration()
+      }
+
       serverController.getTomcatServerIds().each { tomcatId ->
         Tomcat tomcatServer = serverController.getServerById(tomcatId)
         JBFile.delete(tomcatServer.getPostInstallErrFile())

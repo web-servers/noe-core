@@ -40,6 +40,8 @@ class DefaultProperties {
   public static final String HTTPD_SCL_ROOT = Library.getUniversalProperty('httpd.scl.root', '/opt/rh/jbcs-httpd24/root')
   public static final String EAP7_RPM_ROOT = Library.getUniversalProperty('eap7.rmp.root', '/opt/rh/eap7/root/usr/share/wildfly')
   public static final String EAP6_RPM_ROOT = Library.getUniversalProperty('eap6.rpm.root', '/usr/share/jbossas/')
+  public static final String SERVER_JAVA_HOME = Library.getUniversalProperty("server.java.home")
+  public static final String JAVA_HOME = Library.getUniversalProperty("java.home")
 
   // Default workspace basedir
   public static final String WORKSPACE_BASEDIR = Library.getUniversalProperty('workspace.basedir', new File('.').getCanonicalPath() + "${File.separator}workspace")

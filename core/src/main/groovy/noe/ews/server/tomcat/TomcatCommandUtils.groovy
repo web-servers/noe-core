@@ -1,5 +1,6 @@
 package noe.ews.server.tomcat
 
+import noe.common.DefaultProperties
 import noe.common.utils.JBFile
 import noe.common.utils.Library
 import noe.common.utils.Platform
@@ -17,7 +18,8 @@ class TomcatCommandUtils {
     this.tomcat = tomcat
     this.useSudo = JBFile.useAdminPrivileges
 
-    String javaHomeEnvVar = System.getenv('JAVA_HOME')
+    String javaHomeEnvVar = (DefaultProperties.SERVER_JAVA_HOME) ?
+        DefaultProperties.SERVER_JAVA_HOME : DefaultProperties.JAVA_HOME
     this.javaHome = (javaHomeEnvVar != null && !javaHomeEnvVar.isEmpty()) ? new File(javaHomeEnvVar) : null
   }
 

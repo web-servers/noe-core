@@ -8,6 +8,7 @@ import noe.common.utils.Library
 import noe.common.utils.Platform
 import noe.ews.server.ServerEws
 import noe.ews.server.tomcat.TomcatCommandUtils
+import noe.server.ServerController
 import noe.server.Tomcat
 
 @Slf4j
@@ -37,10 +38,20 @@ class TomcatHelper {
     if (platform.isSolaris()) {
       final Boolean tomcatWithSudo = Library.getUniversalProperty('tomcat.postinstall.with.sudo', JBFile.useAdminPrivileges).toBoolean()
       if (tomcatWithSudo) {
-        postInstallOutput = Cmd.executeSudoCommandConsumeStreams(['./.postinstall.tomcat'], postinstallFolder)
+        if (DefaultProperties.SERVER_JAVA_HOME) {
+          postInstallOutput = Cmd.executeSudoCommandConsumeStreams(['./.postinstall.tomcat'], postinstallFolder,
+              null, 100000L, ["JAVA_HOME": DefaultProperties.SERVER_JAVA_HOME])
+        } else {
+          postInstallOutput = Cmd.executeSudoCommandConsumeStreams(['./.postinstall.tomcat'], postinstallFolder)
+        }
       } else {
         if (apacheCoreVersion || ewsMajorVersion >= 3) {
-          postInstallOutput = Cmd.executeCommandConsumeStreams(["sh", "./.postinstall.tomcat"], postinstallFolder)
+          if (DefaultProperties.SERVER_JAVA_HOME) {
+            postInstallOutput = Cmd.executeCommandConsumeStreams(["sh", "./.postinstall.tomcat"], postinstallFolder,
+                null, 100000L, ["JAVA_HOME": DefaultProperties.SERVER_JAVA_HOME])
+          } else {
+            postInstallOutput = Cmd.executeCommandConsumeStreams(["sh", "./.postinstall.tomcat"], postinstallFolder)
+          }
         } else {
           def isIt64 = (platform.isSparc() || platform.isX64()) ? "64" : ""
           String customTomcatPostinstall = ".postinstall.tomcat.nosudo.solaris${isIt64}"
@@ -172,5 +183,17 @@ class TomcatHelper {
         }
       }
     }
+  }
+
+  static List<Tomcat> retrieveAllTomcatInstances() {
+    List<Tomcat> tomcats = new LinkedList<Tomcat>()
+    ServerController serverController = ServerController.getInstance()
+
+    serverController.getTomcatServerIds().each { String tomcatId ->
+      Tomcat tomcat = (Tomcat) serverController.getServerById(tomcatId)
+      tomcats.add(tomcat)
+    }
+
+    return tomcats
   }
 }
