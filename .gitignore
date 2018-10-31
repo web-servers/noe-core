@@ -11,6 +11,7 @@
 *.swp
 /target
 /core/target
+/core/src/main/resources/noe/byteman
 /testsuite/target
 /testsuite/workspace
 /workspace

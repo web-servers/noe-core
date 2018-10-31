@@ -1,5 +1,6 @@
 package noe.tomcat.configure
 
+import noe.byteman.Byteman
 import noe.common.utils.FileStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.PathHelper
@@ -235,13 +236,36 @@ class TomcatConfigurator {
   }
 
   /**
-   * Append environment variable into Tomcat configuration file where envionment variables are stored.
+   * Append environment variable into Tomcat configuration file where environment variables are stored.
    * Zip and RPMs distribution are supported.
    */
   TomcatConfigurator envVariableByAppend(String name, String value) {
     EnvVarsFileFactory.getInstance(tomcatInstance, configVault).appendVariable(name, value)
 
     return this
+  }
+
+  /**
+   * Append byteman specific JAVA_OPTS into Tomcat configuration file via `envVariableByAppend()` method.
+   *
+   * For disabling byteman configuration, it is possible to call method `revertAllConfiguration()`,
+   * however be aware that it removes all configuration changes applied.
+   */
+  TomcatConfigurator enableByteman(Byteman byteman) {
+    envVariableByAppend("JAVA_OPTS", byteman.generateBytemanJavaOpts())
+
+    return this
+  }
+
+  /**
+   * Append byteman default JAVA_OPTS setup into Tomcat configuration file via `envVariableByAppend()` method.
+   * Default setup: -javaagent:/tmp/noe/byteman/byteman.jar=boot:/tmp/noe/byteman/byteman.jar,listener:true,port:9091
+   *
+   * For disabling byteman configuration, it is possible to call method `revertAllConfiguration()`,
+   * however be aware that it removes all configuration changes applied.
+   */
+  TomcatConfigurator enableByteman() {
+    return enableByteman(new Byteman())
   }
 
   /**
