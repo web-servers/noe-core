@@ -13,6 +13,27 @@
         <module>core</module>
     </modules>
 
+    <licenses>
+      <license>
+        <name>Apache License, Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+
+    <developers>
+      <developer>
+          <id>mczernek</id>
+          <name>Marek Czernek</name>
+          <organization>Red Hat</organization>
+      </developer>
+      <developer>
+          <id>karm</id>
+          <name>Michal Karm Babacek</name>
+          <organization>Red Hat</organization>
+      </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:git@${env.GIT_URL}:${env.GIT_USER}/noe-core.git</connection>
         <developerConnection>scm:git:git@${env.GIT_URL}:${env.GIT_USER}/noe-core.git</developerConnection>
@@ -30,6 +51,11 @@
             <id>jboss-qa-releases</id>
             <name>JBoss QA release repository</name>
             <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases</url>
+        </repository>
+        <repository>
+            <id>jboss-public-repository</id>
+            <name>Public JBoss release repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public</url>
         </repository>
     </distributionManagement>
 
