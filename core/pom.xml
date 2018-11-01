@@ -4,7 +4,7 @@
     <parent>
         <groupId>noe</groupId>
         <artifactId>noe-core-parent</artifactId>
-        <version>0.16.11</version>
+        <version>0.16.12-SNAPSHOT</version>
     </parent>
 
     <artifactId>noe-core</artifactId>
