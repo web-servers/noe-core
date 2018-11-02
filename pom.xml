@@ -48,11 +48,6 @@
             <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots</url>
         </snapshotRepository>
         <repository>
-            <id>jboss-qa-releases</id>
-            <name>JBoss QA release repository</name>
-            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases</url>
-        </repository>
-        <repository>
             <id>jboss-public-repository</id>
             <name>Public JBoss release repository</name>
             <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2</url>
