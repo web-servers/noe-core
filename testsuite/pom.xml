@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>noe</groupId>
+            <groupId>org.jboss.qa.noe</groupId>
             <artifactId>noe-core</artifactId>
         </dependency>
 

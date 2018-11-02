@@ -125,12 +125,12 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>noe</groupId>
+                <groupId>org.jboss.qa.noe</groupId>
                 <artifactId>noe-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>noe</groupId>
+                <groupId>org.jboss.qa.noe</groupId>
                 <artifactId>noe-core-testsuite</artifactId>
                 <version>${project.version}</version>
             </dependency>
