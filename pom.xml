@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>noe</groupId>
+    <groupId>org.jboss.qa.noe</groupId>
     <artifactId>noe-core-parent</artifactId>
     <version>0.16.12-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -47,11 +47,11 @@
             <name>JBoss QA snapshot repository</name>
             <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots</url>
         </snapshotRepository>
-        <repository>
+        <!-- <repository>
             <id>jboss-qa-releases</id>
             <name>JBoss QA release repository</name>
             <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases</url>
-        </repository>
+        </repository> -->
         <repository>
             <id>jboss-public-repository</id>
             <name>Public JBoss release repository</name>
