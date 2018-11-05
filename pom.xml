@@ -42,11 +42,6 @@
     </scm>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>jboss-qa-snapshots</id>
-            <name>JBoss QA snapshot repository</name>
-            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots</url>
-        </snapshotRepository>
         <repository>
             <id>jboss-public-repository</id>
             <name>Public JBoss release repository</name>
