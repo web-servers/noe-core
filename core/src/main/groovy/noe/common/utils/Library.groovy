@@ -9,6 +9,7 @@ import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
 import noe.common.NOEWebClient
 
+import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
 /**
@@ -830,4 +831,24 @@ class Library {
 
     return classpath.join(platform.pathsep)
   }
+
+  /**
+   * Wait until condition is satisfied
+   * @param time amount of time to wait
+   * @param unit time unit to wait
+   * @param condition condition for which the waiting will be done
+   * @return true if condition was satisfied and it was waited lower amount of time than provided, false otherwise
+   */
+  static boolean waitForCondition(long time, TimeUnit unit, Closure<Boolean> condition) {
+    final long start = new Date().getTime()
+    final long timeout = unit.toMillis(time)
+    while (new Date().getTime() - start < timeout) {
+      if (condition()) {
+        return true
+      }
+      sleep(500)
+    }
+    return false
+  }
+
 }
