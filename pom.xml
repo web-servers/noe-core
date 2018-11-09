@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
 
     <name>Noe core: Parent</name>
+    <url>https://repository.jboss.org/nexus/content/repositories/public/org/jboss/qa/</url>
 
     <modules>
         <module>core</module>
