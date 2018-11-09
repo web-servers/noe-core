@@ -12,7 +12,7 @@
       Manage JBoss Web Server (Tomcat), JBoss Core Services (HTTPD), JBoss EAP (Wildfly), and
       much more.
     </description>
-    <url>https://repository.jboss.org/nexus/content/repositories/public/org/jboss/qa/</url>
+    <url>https://repository.jboss.org/nexus/content/repositories/public/</url>
 
     <modules>
         <module>core</module>
