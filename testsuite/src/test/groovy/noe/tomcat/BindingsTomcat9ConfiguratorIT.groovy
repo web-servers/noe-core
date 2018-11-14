@@ -13,7 +13,7 @@ class BindingsTomcat9ConfiguratorIT extends BindingsTomcatConfiguratorIT {
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
     Assume.assumeTrue("Tomcat from JWS 5.0 requires at least Java 1.7", Java.isJdk1xOrHigher('1.8'))
 
-    loadTestProperties("/jws5-test.properties")
+    loadTestProperties("/tomcat9-common-test.properties")
     prepareWorkspace()
   }
 }
