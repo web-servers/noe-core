@@ -7,7 +7,7 @@ class ConfsBckpRestoreTomcat9ConfiguratorIT extends ConfsBckpRestoreTomcatConfig
 
   @BeforeClass
    static void beforeClass() {
-    loadTestProperties("/jws5-test.properties")
+    loadTestProperties("/tomcat9-common-test.properties")
     prepareWorkspace()
   }
 }
