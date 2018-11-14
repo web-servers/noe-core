@@ -1,6 +1,5 @@
 package noe.tomcat.configure.envars
 
-import noe.tomcat.JvmRouteTomcatConfiguratorIT
 import org.junit.BeforeClass
 
 
