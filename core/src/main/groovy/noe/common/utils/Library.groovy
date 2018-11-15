@@ -851,4 +851,14 @@ class Library {
     return false
   }
 
+  /**
+   * Measure time which took the closure to execute
+   */
+  static Closure<Long> measureTime = { closure ->
+    long start = System.currentTimeMillis()
+    closure.call()
+    long now = System.currentTimeMillis()
+    now - start
+  }
+
 }
