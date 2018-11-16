@@ -318,6 +318,47 @@ class TomcatConfigurator {
       throw new IllegalArgumentException("'${confFile}' does not exist in ${tomcatInstance.getConfigDirs()}/conf")
     }
   }
+  /**
+   * Creates a specified TomcatUser in the tomcat-users.xml file
+   * @param user TomcatUser instance you want to persist
+   * @return this
+   */
+  TomcatConfigurator addUser(TomcatUser user) {
+    String tomcatUsers = 'tomcat-users.xml'
+    File confFile = retrieveConfFile(tomcatUsers)
+    if (confFile?.exists()) {
+      configVault.push(confFile)
+      Map userAttributes = ['username' : user.username,
+                            'password' : user.password,
+                            'roles'    : user.parsedRoles]
+
+      Node usersNode = getParsedConfig(confFile)
+      usersNode.appendNode('user',userAttributes)
+      printNodeToFile(confFile, usersNode)
+    } else {
+      missingConfigFile(tomcatUsers)
+    }
+    return this
+  }
+
+  /**
+   * Adds the specified listener to server.xml
+   * @param listenerFQCN the fully qualified class name of the listener
+   * @return this
+   */
+  TomcatConfigurator addListener(String listenerFQCN) {
+    String serverXml = 'server.xml'
+    File confFile = retrieveConfFile(serverXml)
+    if (confFile?.exists()) {
+      configVault.push(confFile)
+      Node serverNode = getParsedConfig(confFile)
+      serverNode.appendNode('Listener', ['className' : listenerFQCN])
+      printNodeToFile(confFile, serverNode)
+    } else {
+      missingConfigFile(serverXml)
+    }
+    return this
+  }
 
   /**
    * Persists parsed properties-configuration.
@@ -344,6 +385,12 @@ class TomcatConfigurator {
    */
   TomcatConfigurator revertAllConfiguration() {
     configVault.popAll()
+
+    return this
+  }
+
+  TomcatConfigurator revertConfiguration(File config) {
+    configVault.pop(config)
 
     return this
   }
