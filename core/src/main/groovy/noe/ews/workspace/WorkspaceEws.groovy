@@ -27,8 +27,10 @@ class WorkspaceEws extends WorkspaceAbstract {
   Boolean rpm /// Are we manipulating with rpm distro?
   String ewsVersion /// like 2.0.0-ER3
 
-  WorkspaceEws() {
-    workspaceHttpd = new WorkspaceHttpd()
+  WorkspaceEws(boolean installHttpd = true) {
+    if(installHttpd) {
+      workspaceHttpd = new WorkspaceHttpd()
+    }
     workspaceTomcat = new WorkspaceTomcat()
     workspaceApacheDS = new WorkspaceApacheDS()
     this.ews = Boolean.valueOf(Library.getUniversalProperty('ews', 'true'))
@@ -41,7 +43,7 @@ class WorkspaceEws extends WorkspaceAbstract {
    * Prepare the workspace.
    */
   def prepare() {
-    workspaceHttpd.prepare()
+    workspaceHttpd?.prepare()
     if (platform.isWindows()) {
       serverController.installApacheWindowsService(serverController.getHttpdServerId())
     }
@@ -62,7 +64,7 @@ class WorkspaceEws extends WorkspaceAbstract {
    * Destroy the workspace.
    */
   def destroy() {
-    workspaceHttpd.destroy()
+    workspaceHttpd?.destroy()
     workspaceTomcat.destroy()
     workspaceApacheDS.destroy()
 
@@ -86,7 +88,7 @@ class WorkspaceEws extends WorkspaceAbstract {
     // TODO validate tomcat paths (nodenames)
     def validPaths = Library.validatePaths([
         basedir,
-        workspaceHttpd.basedirHttpd
+        workspaceHttpd?.basedirHttpd
     ])
     if (!validPaths.isEmpty()) {
       // TODO LP How to better handle this?
@@ -141,7 +143,7 @@ class WorkspaceEws extends WorkspaceAbstract {
    * @link http://groovy.codehaus.org/Using+methodMissing+and+propertyMissing
    */
   def propertyMissing(String name) {
-    if (workspaceHttpd.hasProperty(name)) {
+    if (workspaceHttpd?.hasProperty(name)) {
       workspaceHttpd.name
     } else if (workspaceTomcat.hasProperty(name)) {
       workspaceTomcat.name
