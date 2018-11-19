@@ -4,6 +4,9 @@ import groovy.util.logging.Slf4j
 import noe.common.utils.JBFile
 import noe.common.utils.PathHelper
 
+import java.nio.file.Files
+import java.nio.file.Paths
+
 /**
  * Universal byteman configuration allowing generation of byteman specific JAVA_OPTS.
  *
@@ -72,7 +75,7 @@ class Byteman {
 
   /**
    * Copies byteman.jar to folder `${java.io.tmpdir}/noe/byteman` to be accessible for all users/accounts
-   * present in the testing enviroment due to RPM support as servers are running under different users then testing one.
+   * present in the testing environment due to RPM support as servers are running under different users then testing one.
    */
   private static File prepareBytemanJar() {
     String bytemanStringDir = PathHelper.join(System.getProperty("java.io.tmpdir"), "noe", "byteman")
@@ -85,10 +88,8 @@ class Byteman {
       }
 
       JBFile.makeAccessible(bytemanDir)
-      String resourcesPath = "/noe/byteman/"  //resources jar path is always separated by /
-      URL bytemanURL = this.getClass().getResource(resourcesPath + BYTEMAN_JAR_NAME)
-      File bytemanFile = new File(bytemanURL.toURI())
-      JBFile.copy(bytemanFile, bytemanDir)
+      InputStream inputStream = Byteman.class.getResourceAsStream(BYTEMAN_JAR_NAME)
+      Files.copy(inputStream, Paths.get(bytemanJarFile.getPath()))
     }
 
     return bytemanJarFile
