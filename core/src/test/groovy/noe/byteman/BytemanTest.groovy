@@ -16,6 +16,7 @@ class BytemanTest {
   List<File> scriptPathList
   List<File> jarPathList
   File testingDir
+  File defaultBytemanJar
 
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder()
@@ -23,7 +24,8 @@ class BytemanTest {
   @Before
   void beforeTest() {
     testingDir = testFolder.newFolder("testingByteman")
-    expectedDefaultJarPath = PathHelper.join(System.getProperty("java.io.tmpdir"), "noe", "byteman", Byteman.BYTEMAN_JAR_NAME)
+    expectedDefaultJarPath = PathHelper.join(BytemanInstaller.DEFAULT_BYTEMAN_JAR_FOLDER, BytemanInstaller.DEFAULT_BYTEMAN_JAR_NAME)
+    defaultBytemanJar = new BytemanInstaller().prepareBytemanJar()
     defaultListeningProperties = ",listener:true,port:9091"
     defaultJavaagentPrefix = "-javaagent:" + expectedDefaultJarPath + "=boot:" + expectedDefaultJarPath
     defaultJavaagentProperty = defaultJavaagentPrefix + defaultListeningProperties
@@ -33,7 +35,7 @@ class BytemanTest {
 
   @Test
   void getDefaultBytemanJarPathTest() {
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .generateBytemanJavaOpts()
     Assert.assertEquals(defaultJavaagentProperty, actualResult)
   }
@@ -52,13 +54,13 @@ class BytemanTest {
   void getNotExistingModyfiedEnvBytemanJarPathTest() {
     File modifiedBytemanJarPath = new File("non_existing_byteman.jar")
 
-    new Byteman(modifiedBytemanJarPath)
+    new Byteman(modifiedBytemanJarPath).generateBytemanJavaOpts()
   }
 
   @Test
   void generateJavaAgentPropertyWithoutListenerTest() {
     String expectedJavaAgentProperty = "-javaagent:" + expectedDefaultJarPath + "=boot:" + expectedDefaultJarPath
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .listener(false)
         .generateBytemanJavaOpts()
 
@@ -67,7 +69,7 @@ class BytemanTest {
 
   @Test
   void generateJavaAgentPropertyWithoutListenerWithPortTest() {
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .listener(false)
         .port(9091)
         .generateBytemanJavaOpts()
@@ -79,7 +81,7 @@ class BytemanTest {
   void generateJavaAgentPropertyWithPropTest() {
     String expectedJavaAgentProperty = defaultJavaagentProperty + ",prop:key1=value1,prop:key2=value2"
     Map<String, String> propValues = ["key1": "value1", "key2": "value2"]
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .prop(propValues)
         .generateBytemanJavaOpts()
 
@@ -91,7 +93,7 @@ class BytemanTest {
     String expectedJavaAgentProperty = defaultJavaagentProperty + ",policy:true," +
         "script:" + scriptPathList.first().getAbsolutePath()
 
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .script(scriptPathList)
         .policy(true)
         .generateBytemanJavaOpts()
@@ -104,7 +106,7 @@ class BytemanTest {
     String expectedJavaAgentProperty = defaultJavaagentPrefix + ",listener:true,port:1000," +
         "script:" + scriptPathList.first().getAbsolutePath()
 
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .script(scriptPathList)
         .port(1000)
         .generateBytemanJavaOpts()
@@ -114,14 +116,14 @@ class BytemanTest {
 
   @Test(expected = IllegalArgumentException.class)
   void generateJavaAgentPropertyWithWrongPortTest() {
-    new Byteman()
+    new Byteman(defaultBytemanJar)
         .port(-1000)
   }
 
   @Test
   void generateJavaAgentPropertyWithBootJarTest() {
     String expectedJavaAgentProperty = defaultJavaagentProperty + ",boot:" + jarPathList.first().getAbsolutePath()
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .boot(jarPathList)
         .generateBytemanJavaOpts()
 
@@ -131,7 +133,7 @@ class BytemanTest {
   @Test
   void generateJavaAgentPropertyWithSingleScriptTest() {
     String expectedJavaAgentProperty = defaultJavaagentProperty + ",script:" + scriptPathList.first().getAbsolutePath()
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .script([scriptPathList.first()])
         .generateBytemanJavaOpts()
 
@@ -145,7 +147,7 @@ class BytemanTest {
     String expectedJavaAgentProperty = defaultJavaagentProperty + ",script:" + scriptPathLinkedList.first().getAbsolutePath() +
         ",script:" + scriptPathLinkedList.last().getAbsolutePath()
 
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .script(scriptPathLinkedList)
         .generateBytemanJavaOpts()
 
@@ -159,7 +161,7 @@ class BytemanTest {
     String expectedJavaAgentProperty = defaultJavaagentProperty + ",script:" + scriptPathLinkedList.first().getAbsolutePath() +
         ",script:" + scriptPathLinkedList.last().getAbsolutePath() + ",sys:" + expectedDefaultJarPath
 
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .script(scriptPathLinkedList)
         .sys([new File(expectedDefaultJarPath)])
         .generateBytemanJavaOpts()
@@ -175,7 +177,7 @@ class BytemanTest {
         ",script:" + scriptPathLinkedList.last().getAbsolutePath() + ",sys:" + expectedDefaultJarPath +
         ",sys:" + expectedDefaultJarPath
 
-    String actualResult = new Byteman()
+    String actualResult = new Byteman(defaultBytemanJar)
         .script(scriptPathLinkedList)
         .sys([new File(expectedDefaultJarPath), new File(expectedDefaultJarPath)])
         .generateBytemanJavaOpts()
