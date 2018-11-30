@@ -1,6 +1,7 @@
 package noe.tomcat.configure
 
 import noe.byteman.Byteman
+import noe.byteman.BytemanInstaller
 import noe.common.utils.FileStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.PathHelper
@@ -265,7 +266,8 @@ class TomcatConfigurator {
    * however be aware that it removes all configuration changes applied.
    */
   TomcatConfigurator enableByteman() {
-    return enableByteman(new Byteman())
+    File bytemanJar = new BytemanInstaller().prepareBytemanJar()
+    return enableByteman(new Byteman(bytemanJar))
   }
 
   /**

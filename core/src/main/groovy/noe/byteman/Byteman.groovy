@@ -1,11 +1,6 @@
 package noe.byteman
 
 import groovy.util.logging.Slf4j
-import noe.common.utils.JBFile
-import noe.common.utils.PathHelper
-
-import java.nio.file.Files
-import java.nio.file.Paths
 
 /**
  * Universal byteman configuration allowing generation of byteman specific JAVA_OPTS.
@@ -17,14 +12,14 @@ import java.nio.file.Paths
  *
  * Use example:
  * <code>
- *   String JAVA_OPTS = new Byteman()
+ *   String JAVA_OPTS = new Byteman(bytemanJarFile)
  *     .script([bytemanScriptFile1, bytemanScriptFile2])
  *     .sys([systemJarFile])
  *     .generateBytemanJavaOpts()
  * </code>
  *
  * Byteman needs for proper working byteman.jar file fetched as maven dependency and stored during compilation inside
- * resources folder in noe-core maven artifact. Byteman.jar is copied into system folder `${java.io.tmpdir}/noe/byteman`
+ * resources folder in noe-core maven artifact. Byteman.jar is copied into system folder via BytemanInstaller
  * in runtime due to accessibility for various system users/accounts used during testing
  * (eg. tests run under user Hudson, but tomcat server is started as user Tomcat).
  * Byteman.jar location is used during generating -javaagent specific JAVA_OPTS.
@@ -38,8 +33,7 @@ class Byteman {
   public static final boolean DEFAULT_POLICY = false
   public static final boolean DEFAULT_LISTENER = true
 
-  protected static String BYTEMAN_JAR_NAME = "byteman.jar"
-  private File bytemanJarFile
+  private File bytemanJar
   private int bytemanPort
   private boolean bytemanListener
   private boolean bytemanPolicy
@@ -48,22 +42,11 @@ class Byteman {
   private List<File> bytemanSysFileList
   private Map<String, String> bytemanPropertiesMap
 
-  Byteman() {
-    this(prepareBytemanJar())
-  }
-
-  /**
-   * Notice that it is protected to not do mess within API, but it is available for testing within same package.
-   */
-  protected Byteman(File bytemanFile) {
-    bytemanJarFile = bytemanFile
-
-    log.debug("Creating byteman instance with path to byteman jar: " + bytemanJarFile)
-
-    if (!bytemanJarFile.exists()) {
-      throw new FileNotFoundException("File " + bytemanJarFile + " doesn't exist.")
+  Byteman(File bytemanJarFile) throws FileNotFoundException{
+    if (!bytemanJarFile?.exists()) {
+      throw new FileNotFoundException("File bytemanJarFile have to exist.")
     }
-
+    bytemanJar = bytemanJarFile
     bytemanScriptFileList = new LinkedList<File>()
     bytemanBootFileList = new LinkedList<File>()
     bytemanSysFileList = new LinkedList<File>()
@@ -71,28 +54,6 @@ class Byteman {
     bytemanPort = DEFAULT_PORT
     bytemanListener = DEFAULT_LISTENER
     bytemanPolicy = DEFAULT_POLICY
-  }
-
-  /**
-   * Copies byteman.jar to folder `${java.io.tmpdir}/noe/byteman` to be accessible for all users/accounts
-   * present in the testing environment due to RPM support as servers are running under different users then testing one.
-   */
-  private static File prepareBytemanJar() {
-    String bytemanStringDir = PathHelper.join(System.getProperty("java.io.tmpdir"), "noe", "byteman")
-    File bytemanDir = new File(bytemanStringDir)
-    File bytemanJarFile = new File(bytemanDir, BYTEMAN_JAR_NAME)
-
-    if (!bytemanJarFile.exists()) {
-      if (!bytemanDir.exists()) {
-        JBFile.mkdir(bytemanDir)
-      }
-
-      JBFile.makeAccessible(bytemanDir)
-      InputStream inputStream = Byteman.class.getResourceAsStream(BYTEMAN_JAR_NAME)
-      Files.copy(inputStream, Paths.get(bytemanJarFile.getPath()))
-    }
-
-    return bytemanJarFile
   }
 
   /**
@@ -184,14 +145,14 @@ class Byteman {
   }
 
   /**
-   * Composing valid -javaagent options with stored values.
+   * Composing valid -javaagent options with stored values with path to `bytemanJarFile` fetched as method variable
    *
    * @return something like:
    * -javaagent:/tmp/noe/byteman/byteman.jar=boot:/tmp/noe/byteman/byteman.jar,listener:true,port:9091,script:/opt/tomcat.btm,sys:/opt/karmor.jar
    */
   String generateBytemanJavaOpts() {
     StringBuilder javaAgentPropertyBuilder = new StringBuilder()
-    javaAgentPropertyBuilder.append("-javaagent:" + bytemanJarFile.getAbsolutePath() + "=boot:" + bytemanJarFile.getAbsolutePath())
+    javaAgentPropertyBuilder.append("-javaagent:" + bytemanJar.getAbsolutePath() + "=boot:" + bytemanJar.getAbsolutePath())
 
     if (bytemanListener) {
       javaAgentPropertyBuilder.append(",listener:" + bytemanListener + ",port:" + bytemanPort)
