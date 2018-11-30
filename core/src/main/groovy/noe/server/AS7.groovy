@@ -425,7 +425,8 @@ class AS7 extends ServerAbstract {
    * Deploy by copying +
    * removes appName.undeployed marker if present.
    */
-  void deployByCopying(String appPath, boolean explodeFirst = false, String contextName = '') {
+  @Override
+  void deployByCopying(String appPath, Boolean explodeFirst = false, String contextName = '', Boolean zipAsWar = false) {
     log.debug("Deploying by copying appPath:${appPath} with contextName:${contextName}")
     File fullDeplSrcPath = new File(getDeplSrcPath(), appPath)
     String destDirName = contextName ?: fullDeplSrcPath.getName()
@@ -437,7 +438,7 @@ class AS7 extends ServerAbstract {
     }
     log.trace("destDirName after check:${destDirName}")
     // Actually, IMHO, there is no need for exploding archives for AS7. Unlike with tomcat. I will take the liberty of fixing explodeFirst = false.
-    super.deployByCopying(appPath, false, destDirName)
+    super.deployByCopying(appPath, false, destDirName, zipAsWar)
     File scannerHintFilePath = new File(getDeploymentPath(), destDirName + ".undeployed")
     if (scannerHintFilePath.exists()) {
       JBFile.delete(scannerHintFilePath)
