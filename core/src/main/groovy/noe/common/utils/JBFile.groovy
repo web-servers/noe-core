@@ -650,6 +650,8 @@ class JBFile {
     }
 
     if (hasZip == 0) {
+      log.warn("Command 'unzip' is not available, using Ant to unzip '${file.getAbsolutePath()}'. Beware, that this " +
+              "method won't preserve symlinks and filesystem permissions!")
       return ant.unzip(src: file.getAbsolutePath(), dest: destDir.getAbsolutePath())
     }
 
