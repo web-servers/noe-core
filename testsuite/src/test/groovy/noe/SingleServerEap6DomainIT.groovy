@@ -7,6 +7,7 @@ import noe.server.AS7Domain
 import noe.workspace.ServersWorkspace
 import org.junit.BeforeClass
 import org.junit.Test
+import org.junit.Ignore
 
 @Slf4j
 class SingleServerEap6DomainIT extends TestAbstract {
@@ -42,6 +43,8 @@ class SingleServerEap6DomainIT extends TestAbstract {
   }
 
   @Test
+  // https://github.com/web-servers/noe-core/pull/34
+  @Ignore
   void shiftPortsTest() {
     String serverId = serverController.getServerIds().first()
     AS7Domain server = serverController.getServerById(serverId)
