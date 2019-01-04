@@ -291,8 +291,8 @@ class AS7Domain extends ServerAbstract {
       def stringToReplace = '<socket-bindings port-offset="' + value + '"/>'
       def newString = '<socket-bindings port-offset="' + (value + offset) + '"/>'
       if (serverOffsets[key] == 0 && portOffsetNeverUpdated) { // there is port offset still not defined, we need to create the definition
-        stringToReplace = '<!--[\\s~]* Remote JPDA debugging for a specific server'
-        newString += ' <!--'
+        stringToReplace = '<server name="server-one" group="main-server-group"/>'
+        newString = "<server name=\"server-one\" group=\"main-server-group\">${newString}</server>"
       }
       updateConfReplaceRegExp(configFile, stringToReplace, newString)
       serverOffsets[key] += offset
