@@ -16,7 +16,7 @@ class SingleServerEap7DomainIT extends TestAbstract {
   @BeforeClass
   public static void beforeClass() {
     Assume.assumeTrue("EAP 7 requires at least JDK 1.8", new Java().isJdk1xOrHigher('1.8'));
-    loadTestProperties('/eap7-test.properties')
+    loadTestProperties('/eap7-domain-test.properties')
     workspace = new ServersWorkspace(
         new WorkspaceAS7DomainNoHttpd('eap7-domain-1')
     );
