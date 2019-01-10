@@ -10,11 +10,31 @@ import groovy.util.logging.Slf4j
 @Slf4j
 public class Java {
 
-  public static final String javaVersion = System.getProperty('java.version')
-  public static final String javaVendor = System.getProperty('java.vendor')
-  public static final String javaVmName = System.getProperty('java.vm.name')
-  public static final String javaVmInfo = System.getProperty('java.vm.info')
+  public static String javaVersion = System.getProperty('java.version')
+  public static String javaVendor = System.getProperty('java.vendor')
+  public static String javaVmName = System.getProperty('java.vm.name')
+  public static String javaVmInfo = System.getProperty('java.vm.info')
   public static final String javaHome = System.getenv('JAVA_HOME')
+  public static final String serverJavaHome = System.getenv('SERVER_JAVA_HOME')
+  private static final String javaHelperClassResource = "java/JavaVersion.java"
+  private static boolean initialized = false
+
+  static {
+    if (serverJavaHome && !initialized) {
+      if (!new File(serverJavaHome, "bin").exists()) {
+        return
+      }
+      String javac = PathHelper.join(serverJavaHome, "bin", "javac")
+      String java = PathHelper.join(serverJavaHome, "bin", "java")
+      Library.copyResourceTo(javaHelperClassResource, new File("."))
+      Cmd.executeCommandConsumeStreams([javac, "JavaVersion.java"])
+      javaVersion = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-version"])["stdOut"].trim()
+      javaVendor = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vendor"])["stdOut"].trim()
+      javaVmName = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vmname"])["stdOut"].trim()
+      javaVmInfo = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vminfo"])["stdOut"].trim()
+      initialized = true
+    }
+  }
 
   String toString() {
     "${javaVersion} ${javaVendor} ${javaVmName} ${javaVmInfo}"
