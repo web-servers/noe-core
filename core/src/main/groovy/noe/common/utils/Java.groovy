@@ -20,12 +20,12 @@ public class Java {
   private static boolean initialized = false
 
   static {
-    if(serverJavaHome && !initialized) {
-      if(! new File(serverJavaHome, "bin").exists()) {
+    if (serverJavaHome && !initialized) {
+      if (!new File(serverJavaHome, "bin").exists()) {
         return
       }
-      String javac = PathHelper.join(serverJavaHome,"bin","javac")
-      String java = PathHelper.join(serverJavaHome,"bin","java")
+      String javac = PathHelper.join(serverJavaHome, "bin", "javac")
+      String java = PathHelper.join(serverJavaHome, "bin", "java")
       Library.copyResourceTo(javaHelperClassResource, new File("."))
       Cmd.executeCommandConsumeStreams([javac, "JavaVersion.java"])
       javaVersion = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-version"])["stdOut"].trim()
