@@ -17,9 +17,10 @@ public class Java {
   public static final String javaHome = System.getenv('JAVA_HOME')
   public static final String serverJavaHome = System.getenv('SERVER_JAVA_HOME')
   private static final String javaHelperClassResource = "java/JavaVersion.java"
+  private static boolean initialized = false
 
   static {
-    if(serverJavaHome) {
+    if(serverJavaHome && !initialized) {
       if(! new File(serverJavaHome, "bin").exists()) {
         return
       }
@@ -31,6 +32,7 @@ public class Java {
       javaVendor = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vendor"])["stdOut"].trim()
       javaVmName = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vmname"])["stdOut"].trim()
       javaVmInfo = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vminfo"])["stdOut"].trim()
+      initialized = true
     }
   }
 
