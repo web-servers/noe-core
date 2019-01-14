@@ -47,7 +47,7 @@ class WorkspaceHttpdAS7 extends WorkspaceAbstract {
     this.eapVersion = Library.getUniversalProperty('eap.version')
     this.ewsVersion = DefaultProperties.apacheCoreVersion() ? '' : Library.getUniversalProperty('ews.version')
 
-    assert new Version(eapVersion) >= new Version("6.0.0")
+    assert new Version(eapVersion).majorVersion >= new Version("6.0.0").majorVersion
     //downloadClusterBench()
     workspaceHttpd = new WorkspaceHttpd()
     workspaceAS7 = new WorkspaceAS7()
