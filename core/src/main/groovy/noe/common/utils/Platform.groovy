@@ -120,6 +120,10 @@ class Platform {
     return (isRHEL() && (osVersion ==~ /.*el7.*/)) || forceRhel7()
   }
 
+  boolean isRHEL8() {
+    return (isRHEL() && (osVersion ==~ /.*el8.*/)) || forceRhel8()
+  }
+
   boolean isSolaris11() {
     return isSolaris() && (osVersion ==~ /5\.11/)
   }
@@ -157,7 +161,21 @@ class Platform {
     return numOfCpus;
   }
 
+  /**
+   * As on Docker, the 'os.name' of the system is determined by the host OS and not the container one, to make tests
+   * work it is necessary to mock that we are, indeed, using RHEL7 machine.
+   * @return value of the 'force.rhel.7' property
+   */
   private boolean forceRhel7() {
     return Boolean.parseBoolean(Library.getUniversalProperty('force.rhel.7', 'false'))
+  }
+
+  /**
+   * As on Docker, the 'os.name' of the system is determined by the host OS and not the container one, to make tests
+   * work it is necessary to mock that we are, indeed, using RHEL8 machine.
+   * @return value of the 'force.rhel.8' property
+   */
+  private boolean forceRhel8() {
+    return Boolean.parseBoolean(Library.getUniversalProperty('force.rhel.8', 'false'))
   }
 }
