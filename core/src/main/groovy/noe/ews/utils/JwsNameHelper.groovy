@@ -93,6 +93,7 @@ class JwsNameHelper {
       if (platform.isRHEL5()) result += 'RHEL5-'
       else if (platform.isRHEL6()) result += 'RHEL6-'
       else if (platform.isRHEL7()) result += 'RHEL7-'
+      else if (platform.isRHEL8()) result += 'RHEL8-'
       if (platform.isX86()) {
         result += "i386"
       } else if (platform.isX64()) {
