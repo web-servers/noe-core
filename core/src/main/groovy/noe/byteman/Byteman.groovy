@@ -12,7 +12,7 @@ import groovy.util.logging.Slf4j
  *
  * Use example:
  * <code>
- *   String JAVA_OPTS = new Byteman(bytemanJarFile)
+ *   String JAVA_OPTS = new Byteman(new BytemanInstaller().prepareBytemanJar())
  *     .script([bytemanScriptFile1, bytemanScriptFile2])
  *     .sys([systemJarFile])
  *     .generateBytemanJavaOpts()
