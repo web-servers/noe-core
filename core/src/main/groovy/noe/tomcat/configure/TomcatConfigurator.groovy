@@ -251,6 +251,11 @@ class TomcatConfigurator {
    *
    * For disabling byteman configuration, it is possible to call method `revertAllConfiguration()`,
    * however be aware that it removes all configuration changes applied.
+   *
+   * Byteman instance example:
+   * new Byteman(new BytemanInstaller().prepareBytemanJar())
+   *      .script([new File("bytemanScriptFile1.btm"), new File("bytemanScriptFile2.btm")])
+   *      .sys([new File("systemJarFile.jar")])
    */
   TomcatConfigurator enableByteman(Byteman byteman) {
     envVariableByAppend("JAVA_OPTS", byteman.generateBytemanJavaOpts())
