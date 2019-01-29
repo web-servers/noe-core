@@ -254,8 +254,8 @@ class TomcatConfigurator {
    *
    * Byteman instance example:
    * new Byteman(new BytemanInstaller().prepareBytemanJar())
-   *      .script([bytemanScriptFile1.btm, bytemanScriptFile2.btm])
-   *      .sys([systemJarFile.jar])
+   *      .script([new File("bytemanScriptFile1.btm"), new File("bytemanScriptFile2.btm")])
+   *      .sys([new File("systemJarFile.jar")])
    */
   TomcatConfigurator enableByteman(Byteman byteman) {
     envVariableByAppend("JAVA_OPTS", byteman.generateBytemanJavaOpts())
