@@ -239,7 +239,15 @@ abstract class Httpd extends ServerAbstract {
     log.debug("New address:port for server binding: '" + address + ":" + mainHttpPort + "'")
     updateConfReplaceRegExp('httpd.conf', 'Listen (.*)',
         'Listen ' + ((address.contains(':') && !address.contains(']')) ? '[' + address + ']' : address) + ':' + mainHttpPort, true)
-    host = address
+    /* fe80 is IPv6 Link Local prefix eg. fe80::f816:3eff:fe5f:a050
+     * httpd also expects IPv6 Link Local address to be fllowed by '%' and network interface name(eth0,docker0,...)
+     * or interface ID (1,2,...)
+     */
+    if (address.toLowerCase().startsWith('fe80') && address.contains('%')) {
+      host = address.split('%').first()
+    } else {
+      host = address
+    }
   }
 
   /**
