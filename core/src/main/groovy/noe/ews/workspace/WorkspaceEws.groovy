@@ -28,9 +28,10 @@ class WorkspaceEws extends WorkspaceAbstract {
   String ewsVersion /// like 2.0.0-ER3
 
   WorkspaceEws(boolean installHttpd = true) {
-    if(installHttpd) {
+    if (installHttpd) {
       workspaceHttpd = new WorkspaceHttpd()
     }
+
     workspaceTomcat = new WorkspaceTomcat()
     workspaceApacheDS = new WorkspaceApacheDS()
     this.ews = Boolean.valueOf(Library.getUniversalProperty('ews', 'true'))
@@ -43,9 +44,11 @@ class WorkspaceEws extends WorkspaceAbstract {
    * Prepare the workspace.
    */
   def prepare() {
-    workspaceHttpd?.prepare()
-    if (platform.isWindows()) {
-      serverController.installApacheWindowsService(serverController.getHttpdServerId())
+    if(workspaceHttpd) {
+      workspaceHttpd.prepare()
+      if (platform.isWindows()) {
+        serverController.installApacheWindowsService(serverController.getHttpdServerId())
+      }
     }
     // version newer that 3.1.0-DR1 have separated apache and tomcat installations
     boolean purge = (new Version(ewsVersion) >= new Version('3.1.0-DR0')) || (DefaultProperties.apacheCoreVersion() != null)
@@ -65,8 +68,8 @@ class WorkspaceEws extends WorkspaceAbstract {
    */
   def destroy() {
     workspaceHttpd?.destroy()
-    workspaceTomcat.destroy()
-    workspaceApacheDS.destroy()
+    workspaceTomcat?.destroy()
+    workspaceApacheDS?.destroy()
 
     // TODO HP And no basedir was set??
     //      What about Testing standalone tomcats (this.ews should be sufficient)
@@ -78,6 +81,10 @@ class WorkspaceEws extends WorkspaceAbstract {
         log.debug('EWS workspace NOT deleted: ' + basedir)
       }
     }
+
+    workspaceHttpd = null
+    workspaceTomcat = null
+    workspaceApacheDS = null
   }
 
   /**
