@@ -31,7 +31,7 @@ class FileStateVault {
     if (!toStore.exists()) {
       initItem(toStore)
       vault.get(key(toStore)).add(DID_NOT_EXIST)
-    } else if (toStore.isFile()) {
+    } else if (toStore.isFile() && toStore.canRead()) {
       initItem(toStore)
       vault.get(key(toStore)).add(toStore.getBytes())
     } else {
