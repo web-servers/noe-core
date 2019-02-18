@@ -4,6 +4,7 @@ import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
 import noe.common.utils.Platform
 import noe.common.utils.Version
+import noe.eap.creaper.ServerVerProvider
 import noe.server.AS7
 import org.apache.commons.collections.CollectionUtils
 import org.apache.commons.lang3.StringUtils
@@ -589,7 +590,7 @@ class CLILib {
       String escapedLocation =  CLILib.escapeQuotes(addVirtualHostBuilder.location)
       String locationCommand = "/subsystem=undertow/server=${addVirtualHostBuilder.server}" +
               "/host=${addVirtualHostBuilder.hostName}/location=${escapedLocation}:add(handler=welcome-content)"
-      if (DefaultProperties.EAP_VERSION < new Version("7.0.0.DR1")) {
+      if (ServerVerProvider.provideFor(addVirtualHostBuilder.as7serverInstance).lessThan(ServerVerProvider.getMngmtVerOfEAP("7.0.0.DR1"))) {
         createCommand = "/subsystem=web/virtual-server=${addVirtualHostBuilder.hostName}:add"
         return addVirtualHostBuilder.as7serverInstance.as7Cli.runArbitraryCommand(createCommand).exitValue
       }
