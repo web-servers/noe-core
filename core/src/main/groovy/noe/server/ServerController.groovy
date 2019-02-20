@@ -1,7 +1,6 @@
 package noe.server
 
 import groovy.util.logging.Slf4j
-import noe.common.DefaultProperties
 import noe.common.NoeContext
 import noe.common.utils.Platform
 import noe.common.utils.db.DBAllocation
@@ -53,6 +52,10 @@ class ServerController {
     servers[id] = server
 
     return server
+  }
+
+  ServerAbstract removeServer(String id) {
+    return servers.remove(id)
   }
 
   @Deprecated
