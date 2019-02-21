@@ -4,10 +4,16 @@ import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
 import noe.common.utils.Platform
 import noe.common.utils.Version
+import noe.eap.creaper.ManagementClientProvider
 import noe.eap.creaper.ServerVerProvider
 import noe.server.AS7
 import org.apache.commons.collections.CollectionUtils
 import org.apache.commons.lang3.StringUtils
+import org.wildfly.extras.creaper.core.online.ModelNodeResult
+import org.wildfly.extras.creaper.core.online.OnlineManagementClient
+import org.wildfly.extras.creaper.core.online.operations.Address
+import org.wildfly.extras.creaper.core.online.operations.Operations
+
 /**
  * CLILib - your first step in the realm of AS7/Wildfly configuration!
  *
@@ -3281,9 +3287,13 @@ class CLILib {
    * @return String containing the result of call for given attribute.
    */
   static String readSocketBinding(AS7 as7serverInstance, String name, String attribute) {
-    String cmdStr = "/socket-binding-group=standard-sockets/socket-binding=$name:read-attribute(name=$attribute)"
-    String output =  readArbitraryCommandOutput(as7serverInstance, cmdStr)
-    return (output =~ (/\"result\" => (.+)/))[0][1]
+    final Address address = Address.of("socket-binding-group", "standard-sockets").and("socket-binding", name)
+    ManagementClientProvider.createOnlineManagementClient(as7serverInstance).withCloseable {
+      final OnlineManagementClient client ->
+        final ModelNodeResult result = new Operations(client).readAttribute(address, attribute)
+        result.assertSuccess()
+        return result.stringValue()
+    }
   }
 
   /**
