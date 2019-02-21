@@ -1,6 +1,5 @@
 package noe.common.utils
 
-
 /**
  * Service class for storing and restoring of file states.
  * State means content or information whether file does not exist.
@@ -12,16 +11,58 @@ package noe.common.utils
  *
  * Symlinks do not have any special care.
  *
- * There is no manipulation with access rights on files, only exception is when file
- * is being removed - when normal delete fails deleting with sudo is activated (if enabled).
+ * There is no manipulation with access rights on file, if file is not accessable,
+ * exception is thrown. When file is deleted, `sudo` is applied if simple delete does not work.
  *
  * @see JBFile#delete
  * @see DirStateVault
  *
  */
 class FileStateVault implements StateVault {
-  final static byte[] DID_NOT_EXIST = [6, 6, 6]
-  Map<String, List<byte[]>> vault = [:]
+  Map<String, List<FileState>> vault = [:]
+  private boolean isWindows = new Platform().isWindows()
+
+  class FileState {
+    final static byte[] DID_NOT_EXIST = [6, 6, 6]
+    private byte[] state
+
+    /**
+     * Attributes of files on Unix like OS only.
+     */
+    private JBFile.FilePermission permission
+
+
+    FileState saveState(File file) {
+      this.state = file.getBytes()
+
+      if (!isWindows) {
+        this.permission = JBFile.retrievePermissions(file)
+      }
+
+      return this
+    }
+
+    FileState restoreState(File restoreTarget) {
+      restoreTarget.setBytes(state)
+
+      if (!isWindows) {
+        JBFile.definePermissions(permission, restoreTarget)
+      }
+
+      return this
+    }
+
+    FileState setDidNotExist() {
+      this.state = DID_NOT_EXIST
+
+      return this
+    }
+
+    boolean didNotExists() {
+      return this.state == DID_NOT_EXIST
+    }
+
+  }
 
   /**
    * If file toStore does exist it's current content is stored into memory (stack).
@@ -34,10 +75,10 @@ class FileStateVault implements StateVault {
   FileStateVault push(File toStore) {
     if (!toStore.exists()) {
       initItem(toStore)
-      vault.get(key(toStore)).add(DID_NOT_EXIST)
+      vault.get(key(toStore)).add(new FileState().setDidNotExist())
     } else if (toStore.isFile() && toStore.canRead()) {
       initItem(toStore)
-      vault.get(key(toStore)).add(toStore.getBytes())
+      vault.get(key(toStore)).add(new FileState().saveState(toStore))
     } else {
       throw new IllegalStateException("Target to store '${toStore}' is not file or is not accessible.")
     }
@@ -83,10 +124,10 @@ class FileStateVault implements StateVault {
       throw new IllegalStateException("Target to re-store '${toRestore}' does not exist in vault.")
     }
 
-    byte[] contentToRestore = vault.get(key(toRestore)).last()
-    deleteIfDidNotExistsElseRestore(toRestore, contentToRestore)
+    FileState fileStateToRestore = vault.get(key(toRestore)).last()
+    deleteIfDidNotExistsElseRestore(toRestore, fileStateToRestore)
 
-    vault.get(key(toRestore)).remove(contentToRestore)
+    vault.get(key(toRestore)).remove(fileStateToRestore)
     if (vault.get(key(toRestore)).size() == 0) {
       vault.remove(key(toRestore))
     }
@@ -98,15 +139,15 @@ class FileStateVault implements StateVault {
     return vault.containsKey(key(file))
   }
 
-  private void deleteIfDidNotExistsElseRestore(File toRestore, byte[] contentToRestore) {
-    if (contentToRestore == DID_NOT_EXIST) {
+  private void deleteIfDidNotExistsElseRestore(File toRestore, FileState fileState) {
+    if (fileState.didNotExists()) {
       JBFile.delete(toRestore)
     } else {
       if (!toRestore.exists()) {
         toRestore.getParentFile().mkdirs()
         toRestore.createNewFile()
       }
-      toRestore.setBytes(contentToRestore)
+      fileState.restoreState(toRestore)
     }
   }
 
@@ -122,8 +163,8 @@ class FileStateVault implements StateVault {
       throw new IllegalStateException("Target to re-store '${toRestore}' does not exist in vault.")
     }
 
-    byte[] contentToRestore = vault.get(key(toRestore)).first()
-    deleteIfDidNotExistsElseRestore(toRestore, contentToRestore)
+    FileState fileStateToRestore = vault.get(key(toRestore)).first()
+    deleteIfDidNotExistsElseRestore(toRestore, fileStateToRestore)
 
     vault.remove(key(toRestore))
 
@@ -138,9 +179,9 @@ class FileStateVault implements StateVault {
    */
   @Override
   FileStateVault popAll() {
-    vault.each { String key, List<byte[]> data ->
-      byte[] contentToRestore = data.first()
-      deleteIfDidNotExistsElseRestore(new File(key), contentToRestore)
+    vault.each { String key, List<FileState> data ->
+      FileState fileStateToRestore = data.first()
+      deleteIfDidNotExistsElseRestore(new File(key), fileStateToRestore)
     }
 
     vault.clear()

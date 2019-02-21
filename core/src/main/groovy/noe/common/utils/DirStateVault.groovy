@@ -3,7 +3,7 @@ package noe.common.utils
 /**
  * Service class for storing and restoring of directories states.
  * State means content of files in directory and subdirectories or information whether files
- * and subdirectories does not exist.
+ * and subdirectories does not exist, it also means file permissions.
  *
  * State is stored in memory.
  *
@@ -11,8 +11,8 @@ package noe.common.utils
  *
  * Symlinks do not have any special care.
  *
- * There is no manipulation with access rights on files, only exception is when file
- * is being removed - when normal delete fails deleting with sudo is activated (if enabled).
+ * There is no manipulation with access rights on items, if item is not accessable,
+ * exception is thrown. When items are deleted, `sudo` is applied if simple delete does not work.
  *
  * Each record/pushed directory is handled individually, implication is that push of subdirectory of
  * already pushed directory is handled separately. There is no logic checking relation between pushed directories.
@@ -24,11 +24,34 @@ package noe.common.utils
  */
 class DirStateVault implements StateVault<DirStateVault> {
   private Map<String, List<DirState>> vault = [:]
+  private boolean isWindows = new Platform().isWindows()
 
-  static class DirState {
+  class DirState {
     FileStateVault fileStateVault
     DirStateVault dirStateVault
     boolean existed = true
+    File dir
+
+    /**
+     * Attribs of files on Unix like OS only.
+     */
+    private JBFile.FilePermission permission
+
+    DirState(File targetDir) {
+      this.dir = targetDir
+    }
+
+    void storeDirPermissions() {
+      if (dir.exists() && !isWindows) {
+        this.permission = JBFile.retrievePermissions(dir)
+      }
+    }
+
+    void loadDirPermissions() {
+      if (dir.exists() && !isWindows) {
+        JBFile.definePermissions(permission, dir)
+      }
+    }
 
     boolean isEmpty() {
       return fileStateVault == null && dirStateVault == null
@@ -47,7 +70,7 @@ class DirStateVault implements StateVault<DirStateVault> {
   @Override
   DirStateVault push(File toStore) {
     initItem(toStore)
-    DirState dirState = new DirState()
+    DirState dirState = new DirState(toStore)
 
     // all files in directory are handle by 1 FileStateVault instance and
     // all directories are handled by 1 DirStateVault instance
@@ -55,14 +78,14 @@ class DirStateVault implements StateVault<DirStateVault> {
     StateVault dirsInDirStateVault
 
     if (!toStore.exists()) {
-      DirState ds = new DirState()
-      ds.existed = false
-      vault.get(key(toStore)).add(ds)
+      dirState.existed = false
+      vault.get(key(toStore)).add(dirState)
     } else {
       toStore.listFiles().each { File item ->
         if (item.isFile() && item.canRead()) {
           filesInDirFileStateVault = (filesInDirFileStateVault ?: new FileStateVault()).push(item)
         } else if (item.isDirectory() && item.canRead() && item.canExecute()) {
+          dirState.storeDirPermissions()
           dirsInDirStateVault = (dirsInDirStateVault ?: new DirStateVault()).push(item)
         } else {
           throw new IllegalStateException("Target to store '${toStore}' is not accessible.")
@@ -114,9 +137,7 @@ class DirStateVault implements StateVault<DirStateVault> {
     }
 
     DirState dirState = vault.get(key(toRestore)).last()
-    FileStateVault fileStateVault = dirState?.fileStateVault
-    DirStateVault dirStateVault = dirState?.dirStateVault
-    restoreDirectory(toRestore, fileStateVault, dirStateVault)
+    restoreDirectory(toRestore, dirState)
 
     vault.get(key(toRestore)).pop()
     if (vault.get(key(toRestore)).isEmpty()) {
@@ -156,9 +177,8 @@ class DirStateVault implements StateVault<DirStateVault> {
       throw new IllegalStateException("Target to re-store '${toRestore}' does not exist in vault.")
     }
 
-    FileStateVault fileStateVault = vault.get(key(toRestore)).first()?.fileStateVault
-    DirStateVault dirStateVault = vault.get(key(toRestore)).first()?.dirStateVault
-    restoreDirectory(toRestore, fileStateVault, dirStateVault)
+    DirState dirState = vault.get(key(toRestore)).first()
+    restoreDirectory(toRestore, dirState)
 
     vault.remove(key(toRestore))
 
@@ -179,9 +199,11 @@ class DirStateVault implements StateVault<DirStateVault> {
     }
   }
 
-  private void restoreDirectory(File toRestore, FileStateVault fileStateVault, DirStateVault dirStateVault) {
+  private void restoreDirectory(File toRestore, DirState dirState) {
     boolean fileDidExist
     boolean dirDidExist
+    FileStateVault fileStateVault = dirState?.fileStateVault
+    DirStateVault dirStateVault = dirState?.dirStateVault
 
     // directory did ont exists -> delete
     if (!vault.get(key(toRestore)).last().existed) {
@@ -195,7 +217,7 @@ class DirStateVault implements StateVault<DirStateVault> {
       toRestore.mkdirs()
     }
 
-    // remove anything new
+    // remove anything new and set original permissions
     toRestore.listFiles().each { File existingItemInToRestoreFolder ->
 
       if (existingItemInToRestoreFolder.isFile()) {
@@ -210,6 +232,8 @@ class DirStateVault implements StateVault<DirStateVault> {
         dirDidExist = (dirStateVault) ? (dirStateVault?.isPushed(existingItemInToRestoreFolder)) : false
         if (!dirDidExist) {
           JBFile.delete(existingItemInToRestoreFolder)
+        } else {
+          dirState.loadDirPermissions()
         }
 
       } else {
