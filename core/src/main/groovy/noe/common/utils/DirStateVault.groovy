@@ -11,8 +11,9 @@ package noe.common.utils
  *
  * Symlinks do not have any special care.
  *
- * There is no manipulation with access rights on items, if item is not accessable,
- * exception is thrown. When items are deleted, `sudo` is applied if simple delete does not work.
+ * There is manipulation with access rights on items, if item is not accessible it's access rights are changed
+ * temporalily for time if saving or restoring state, To enable this functionality NOE has to be executed with
+ * -Drun.with.sudo=true.
  *
  * Each record/pushed directory is handled individually, implication is that push of subdirectory of
  * already pushed directory is handled separately. There is no logic checking relation between pushed directories.
@@ -74,8 +75,8 @@ class DirStateVault implements StateVault<DirStateVault> {
 
     // all files in directory are handle by 1 FileStateVault instance and
     // all directories are handled by 1 DirStateVault instance
-    StateVault filesInDirFileStateVault
-    StateVault dirsInDirStateVault
+    FileStateVault filesInDirFileStateVault
+    DirStateVault dirsInDirStateVault
 
     if (!toStore.exists()) {
       dirState.existed = false
@@ -112,7 +113,7 @@ class DirStateVault implements StateVault<DirStateVault> {
 
   private void makeDirAccessibleIfItIsNot(File dir) {
     if (!isWindows && !(dir.canRead() && dir.canExecute() && dir.canExecute())) {
-      JBFile.chmod('o+rwx')
+      JBFile.chmod('u+rwx', dir)
     }
   }
 
@@ -244,7 +245,7 @@ class DirStateVault implements StateVault<DirStateVault> {
         }
 
       } else {
-        throw IllegalStateException("Can not access to target ${existingItemInToRestoreFolder}")
+        throw new IllegalStateException("Can not access to target ${existingItemInToRestoreFolder}")
       }
 
     }

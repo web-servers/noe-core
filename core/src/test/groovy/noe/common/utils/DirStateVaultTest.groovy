@@ -8,6 +8,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+import static org.junit.Assert.assertEquals
+
 
 class DirStateVaultTest {
   List firstLevelDir = []
@@ -203,6 +205,30 @@ class DirStateVaultTest {
 
     Assert.assertFalse("File ($shouldNotExists1) should not exists after popall()", shouldNotExists1.exists())
     Assert.assertFalse("File ($shouldNotExists2) should not exists after popall()", shouldNotExists2.exists())
+
+    contentEqual(origContent)
+  }
+
+  @Test
+  void storingInaccessibleDirAndModifyPermissions() {
+    Assume.assumeTrue("On non Windows only", !new Platform().isWindows())
+    Assume.assumeTrue("To run this test -Drun.with.sudo=true must be set. Oper. system user has to have passwordless sudo configured.", JBFile.useAdminPrivileges)
+
+    LinkedHashMap<File, byte[]> origContent = loadContentFromFiles()
+    JBFile.chmod('ugo-rwx', testDir)
+    DirStateVault vault = new DirStateVault().push(testDir)
+
+    JBFile.chmod('u+rwx', testDir)
+    File mustNotExistsFIle = new File(testDir, 'must-not-exists-after-pop')
+    mustNotExistsFIle.createNewFile()
+    vault.pop(testDir)
+
+    JBFile.FilePermission permAfterPop = JBFile.retrievePermissions(testDir)
+    assertEquals("Permissions on file was not reverted.", permAfterPop.perm, '0000')
+
+    JBFile.chmod('ugo+rwx', testDir)
+
+    Assert.assertTrue(!mustNotExistsFIle.exists())
 
     contentEqual(origContent)
   }

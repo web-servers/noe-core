@@ -46,7 +46,7 @@ class FileStateVault implements StateVault {
 
     private void makeTheFileReadableIfItIsNot(File file) {
       if (!isWindows && !file.canRead()) {
-        JBFile.chmod('o+r', file)
+        JBFile.chmod('ugo+r', file)
       }
     }
 
@@ -66,7 +66,7 @@ class FileStateVault implements StateVault {
 
     private void makeFileWriteableIfItIsNot(File restoreTarget) {
       if (!isWindows && !restoreTarget.canWrite()) {
-        JBFile.chmod('o+w', restoreTarget)
+        JBFile.chmod('ugo+w', restoreTarget)
       }
     }
 
