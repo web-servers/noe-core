@@ -33,7 +33,7 @@ class DirStateVault implements StateVault<DirStateVault> {
     File dir
 
     /**
-     * Attribs of files on Unix like OS only.
+     * Permissions of file on Unix like OS only.
      */
     private JBFile.FilePermission permission
 
@@ -43,7 +43,7 @@ class DirStateVault implements StateVault<DirStateVault> {
 
     void storeDirPermissions() {
       if (dir.exists() && !isWindows) {
-        this.permission = JBFile.retrievePermissions(dir)
+        permission = JBFile.retrievePermissions(dir)
       }
     }
 
@@ -81,16 +81,19 @@ class DirStateVault implements StateVault<DirStateVault> {
       dirState.existed = false
       vault.get(key(toStore)).add(dirState)
     } else {
+      dirState.storeDirPermissions()
+      makeDirAccessibleIfItIsNot(toStore)
+
       toStore.listFiles().each { File item ->
-        if (item.isFile() && item.canRead()) {
+        if (item.isFile()) {
           filesInDirFileStateVault = (filesInDirFileStateVault ?: new FileStateVault()).push(item)
-        } else if (item.isDirectory() && item.canRead() && item.canExecute()) {
-          dirState.storeDirPermissions()
+        } else if (item.isDirectory()) {
           dirsInDirStateVault = (dirsInDirStateVault ?: new DirStateVault()).push(item)
         } else {
           throw new IllegalStateException("Target to store '${toStore}' is not accessible.")
         }
       }
+      dirState.loadDirPermissions()
 
       if (filesInDirFileStateVault) {
         dirState.fileStateVault = filesInDirFileStateVault
@@ -105,6 +108,12 @@ class DirStateVault implements StateVault<DirStateVault> {
     }
 
     return this
+  }
+
+  private void makeDirAccessibleIfItIsNot(File dir) {
+    if (!isWindows && !(dir.canRead() && dir.canExecute() && dir.canExecute())) {
+      JBFile.chmod('o+rwx')
+    }
   }
 
   /**
@@ -217,7 +226,7 @@ class DirStateVault implements StateVault<DirStateVault> {
       toRestore.mkdirs()
     }
 
-    // remove anything new and set original permissions
+    // remove anything, what was not present on push
     toRestore.listFiles().each { File existingItemInToRestoreFolder ->
 
       if (existingItemInToRestoreFolder.isFile()) {
@@ -232,8 +241,6 @@ class DirStateVault implements StateVault<DirStateVault> {
         dirDidExist = (dirStateVault) ? (dirStateVault?.isPushed(existingItemInToRestoreFolder)) : false
         if (!dirDidExist) {
           JBFile.delete(existingItemInToRestoreFolder)
-        } else {
-          dirState.loadDirPermissions()
         }
 
       } else {
@@ -244,7 +251,10 @@ class DirStateVault implements StateVault<DirStateVault> {
 
     // now, there are only files what was pushed, any missing, will be recovered as well as state of existing
     fileStateVault?.pop()
+
+    makeDirAccessibleIfItIsNot(toRestore)
     dirStateVault?.pop()
+    dirState.loadDirPermissions()
   }
 
   private String key(File file) {

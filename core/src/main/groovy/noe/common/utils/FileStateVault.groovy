@@ -33,23 +33,41 @@ class FileStateVault implements StateVault {
 
 
     FileState saveState(File file) {
-      this.state = file.getBytes()
-
       if (!isWindows) {
         this.permission = JBFile.retrievePermissions(file)
       }
 
+      makeTheFileReadableIfItIsNot(file)
+      this.state = file.getBytes()
+      returnOriginalPermissions(file)
+
       return this
     }
 
-    FileState restoreState(File restoreTarget) {
-      restoreTarget.setBytes(state)
-
-      if (!isWindows) {
-        JBFile.definePermissions(permission, restoreTarget)
+    private void makeTheFileReadableIfItIsNot(File file) {
+      if (!isWindows && !file.canRead()) {
+        JBFile.chmod('o+r', file)
       }
+    }
+
+    private returnOriginalPermissions(File file) {
+      if (!isWindows) {
+        JBFile.definePermissions(permission, file)
+      }
+    }
+
+    FileState restoreState(File restoreTarget) {
+      makeFileWriteableIfItIsNot(restoreTarget)
+      restoreTarget.setBytes(state)
+      returnOriginalPermissions(restoreTarget)
 
       return this
+    }
+
+    private void makeFileWriteableIfItIsNot(File restoreTarget) {
+      if (!isWindows && !restoreTarget.canWrite()) {
+        JBFile.chmod('o+w', restoreTarget)
+      }
     }
 
     FileState setDidNotExist() {
@@ -76,7 +94,7 @@ class FileStateVault implements StateVault {
     if (!toStore.exists()) {
       initItem(toStore)
       vault.get(key(toStore)).add(new FileState().setDidNotExist())
-    } else if (toStore.isFile() && toStore.canRead()) {
+    } else if (toStore.isFile()) {
       initItem(toStore)
       vault.get(key(toStore)).add(new FileState().saveState(toStore))
     } else {
