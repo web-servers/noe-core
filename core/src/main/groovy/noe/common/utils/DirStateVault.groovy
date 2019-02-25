@@ -73,6 +73,10 @@ class DirStateVault implements StateVault<DirStateVault> {
     initItem(toStore)
     DirState dirState = new DirState(toStore)
 
+    if (toStore.isFile()) {
+      throw new IllegalStateException("Target to store '${toStore}' is not directory.")
+    }
+
     // all files in directory are handle by 1 FileStateVault instance and
     // all directories are handled by 1 DirStateVault instance
     FileStateVault filesInDirFileStateVault

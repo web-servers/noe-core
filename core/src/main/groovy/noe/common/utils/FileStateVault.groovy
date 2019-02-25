@@ -11,14 +11,15 @@ package noe.common.utils
  *
  * Symlinks do not have any special care.
  *
- * There is no manipulation with access rights on file, if file is not accessable,
- * exception is thrown. When file is deleted, `sudo` is applied if simple delete does not work.
+ * There is manipulation with access rights on items, if item is not accessible it's access rights are changed
+ * temporalily for time if saving or restoring state, To enable this functionality NOE has to be executed with
+ * -Drun.with.sudo=true.
  *
  * @see JBFile#delete
  * @see DirStateVault
  *
  */
-class FileStateVault implements StateVault {
+class FileStateVault implements StateVault<FileStateVault> {
   Map<String, List<FileState>> vault = [:]
   private boolean isWindows = new Platform().isWindows()
 
