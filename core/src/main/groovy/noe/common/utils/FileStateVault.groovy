@@ -1,8 +1,8 @@
 package noe.common.utils
 
 /**
- * Service class for storing and restoring of file statuses.
- * Status means content or information whether file does not exist.
+ * Service class for storing and restoring of file states.
+ * State means content or information whether file does not exist.
  *
  * This applies on files only (no directories)
  * State is stored in memory.
@@ -11,14 +11,77 @@ package noe.common.utils
  *
  * Symlinks do not have any special care.
  *
- * There is no manipulation with access rights on files, only exception is when file
- * is being removed - when normal delete fails deleting with sudo is activated (if enabled).
+ * There is manipulation with access rights on items, if item is not accessible it's access rights are changed
+ * temporalily for time if saving or restoring state, To enable this functionality NOE has to be executed with
+ * -Drun.with.sudo=true.
+ *
  * @see JBFile#delete
+ * @see DirStateVault
  *
  */
-class FileStateVault {
-  final static byte[] DID_NOT_EXIST = [6, 6, 6]
-  Map<String, List<byte[]>> vault = [:]
+class FileStateVault implements StateVault<FileStateVault> {
+  Map<String, List<FileState>> vault = [:]
+  private boolean isWindows = new Platform().isWindows()
+
+  class FileState {
+    final static byte[] DID_NOT_EXIST = [6, 6, 6]
+    private byte[] state
+
+    /**
+     * Attributes of files on Unix like OS only.
+     */
+    private JBFile.FilePermission permission
+
+
+    FileState saveState(File file) {
+      if (!isWindows) {
+        this.permission = JBFile.retrievePermissions(file)
+      }
+
+      makeTheFileReadableIfItIsNot(file)
+      this.state = file.getBytes()
+      returnOriginalPermissions(file)
+
+      return this
+    }
+
+    private void makeTheFileReadableIfItIsNot(File file) {
+      if (!isWindows && !file.canRead()) {
+        JBFile.chmod('ugo+r', file)
+      }
+    }
+
+    private returnOriginalPermissions(File file) {
+      if (!isWindows) {
+        JBFile.definePermissions(permission, file)
+      }
+    }
+
+    FileState restoreState(File restoreTarget) {
+      makeFileWriteableIfItIsNot(restoreTarget)
+      restoreTarget.setBytes(state)
+      returnOriginalPermissions(restoreTarget)
+
+      return this
+    }
+
+    private void makeFileWriteableIfItIsNot(File restoreTarget) {
+      if (!isWindows && !restoreTarget.canWrite()) {
+        JBFile.chmod('ugo+w', restoreTarget)
+      }
+    }
+
+    FileState setDidNotExist() {
+      this.state = DID_NOT_EXIST
+
+      return this
+    }
+
+    boolean didNotExists() {
+      return this.state == DID_NOT_EXIST
+    }
+
+  }
 
   /**
    * If file toStore does exist it's current content is stored into memory (stack).
@@ -27,13 +90,14 @@ class FileStateVault {
    * The state of the file can be loaded by method `pop()` which restore
    * last known state and delete this state from memory.
    */
+  @Override
   FileStateVault push(File toStore) {
     if (!toStore.exists()) {
       initItem(toStore)
-      vault.get(key(toStore)).add(DID_NOT_EXIST)
+      vault.get(key(toStore)).add(new FileState().setDidNotExist())
     } else if (toStore.isFile()) {
       initItem(toStore)
-      vault.get(key(toStore)).add(toStore.getBytes())
+      vault.get(key(toStore)).add(new FileState().saveState(toStore))
     } else {
       throw new IllegalStateException("Target to store '${toStore}' is not file or is not accessible.")
     }
@@ -52,20 +116,37 @@ class FileStateVault {
   }
 
   /**
+   * Restores last known state of all files and remove those states from memory.
+   *
+   * @see JBFile#delete
+   */
+  @Override
+  FileStateVault pop() {
+    Set<String> keys = Collections.unmodifiableCollection(vault.keySet())
+
+    keys.each { String key ->
+      pop(new File(key))
+    }
+
+    return this
+  }
+
+  /**
    * Restores last known state of given file and remove that state from memory.
    * If information that file did not exist was found, file is deleted.
    *
    * @see JBFile#delete
    */
+  @Override
   FileStateVault pop(File toRestore) {
     if (!vault.containsKey(key(toRestore)) || vault.get(key(toRestore)).size() == 0) {
       throw new IllegalStateException("Target to re-store '${toRestore}' does not exist in vault.")
     }
 
-    byte[] contentToRestore = vault.get(key(toRestore)).last()
-    deleteIfDidNotExistsElseRestore(toRestore, contentToRestore)
+    FileState fileStateToRestore = vault.get(key(toRestore)).last()
+    deleteIfDidNotExistsElseRestore(toRestore, fileStateToRestore)
 
-    vault.get(key(toRestore)).remove(contentToRestore)
+    vault.get(key(toRestore)).remove(fileStateToRestore)
     if (vault.get(key(toRestore)).size() == 0) {
       vault.remove(key(toRestore))
     }
@@ -73,11 +154,19 @@ class FileStateVault {
     return this
   }
 
-  private void deleteIfDidNotExistsElseRestore(File toRestore, byte[] contentToRestore) {
-    if (contentToRestore == DID_NOT_EXIST) {
+  boolean isPushed(File file) {
+    return vault.containsKey(key(file))
+  }
+
+  private void deleteIfDidNotExistsElseRestore(File toRestore, FileState fileState) {
+    if (fileState.didNotExists()) {
       JBFile.delete(toRestore)
     } else {
-      toRestore.setBytes(contentToRestore)
+      if (!toRestore.exists()) {
+        toRestore.getParentFile().mkdirs()
+        toRestore.createNewFile()
+      }
+      fileState.restoreState(toRestore)
     }
   }
 
@@ -87,13 +176,14 @@ class FileStateVault {
    * @see JBFile#delete
    * @see FileStateVault#pop
    */
+  @Override
   FileStateVault popAll(File toRestore) {
     if (!vault.containsKey(key(toRestore)) || vault.get(key(toRestore)).size() == 0) {
       throw new IllegalStateException("Target to re-store '${toRestore}' does not exist in vault.")
     }
 
-    byte[] contentToRestore = vault.get(key(toRestore)).first()
-    deleteIfDidNotExistsElseRestore(toRestore, contentToRestore)
+    FileState fileStateToRestore = vault.get(key(toRestore)).first()
+    deleteIfDidNotExistsElseRestore(toRestore, fileStateToRestore)
 
     vault.remove(key(toRestore))
 
@@ -106,10 +196,11 @@ class FileStateVault {
    * @see JBFile#delete
    * @see FileStateVault#pop
    */
+  @Override
   FileStateVault popAll() {
-    vault.each { String key, List<byte[]> data ->
-      byte[] contentToRestore = data.first()
-      deleteIfDidNotExistsElseRestore(new File(key), contentToRestore)
+    vault.each { String key, List<FileState> data ->
+      FileState fileStateToRestore = data.first()
+      deleteIfDidNotExistsElseRestore(new File(key), fileStateToRestore)
     }
 
     vault.clear()

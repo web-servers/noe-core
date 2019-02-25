@@ -1,10 +1,12 @@
 package noe.common.utils
 
+import org.junit.Assume
 import org.junit.Before
 import org.junit.Rule;
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
+import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
 import static org.junit.Assert.assertFalse
 
@@ -134,5 +136,25 @@ class FileStateVaultTest {
     assertTrue(Arrays.equals(testFile2.getBytes(), fileContentToTest2))
   }
 
+  @Test
+  void storingInaccessibleFileAndModifyPermissions() {
+    Assume.assumeTrue("On non Windows only", !new Platform().isWindows())
+    Assume.assumeTrue("To run this test -Drun.with.sudo=true must be set. Oper. system user has to have passwordless sudo configured.", JBFile.useAdminPrivileges)
+
+    File testFile = testFolder.newFile()
+    testFile.append("dummy")
+    JBFile.chmod('ugo-rwx', testFile)
+    FileStateVault vault = new FileStateVault().push(testFile)
+
+    JBFile.chmod('u+w', testFile)
+    testFile.setText("garbage")
+    vault.pop(testFile)
+
+    JBFile.FilePermission permAfterPop = JBFile.retrievePermissions(testFile)
+    assertEquals("Permissions on file was not reverted.", permAfterPop.perm, '0000')
+
+    JBFile.chmod('ugo+rwx', testFile)
+    assertEquals(testFile.getText(), 'dummy')
+  }
 
 }
