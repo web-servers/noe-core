@@ -26,6 +26,7 @@ import noe.server.AS7
 import noe.server.Httpd
 import noe.server.ServerAbstract
 import noe.server.Tomcat
+import noe.server.jk.WorkerServer
 import noe.workspace.IWorkspace
 import noe.workspace.ServersWorkspace
 import org.junit.After
@@ -50,10 +51,10 @@ class JkConfiguratorTestIT extends TestAbstract {
 
   FacingServerNode facingServerNode
   ServerAbstract facingServer
-  ServerAbstract workerServer1
-  ServerAbstract workerServer2
-  ServerAbstract workerServer3
-  ServerAbstract workerServer4
+  WorkerServer workerServer1
+  WorkerServer workerServer2
+  WorkerServer workerServer3
+  WorkerServer workerServer4
 
 
   @Parameterized.Parameters
@@ -66,7 +67,7 @@ class JkConfiguratorTestIT extends TestAbstract {
 
     [
       [Httpd.class, Tomcat.class, modJkPlatforms],
-      [Httpd.class, AS7.class, modJkPlatforms]
+//      [Httpd.class, AS7.class, modJkPlatforms]
     ].collect { it as Object[] }
 
   }
@@ -98,8 +99,8 @@ class JkConfiguratorTestIT extends TestAbstract {
     assumeTrue("The test is not supported on this platform", executeTest)
     workspace = new ServersWorkspace(
         np.retrieveWorkspaceInstance()
-    );
-    workspace.prepare();
+    )
+    workspace.prepare()
 
     np.prepareFacingServer()
   }
@@ -184,16 +185,16 @@ class JkConfiguratorTestIT extends TestAbstract {
           .setAdditionalLines(['# This is just test comment'])))
       .addWorkerNode(new WorkerNode(workerServer1)
          .addUrlMap("/proxy_url1"))
-      .addWorker(new WorkerNode(workerServer2)
+      .addWorkerNode(new WorkerNode(workerServer2)
          .addUrlMap("/proxy_url2"))
-      .addBalancer(new BalancerNode()
+      .addBalancerNode(new BalancerNode()
         .addWorker(new WorkerNode(workerServer3))
         .addWorker(new WorkerNode(workerServer4))
         .addUrlMap('/balanced_url'))
-      .addStatusWorker(new StatusWorkerNode()
+      .addStatusWorkerNode(new StatusWorkerNode()
         .setCss('my.css')
         .setUrlsMap(['/status']))
-      .addStatusWorker(new StatusWorkerNode()
+      .addStatusWorkerNode(new StatusWorkerNode()
         .setReadOnly(true)
         .setUrlsMap(['/status_readonly']))
       .setAdditionalUrlMaps(['!/admin|/admin/*':'*'])
