@@ -25,8 +25,8 @@ class SingleServerTestUtils {
       boolean running = server.isRunning()
       if (running) {
        log.info("${serverId} is running even though it is not expected to, printing running processes and opened ports")
-        Cmd.printSystemProcesses()
-        Cmd.printSystemOpenedPorts()
+        Cmd.logSystemProcesses()
+        Cmd.logSystemOpenedPorts()
       }
       Assert.assertFalse("Server ${serverId} shouldn't be running after being stopped", running)
     } catch (Exception ex) {
@@ -50,8 +50,8 @@ class SingleServerTestUtils {
       boolean running = server.isRunning()
       if (running) {
         log.info("${serverId} is running even though it is not expected to, printing running processes and opened ports")
-        Cmd.printSystemProcesses()
-        Cmd.printSystemOpenedPorts()
+        Cmd.logSystemProcesses()
+        Cmd.logSystemOpenedPorts()
       }
       Assert.assertFalse("Server ${serverId} shouldn't be running after being killed", running)
     } catch (Exception ex) {
@@ -78,8 +78,8 @@ class SingleServerTestUtils {
       boolean running = server.isRunning()
       if (running) {
         log.info("${serverId} is running even though it is not expected to, printing running processes and opened ports")
-        Cmd.printSystemProcesses()
-        Cmd.printSystemOpenedPorts()
+        Cmd.logSystemProcesses()
+        Cmd.logSystemOpenedPorts()
       }
       Assert.assertFalse("Server ${serverId} shouldn't be running after being killed", running)
     } catch (Exception ex) {
