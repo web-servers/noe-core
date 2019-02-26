@@ -16,12 +16,13 @@ import noe.ews.server.tomcat.TomcatSolaris
 import noe.ews.server.tomcat.TomcatWindows
 import noe.rhel.server.tomcat.TomcatJwsRpmScl
 import noe.rhel.server.tomcat.TomcatRpm
+import noe.server.jk.WorkerServer
 import noe.tomcat.configure.TomcatConfigurator
 
 import java.util.concurrent.TimeUnit
 
 @Slf4j
-class Tomcat extends ServerAbstract {
+class Tomcat extends ServerAbstract implements WorkerServer {
   public static final int DEFAULT_AJP_PORT = 8009
   public static final int DEFAULT_HTTP_PORT = 8080
   public static final int DEFAULT_HTTPS_PORT = 8443
