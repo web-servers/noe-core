@@ -3,6 +3,7 @@ package noe.common.utils
 import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
 import noe.common.StreamConsumer
+import noe.common.StreamFiller
 import noe.common.newcmd.CmdCommand
 import noe.common.newcmd.KillCmdBuilder
 import noe.common.newcmd.ListProcess
@@ -117,21 +118,12 @@ public class Cmd {
 
     //TODO: Command should always be an instance of List, not String.
     Process process = (command).execute(Library.map2list(Library.mapUnion(Cmd.props, tmpProps)), targetDir)
-    process.consumeProcessOutput(output, error)
 
-    if (input) {
-      byte[] buffer = new byte[1024]
-      int read = 0
-      while ((read = input.read(buffer)) != -1) {
-        process.out.write(buffer, 0, read)
-      }
-      input.close()
-      try {
-        process.out.close()
-      } catch (IOException e) {
-        log.debug("executeCommandRedirectIO: out stream already closed after [${command}] execution")
-      }
-    }
+    StreamFiller stdIn = new StreamFiller(process.getOutputStream(), input)
+    stdIn.start()
+
+    process.waitForProcessOutput(output,error);
+    stdIn.join(5000)
 
     return process.waitFor()
   }
@@ -281,7 +273,7 @@ public class Cmd {
     //TODO: Command should always be an instance of List, not String.
     def Process process = (sudocommand).execute(Library.map2list(Library.mapUnion(Cmd.props, tmpProps)), targetDir)
     // TODO parametrized input, output streams
-    process.consumeProcessOutput(System.out, System.err)
+    process.waitForProcessOutput(System.out, System.err)
 
     return process.waitFor()
   }
@@ -309,10 +301,15 @@ public class Cmd {
 
     //TODO: Command should always be an instance of List, not String.
     Process process = "sudo su - $username".execute(Library.map2list(Library.mapUnion(Cmd.props, tmpProps)), targetDir)
+
+    String cmdString = command + '\n' + 'exit\n'
+    InputStream cmdInput = new ByteArrayInputStream( cmdString.getBytes() );
+    StreamFiller stdIn = new StreamFiller(process.getOutputStream(), cmdInput)
+    stdIn.start()
+
     // TODO parametrized input, output streams
-    process.consumeProcessOutput(System.out, System.err)
-    process.out << command + '\n'
-    process.out << 'exit\n'
+    process.waitForProcessOutput(System.out, System.err)
+    stdIn.join(5000)
 
     return process.waitFor()
   }
@@ -507,7 +504,7 @@ public class Cmd {
             "/f",
             "/t"
         ].execute()
-        pKill.consumeProcessOutput(System.out, System.err)
+        pKill.waitForProcessOutput(System.out, System.err)
         return pKill.waitFor()
       } else {
         log.debug("killtree(): MS Windows taskkill command: taskkill /fi \"windowtitle eq ${winappname}*\" /f /t")
@@ -518,7 +515,7 @@ public class Cmd {
             "/f",
             "/t"
         ].execute()
-        pKill.consumeProcessOutput(System.out, System.err)
+        pKill.waitForProcessOutput(System.out, System.err)
         return pKill.waitFor()
       }
     } else {
@@ -679,7 +676,7 @@ public class Cmd {
     pidsToKill.each { pid ->
       // /t for Tree is intentional here.
       Process pKill = ["taskkill", "/PID", "${pid}", "/f", "/t"].execute()
-      pKill.consumeProcessOutput(System.out, System.err)
+      pKill.waitForProcessOutput(System.out, System.err)
       pKill.waitFor()
     }
 
@@ -690,7 +687,7 @@ public class Cmd {
       // /t for Tree is intentional here.
       // *  expands to e.g. .exe i.e. identifier "httpd" would kill "httpd.exe" image
       Process pKill = ["taskkill", "/IM", "${identifier}*", "/f", "/t"].execute()
-      pKill.consumeProcessOutput(System.out, System.err)
+      pKill.waitForProcessOutput(System.out, System.err)
       pKill.waitFor()
     }
   }
