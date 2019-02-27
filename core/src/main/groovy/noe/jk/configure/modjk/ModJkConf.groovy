@@ -224,11 +224,11 @@ class ModJkConf implements Configurator {
   }
 
   private File retrieveHttpdModulesDir() {
-    return new File(httpd.getServerRoot(), 'modules')
+    return new File(httpd.getModulesDir())
   }
 
   private File retrieveHttpdLogsDir() {
-    return new File(httpd.getServerRoot(), 'logs')
+    return httpd.getLogsFiles().first()
   }
 
   private File retrieveHttpdConfDeploymentPath() {

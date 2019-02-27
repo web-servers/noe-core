@@ -67,7 +67,7 @@ class JkConfiguratorTestIT extends TestAbstract {
 
     [
       [Httpd.class, Tomcat.class, modJkPlatforms],
-//      [Httpd.class, AS7.class, modJkPlatforms]
+      [Httpd.class, AS7.class, modJkPlatforms]
     ].collect { it as Object[] }
 
   }
