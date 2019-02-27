@@ -122,10 +122,11 @@ public class Cmd {
     StreamFiller stdIn = new StreamFiller(process.getOutputStream(), input)
     stdIn.start()
 
-    process.waitForProcessOutput(output,error);
+    process.waitForProcessOutput(output,error)
+    final int errCode = process.waitFor()
     stdIn.join(5000)
 
-    return process.waitFor()
+    return errCode
   }
 
   /**
@@ -309,9 +310,10 @@ public class Cmd {
 
     // TODO parametrized input, output streams
     process.waitForProcessOutput(System.out, System.err)
+    final int errCode = process.waitFor()
     stdIn.join(5000)
 
-    return process.waitFor()
+    return errCode
   }
 
   /**
