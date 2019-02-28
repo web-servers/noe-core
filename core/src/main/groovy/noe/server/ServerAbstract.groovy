@@ -108,6 +108,16 @@ abstract class ServerAbstract implements IApp {
     this.processCode = String.valueOf(Math.abs(this.hashCode()))
   }
 
+  List<File> getLogsFiles(){
+    List<File> files = []
+
+    logDirs.each { logDir ->
+      files.add(new File(getServerRoot(), logDir))
+    }
+
+    return files
+  }
+
   void backup() {
     log.trace('Starting properties backup for server {}', serverId)
 
