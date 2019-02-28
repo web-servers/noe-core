@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jboss.qa.noe</groupId>
         <artifactId>noe-core-parent</artifactId>
-        <version>0.16.16</version>
+        <version>0.16.17-SNAPSHOT</version>
     </parent>
 
     <artifactId>noe-core-testsuite</artifactId>
