@@ -9,13 +9,12 @@ import noe.common.utils.Version
 import noe.ews.server.tomcat.TomcatProperties
 import noe.jbcs.utils.HttpdHelper
 import noe.server.Httpd
-import noe.server.Tomcat
-import noe.workspace.WorkspaceAbstract
 import noe.workspace.WorkspaceHttpd
+import noe.workspace.WorkspaceMultipleTomcats
 import noe.workspace.WorkspaceTomcat
 
 @Slf4j
-class WorkspaceHttpdTomcats extends WorkspaceAbstract {
+class WorkspaceHttpdTomcats extends WorkspaceMultipleTomcats {
 
   int numberOfAdditionalTomcats
 
@@ -62,21 +61,7 @@ class WorkspaceHttpdTomcats extends WorkspaceAbstract {
     /**
      * Tomcats
      */
-    for (int i = 2; i < numberOfAdditionalTomcats + 2; i++) {
-      // We start tests always with only one tomcat 
-      // TOMCAT_MAJOR_VERSION environment variable is set in run.env
-      String tomcatVersion = TomcatProperties.TOMCAT_MAJOR_VERSION
-      String id = "tomcat-$tomcatVersion-${i}"
-      log.info("Creating new tomcat server instance: ${id}")
-      // if node2 is not defined - create default
-      if (!serverController.getTomcatServerIds([TomcatProperties.TOMCAT_MAJOR_VERSION]).contains(id)) {
-        String tomcatDir = id
-        Tomcat nextServer = Tomcat.getInstance(basedir, tomcatVersion.toString(), tomcatDir, context)
-        nextServer.createNewServerInstance(id, DefaultProperties.DEFAULT_SHIFT_PORT_OFFSET * (i - 1))
-
-        serverController.addServer(id, nextServer)
-      }
-    }
+    createAdditionalTomcatsWithRegistrations(numberOfAdditionalTomcats)
 
     serverController.getHttpdServerIds().each { httpdServerId ->
       log.debug("EWS: httpdBasedir:${httpdServerId}")
@@ -115,17 +100,7 @@ class WorkspaceHttpdTomcats extends WorkspaceAbstract {
     httpd.setHost(hostIpAddress)
     httpd.updateConfSetBindAddress(hostIpAddress)
 
-    def tomcatIds = serverController.getTomcatServerIds([
-        TomcatProperties.TOMCAT_MAJOR_VERSION
-    ])
-    tomcatIds.each { tomcatId ->
-      Tomcat tomcat = serverController.getServerById(tomcatId)
-      String host = tomcat.getHost()
-      originalTomcatHosts.put(tomcatId, host)
-      if (host == null || host.isEmpty() || host.equals(DefaultProperties.HOST)) {
-        tomcat.setHost(hostIpAddress)
-      }
-    }
+    originalTomcatHosts.putAll(originalTomcatHostsIpAddresses())
 
     serverController.backup()
 
