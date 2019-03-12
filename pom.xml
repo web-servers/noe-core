@@ -4,7 +4,7 @@
 
     <groupId>org.jboss.qa.noe</groupId>
     <artifactId>noe-core-parent</artifactId>
-    <version>0.16.18</version>
+    <version>0.16.19-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Noe core: Parent</name>
@@ -43,7 +43,7 @@
         <connection>scm:git:git@${env.GIT_URL}:${env.GIT_USER}/noe-core.git</connection>
         <developerConnection>scm:git:git@${env.GIT_URL}:${env.GIT_USER}/noe-core.git</developerConnection>
         <url>https://${env.GIT_URL}/${env.GIT_USER}/noe-core</url>
-        <tag>v0.16.18</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
