@@ -15,6 +15,17 @@ package noe.common.utils
  * temporalily for time if saving or restoring state, To enable this functionality NOE has to be executed with
  * -Drun.with.sudo=true.
  *
+ * IMPORTANT
+ * -----------------------------------------------------------------------------------------------------
+ * Since state of file is stored in memory, it is highly recommended to use `FileStateVault` with care.
+ *
+ * For instance saving larger binary files is not good idea since space on heap can be consumed
+ * quickly and runtime requirements can change uncontrollably.
+ *
+ * On other hand, a smaller files like configurations or scripts files, suites perfectly for usage with
+ * `FileStateVault` in general.
+ * -----------------------------------------------------------------------------------------------------
+ *
  * @see JBFile#delete
  * @see DirStateVault
  *

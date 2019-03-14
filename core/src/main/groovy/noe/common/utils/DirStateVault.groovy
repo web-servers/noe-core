@@ -20,6 +20,17 @@ package noe.common.utils
  *
  * For work with files only check class FileStateVault
  *
+ * IMPORTANT
+ * -----------------------------------------------------------------------------------------------------
+ * Since states of files are stored in memory, it is highly recommended to use `DirStateVault` with care.
+ *
+ * For instance saving larger binary files is not good idea since space on heap can be consumed
+ * quickly and runtime requirements can change uncontrollably.
+ *
+ * On other hand, a smaller files like configurations or scripts files, suites perfectly for usage with
+ * `FileStateVault` in general.
+ * -----------------------------------------------------------------------------------------------------
+ *
  * @see FileStateVault
  * @see JBFile#delete
  */
