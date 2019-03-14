@@ -28,7 +28,7 @@ package noe.common.utils
  * quickly and runtime requirements can change uncontrollably.
  *
  * On other hand, a smaller files like configurations or scripts files, suites perfectly for usage with
- * `FileStateVault` in general.
+ * `DirStateVault` in general.
  * -----------------------------------------------------------------------------------------------------
  *
  * @see FileStateVault
