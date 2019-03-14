@@ -60,10 +60,10 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
     }
 
     uriWorkerMapProperties
-        .setBalancers(balancers)
-        .setWorkers(jkScenario.getWorkerNodes())
-        .setStatusWorkers(jkScenario.getStatusWorkerNodes())
-        .setAdditionalUrlMaps(jkScenario.getAdditionalUrlMaps())
+        .setBalancers(uriWorkerMapProperties.getBalancers() + balancers)
+        .setWorkers(uriWorkerMapProperties.getWorkers() + jkScenario.getWorkerNodes())
+        .setStatusWorkers(uriWorkerMapProperties.getStatusWorkers() + jkScenario.getStatusWorkerNodes())
+        .setAdditionalUrlMaps(uriWorkerMapProperties.getAdditionalUrlMaps() + jkScenario.getAdditionalUrlMaps())
 
     configurators << uriWorkerMapProperties.configure()
   }
@@ -78,9 +78,9 @@ class FacingServerConfigurator implements Configurator<FacingServerConfigurator>
     }
 
     workersProperties
-        .setBalancers(balancers)
-        .setWorkers(jkScenario.getWorkerNodes())
-        .setStatusWorkers(jkScenario.getStatusWorkerNodes())
+        .setBalancers(workersProperties.getBalancers() + balancers)
+        .setWorkers(workersProperties.getWorkers() + jkScenario.getWorkerNodes())
+        .setStatusWorkers(workersProperties.getStatusWorkers() + jkScenario.getStatusWorkerNodes())
 
     configurators << workersProperties.configure()
   }

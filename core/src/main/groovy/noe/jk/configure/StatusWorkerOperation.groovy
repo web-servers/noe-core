@@ -11,7 +11,7 @@ import noe.common.utils.Library
  * Example: List balancer summary in text format
  * <code>
  *     new StatusWorkerOperation()
- *         .setAction(StatusWorkerOperation.Action.LIST)
+ *         .setAction(new StatusWorkerOperation.List())
  *         .setOutputFormat(StatusWorkerOperation.OutputFormat.TEXT)
  *         .setBalancerId(balancerId)
  *         .setHost(facingServer.getHost())
@@ -26,29 +26,83 @@ class StatusWorkerOperation {
    * Chapter: Usage Patterns / Actions
    * @link https://tomcat.apache.org/connectors-doc/reference/status.html
    */
-  enum Action { LIST, SHOW, EDIT, UPDATE, RESET, RECOVER, VERSION, DUMP }
+  interface Action {
+    String build()
+  }
+
+  static class List implements Action {
+    @Override
+    String build() {
+      return 'list'
+    }
+  }
+
+  static class Show implements Action {
+    @Override
+    String build() {
+      return 'show'
+    }
+  }
+
+  static class Reset implements Action {
+    @Override
+    String build() {
+      return 'reset'
+    }
+  }
+
+  static class Recover implements Action {
+    @Override
+    String build() {
+      return 'recover'
+    }
+  }
+
+  static class Version implements Action {
+    @Override
+    String build() {
+      return 'version'
+    }
+  }
+
+  static class Dump implements Action {
+    @Override
+    String build() {
+      return 'dump'
+    }
+  }
+
+  static class Update implements Action {
+    Map<String, String> params = [:]
+
+    @Override
+    String build() {
+      StringBuilder action = new StringBuilder("update")
+
+      params.each {String name, String value ->
+        action.append("&${name.toLowerCase()}=${value}")
+      }
+
+      return action.toString()
+    }
+
+    /**
+     * Chapter: Request Parameters / Data Parameters for the standard Update Action
+     * @link https://tomcat.apache.org/connectors-doc/reference/status.html
+     */
+    Update addParameter(String name, String value) {
+      params.put(name, value)
+
+      return this
+    }
+
+  }
 
   /**
    * Chapter: Usage Patterns / Output Format
    * @link https://tomcat.apache.org/connectors-doc/reference/status.html
    */
   enum OutputFormat { HTML, XML, PROPERTIES, TEXT }
-
-  /**
-   * Chapter: Request Parameters / Data Parameters for the standard Update Action
-   * @link https://tomcat.apache.org/connectors-doc/reference/status.html
-   */
-  enum Parameters {
-
-    // load balancer workers
-    VLR, VLT, VLEE, VLX, VLS, VLF, VLM, VLL,
-
-    // load balancer members
-    VWA, VWF, VWN, VWR, VWC, VWD,
-
-    // ajp workers and ajp load balancer members
-    VAHST, VAPRT, VACPT, VACT, VAPT, VART, VAR, VARO, VABL, VAMPS
-  }
 
   Action action
   OutputFormat outputFormat = OutputFormat.PROPERTIES
@@ -168,7 +222,7 @@ class StatusWorkerOperation {
     StringBuilder c = new StringBuilder("?")
 
     if (action != null) {
-      c.append("cmd=${transformAction(action)}&")
+      c.append("cmd=${action.build()}&")
     }
     if (outputFormat != null) {
       c.append("mime=${transformOutputType(outputFormat)}&")
@@ -203,10 +257,6 @@ class StatusWorkerOperation {
     lastResult = Library.retrieveURLContent(new URL("http", host, port, getUrlPath() + command))
 
     return this
-  }
-
-  private String transformAction(Action action) {
-    return action.toString().toLowerCase()
   }
 
   private String transformOutputType(OutputFormat format) {
