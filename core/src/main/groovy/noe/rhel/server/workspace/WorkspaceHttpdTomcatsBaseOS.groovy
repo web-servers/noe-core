@@ -2,7 +2,6 @@ package noe.rhel.server.workspace
 
 import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
-import noe.common.utils.FileStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.Version
 import noe.ews.server.tomcat.TomcatProperties
@@ -19,7 +18,7 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
 
   protected static WorkspaceHttpdBaseOS workspaceHttpd
   protected static WorkspaceTomcat workspaceTomcat
-  private FileStateVault moduleJkStateVault  = new FileStateVault()
+  private List<File> modJkModules = []
 
   Boolean ews
   Boolean rpm
@@ -53,12 +52,12 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
     originalTomcatHosts.putAll(originalTomcatHostsIpAddresses())
   }
 
-  private copyModulesIfMissing(Httpd httpd) {
+  private void copyModulesIfMissing(Httpd httpd) {
     File modulePath = new File("${httpd.getServerRoot()}/modules/mod_jk.so")
     File sclModulePath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/usr/lib64/httpd/modules/mod_jk.so")
-    log.info("Storing content of file ${modulePath}.")
     if (!modulePath.exists() && sclModulePath.exists()) {
-      moduleJkStateVault.push(modulePath)
+      log.info("Copiing file ${sclModulePath} to modules folder of httpd ${modulePath}.")
+      modJkModules.add(modulePath)
       JBFile.copyFile(sclModulePath, modulePath)
     }
     if (!modulePath.exists()) {
@@ -72,7 +71,9 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
       serverController.getServerById(tomcatId).setHost(originalTomcatHosts.get(tomcatId))
     }
 
-    moduleJkStateVault.popAll()
+    modJkModules.each() {File module ->
+      JBFile.delete(module)
+    }
 
     super.destroy()
 
