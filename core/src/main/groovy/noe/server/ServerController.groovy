@@ -3,8 +3,9 @@ package noe.server
 import groovy.util.logging.Slf4j
 import noe.common.NoeContext
 import noe.common.utils.Platform
-import noe.common.utils.db.DBAllocation
+
 import noe.ews.server.tomcat.TomcatProperties
+
 /**
  * Global class for management of servers
  * It is a singleton.
@@ -16,7 +17,6 @@ class ServerController {
   final NoeContext noeContext /// Context of controller (default, ews, ...)
   protected static Platform platform
   static String databaseLabel = 'oracle11gR2RAC'
-  static DBAllocation dbAllocation
   @Deprecated
   static AntBuilder ant
 
@@ -325,22 +325,6 @@ class ServerController {
     } else {
       throw new RuntimeException("Server with id $id does not exist.")
     }
-  }
-
-  void allocateDatabase() {
-// TODO: Implement upstream DB
-    throw new Exception("This feature is currently unimplemented")
-  }
-
-  void releaseDatabase() {
-//    TODO: Implement upstream DB
-    throw new Exception("This feature is currently unimplemented")
-//    if (dbAllocation) {
-//      dbAllocation.clean()
-//      dbAllocation.release()
-//    } else {
-//      throw new RuntimeException("There isn't any allocated database to release.")
-//    }
   }
 
   Set<String> getAs7ServerIds() {
