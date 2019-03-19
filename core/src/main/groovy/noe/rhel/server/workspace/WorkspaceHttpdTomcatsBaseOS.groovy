@@ -66,7 +66,7 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
       File modulePath = new File("${httpd.getServerRoot()}/modules/${moduleName}.so")
       File sclModulePath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/usr/lib64/httpd/modules/${moduleName}.so")
       if (!modulePath.exists() && sclModulePath.exists()) {
-        log.info("Copying file ${sclModulePath} to modules folder of httpd ${modulePath}.")
+        log.debug("Copying file ${sclModulePath} to modules folder of httpd ${modulePath}.")
         moduleFiles.add(modulePath)
         JBFile.copyFile(sclModulePath, modulePath)
       }
@@ -89,7 +89,7 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
       File confPath = new File(httpd.getServerRoot(), confRelativePath)
       File sclConfPath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/etc/httpd/${confRelativePath}")
       if (!confPath.exists() && sclConfPath.exists()) {
-        log.info("Copying file ${sclConfPath} to config.d folder of httpd ${confPath}.")
+        log.debug("Copying file ${sclConfPath} to config.d folder of httpd ${confPath}.")
         fileStateVault.push(confPath)
         JBFile.copyFile(sclConfPath, confPath)
       }
