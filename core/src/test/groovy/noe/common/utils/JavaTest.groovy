@@ -38,6 +38,7 @@ class JavaTest {
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk17())
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk18())
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk19())
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk11())
     }
   }
 
@@ -53,6 +54,7 @@ class JavaTest {
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk16())
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk18())
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk19())
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk11())
     }
   }
 
@@ -68,6 +70,7 @@ class JavaTest {
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk16())
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk17())
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk19())
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk11())
     }
   }
 
@@ -84,6 +87,24 @@ class JavaTest {
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk16())
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk17())
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk18())
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk11())
+    }
+  }
+
+  @Test
+  void testIsJdk11() {
+    List<String> testedStrings = new LinkedList<>()
+    testedStrings.add("11.0.2")
+    testedStrings.add("11.1.5")
+    testedStrings.add("11-test")
+
+    for (String testedString : testedStrings) {
+      setJavaVersion(testedString)
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk19())
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk16())
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk17())
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk18())
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk11())
     }
   }
 
@@ -103,6 +124,8 @@ class JavaTest {
       Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.9"))
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("10"))
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.10"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("11"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.11"))
     }
 
     testedStrings = new LinkedList<>()
@@ -118,6 +141,25 @@ class JavaTest {
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.9"))
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("10"))
       Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.10"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("11"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.11"))
+    }
+
+    testedStrings = new LinkedList<>()
+    testedStrings.add("1.7.0")
+    testedStrings.add("1.7.3")
+
+    for (String testedString : testedStrings) {
+      setJavaVersion(testedString)
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.6"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.7"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.8"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("9"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.9"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("10"))
+      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.10"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("11"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.11"))
     }
   }
 }
