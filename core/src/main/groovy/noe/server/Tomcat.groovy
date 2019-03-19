@@ -669,6 +669,28 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     updateConfReplaceRegExp('server.xml', dummyComment, enableNIOSsl, true, true)
   }
 
+  void enableSslNIOProtocolOpenSsl(String protocol = "org.apache.coyote.http11.Http11NioProtocol",
+                                   boolean upgradeProtocol = false) {
+    def nl = platform.nl
+    def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
+
+    def enableNIOSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="' + protocol + '"' + nl +
+      'sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"' + nl +
+      'maxThreads="150" SSLEnabled="true">' + nl + nl
+
+    if (upgradeProtocol) {
+      enableNIOSsl += '  <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol"/>' + nl + nl
+    }
+
+    enableNIOSsl += '  <SSLHostConfig>' + nl +
+      '    <Certificate certificateKeyFile="' + this.sslKey + '" certificateKeyPassword="' + this.sslKeystorePassword + '"' +
+      ' certificateFile="' + this.sslCertificate + '"/>' + nl +
+      '  </SSLHostConfig>' + nl +
+      '</Connector>'
+
+    updateConfReplaceRegExp('server.xml', dummyComment, enableNIOSsl, true, true)
+  }
+
   Map defaultSslProps = [
       ssl                  : true,
       sslKeyStorePass      : "changeit",
