@@ -56,6 +56,8 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
 
   /**
    * JBCS modules are provided in different folder and need to be properly loaded or copied for smooth working.
+   * @link https://issues.jboss.org/browse/JBCS-730
+   * @link https://issues.jboss.org/browse/JBCS-734
    * @param httpd Instance of `Httpd` server
    */
   private void copyModulesIfMissing(Httpd httpd) {
@@ -77,6 +79,8 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
   /**
    * JBCS modules are provided in different folder then BaseOS httpd expects them and have to be copied for sake of
    * mod_cluster tests
+   * @link https://issues.jboss.org/browse/JBCS-730
+   * @link https://issues.jboss.org/browse/JBCS-734
    * @param httpd Instance of `Httpd` server
    */
   private void copyConfIfMissing(Httpd httpd) {
