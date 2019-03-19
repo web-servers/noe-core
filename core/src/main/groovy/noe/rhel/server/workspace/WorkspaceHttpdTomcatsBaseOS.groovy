@@ -2,6 +2,7 @@ package noe.rhel.server.workspace
 
 import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
+import noe.common.utils.FileStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.Version
 import noe.ews.server.tomcat.TomcatProperties
@@ -18,7 +19,8 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
 
   protected static WorkspaceHttpdBaseOS workspaceHttpd
   protected static WorkspaceTomcat workspaceTomcat
-  private List<File> modJkModules = []
+  private List<File> moduleFiles = []
+  private FileStateVault fileStateVault = new FileStateVault()
 
   Boolean ews
   Boolean rpm
@@ -29,7 +31,6 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
   WorkspaceHttpdTomcatsBaseOS(int numberOfAdditionalTomcats = 0) {
     super()
     this.numberOfAdditionalTomcats = numberOfAdditionalTomcats
-    //downloadClusterBench()
     workspaceHttpd = new WorkspaceHttpdBaseOS()
     workspaceTomcat = new WorkspaceTomcat()
 
@@ -46,6 +47,7 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
     httpd.updateConfSetBindAddress(hostIpAddress)
 
     copyModulesIfMissing(httpd)
+    copyConfIfMissing(httpd)
     workspaceTomcat.prepare(true) //always true due to running with JWS 5 `ewsVersion >= new Version('3.1.0-DR0')`
 
     createAdditionalTomcatsWithRegistrations(numberOfAdditionalTomcats)
@@ -53,15 +55,34 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
   }
 
   private void copyModulesIfMissing(Httpd httpd) {
-    File modulePath = new File("${httpd.getServerRoot()}/modules/mod_jk.so")
-    File sclModulePath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/usr/lib64/httpd/modules/mod_jk.so")
-    if (!modulePath.exists() && sclModulePath.exists()) {
-      log.info("Copiing file ${sclModulePath} to modules folder of httpd ${modulePath}.")
-      modJkModules.add(modulePath)
-      JBFile.copyFile(sclModulePath, modulePath)
+    List<String> moduleNames = ["mod_jk", "mod_advertise", "mod_cluster_slotmem", "mod_manager", "mod_proxy_cluster"]
+    moduleNames.each() { String moduleName ->
+      File modulePath = new File("${httpd.getServerRoot()}/modules/${moduleName}.so")
+      File sclModulePath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/usr/lib64/httpd/modules/${moduleName}.so")
+      if (!modulePath.exists() && sclModulePath.exists()) {
+        log.info("Copying file ${sclModulePath} to modules folder of httpd ${modulePath}.")
+        moduleFiles.add(modulePath)
+        JBFile.copyFile(sclModulePath, modulePath)
+      }
+      if (!modulePath.exists()) {
+        throw new FileNotFoundException("Module file is missing. ${modulePath}")
+      }
     }
-    if (!modulePath.exists()) {
-      throw new FileNotFoundException("Mod_jk module file is missing. ${modulePath}")
+  }
+
+  private void copyConfIfMissing(Httpd httpd) {
+    List<String> confRelativePaths = ["conf.d/mod_cluster.conf"]
+    confRelativePaths.each() { String confRelativePath->
+      File confPath = new File("${httpd.getServerRoot()}/${confRelativePath}")
+      File sclConfPath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/etc/httpd/${confRelativePath}")
+      if (!confPath.exists() && sclConfPath.exists()) {
+        log.info("Copying file ${sclConfPath} to modules folder of httpd ${confPath}.")
+        moduleFiles.add(confPath)
+        JBFile.copyFile(sclConfPath, confPath)
+      }
+      if (!confPath.exists()) {
+        throw new FileNotFoundException("Module file is missing. ${confPath}")
+      }
     }
   }
 
@@ -71,9 +92,12 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
       serverController.getServerById(tomcatId).setHost(originalTomcatHosts.get(tomcatId))
     }
 
-    modJkModules.each() {File module ->
+    moduleFiles.each() { File module ->
+      log.debug("Removing file ${module}.")
       JBFile.delete(module)
     }
+
+    fileStateVault.popAll()
 
     super.destroy()
 
