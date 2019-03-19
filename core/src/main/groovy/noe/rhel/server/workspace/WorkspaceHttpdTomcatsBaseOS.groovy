@@ -54,6 +54,10 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
     originalTomcatHosts.putAll(originalTomcatHostsIpAddresses())
   }
 
+  /**
+   * JBCS modules are provided in different folder and need to be properly loaded or copied for smooth working.
+   * @param httpd Instance of `Httpd` server
+   */
   private void copyModulesIfMissing(Httpd httpd) {
     List<String> moduleNames = ["mod_jk", "mod_advertise", "mod_cluster_slotmem", "mod_manager", "mod_proxy_cluster"]
     moduleNames.each() { String moduleName ->
@@ -70,14 +74,19 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
     }
   }
 
+  /**
+   * JBCS modules are provided in different folder then BaseOS httpd expects them and have to be copied for sake of
+   * mod_cluster tests
+   * @param httpd Instance of `Httpd` server
+   */
   private void copyConfIfMissing(Httpd httpd) {
     List<String> confRelativePaths = ["conf.d/mod_cluster.conf"]
     confRelativePaths.each() { String confRelativePath->
-      File confPath = new File("${httpd.getServerRoot()}/${confRelativePath}")
+      File confPath = new File(httpd.getServerRoot(), confRelativePath)
       File sclConfPath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/etc/httpd/${confRelativePath}")
       if (!confPath.exists() && sclConfPath.exists()) {
-        log.info("Copying file ${sclConfPath} to modules folder of httpd ${confPath}.")
-        moduleFiles.add(confPath)
+        log.info("Copying file ${sclConfPath} to config.d folder of httpd ${confPath}.")
+        fileStateVault.push(confPath)
         JBFile.copyFile(sclConfPath, confPath)
       }
       if (!confPath.exists()) {
@@ -93,7 +102,6 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
     }
 
     moduleFiles.each() { File module ->
-      log.debug("Removing file ${module}.")
       JBFile.delete(module)
     }
 
