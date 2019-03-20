@@ -61,6 +61,10 @@ public class Java {
     return (javaVersion ==~ /^9[\.\-\+].*/)
   }
 
+  static boolean isJdk11() {
+    return (javaVersion ==~ /^11[\.\-\+].*/)
+  }
+
   /**
    * Are we running on minimumJDKVersion ?
    *
@@ -68,30 +72,30 @@ public class Java {
    * @return true if we are running on minimumJDKVersion or higher
    */
   static boolean isJdk1xOrHigher(String minimumJDKVersion) {
-    int usedJavaMajorVersion;
-    int minimumJavaMajorVersion;
+    int usedJavaMajorVersion
+    int minimumJavaMajorVersion
 
     // In long form of format introduced since Java 9, there might be used '-' and '+' as a delimiter, e.g.: 9-ea+19.
     String myJavaVersion = javaVersion.replaceAll('-', '.').replaceAll('\\+', '.')
-    List<String> javaVersionTokenize = myJavaVersion.tokenize('.');
-    List<String> minimumVersionTokenize = minimumJDKVersion.tokenize('.');
+    List<String> javaVersionTokenize = myJavaVersion.tokenize('.')
+    List<String> minimumVersionTokenize = minimumJDKVersion.tokenize('.')
 
     try {
       // Get used Java major version number
-      if (Integer.parseInt(javaVersionTokenize[0]) != 1) {
-        // Currently used java uses new version format introduced since Java 9
-        usedJavaMajorVersion = Integer.parseInt(javaVersionTokenize[0])
-      } else {
+      if (javaVersion.startsWith("1.")) {
         // Old version format used
         usedJavaMajorVersion = Integer.parseInt(javaVersionTokenize[1])
+      } else {
+        // Currently used java uses new version format introduced since Java 9
+        usedJavaMajorVersion = Integer.parseInt(javaVersionTokenize[0])
       }
 
-      if (Integer.parseInt(minimumVersionTokenize[0]) != 1) {
-        // Provided version is in new format introduced since Java 9
-        minimumJavaMajorVersion = Integer.parseInt(minimumVersionTokenize[0])
-      } else {
+      if (minimumJDKVersion.startsWith("1.")) {
         // Old version format used
         minimumJavaMajorVersion = Integer.parseInt(minimumVersionTokenize[1])
+      } else {
+        // Provided version is in new format introduced since Java 9
+        minimumJavaMajorVersion = Integer.parseInt(minimumVersionTokenize[0])
       }
 
       return (usedJavaMajorVersion >= minimumJavaMajorVersion)
