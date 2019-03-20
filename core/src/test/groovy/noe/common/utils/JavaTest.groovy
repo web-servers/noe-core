@@ -146,18 +146,18 @@ class JavaTest {
     }
 
     testedStrings = new LinkedList<>()
-    testedStrings.add("1.7.0")
-    testedStrings.add("1.7.3")
+    testedStrings.add("11.0.2")
+    testedStrings.add("11-test")
 
     for (String testedString : testedStrings) {
       setJavaVersion(testedString)
-      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.6"))
-      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.7"))
-      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.8"))
-      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("9"))
-      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.9"))
-      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("10"))
-      Assert.assertFalse("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.10"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.6"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.7"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.8"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("9"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.9"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("10"))
+      Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.10"))
       Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("11"))
       Assert.assertTrue("Java version string compared '" + testedString + "'", Java.isJdk1xOrHigher("1.11"))
     }

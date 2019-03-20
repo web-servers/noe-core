@@ -90,7 +90,7 @@ public class Java {
         usedJavaMajorVersion = Integer.parseInt(javaVersionTokenize[0])
       }
 
-      if (javaVersion.startsWith("1.")) {
+      if (minimumJDKVersion.startsWith("1.")) {
         // Old version format used
         minimumJavaMajorVersion = Integer.parseInt(minimumVersionTokenize[1])
       } else {
