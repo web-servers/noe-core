@@ -21,7 +21,7 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
   protected static WorkspaceTomcat workspaceTomcat
   private List<File> moduleFiles = []
   private FileStateVault fileStateVault = new FileStateVault()
-  private Boolean isModClusterProfileAcivated
+  private Boolean modClusterTesting
 
   Boolean ews
   Boolean rpm
@@ -29,12 +29,18 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
   String hostIpAddress = DefaultProperties.HOST
   Map<String,String> originalTomcatHosts = [:]
 
-  WorkspaceHttpdTomcatsBaseOS(int numberOfAdditionalTomcats = 0, Boolean isModClusterProfile = false) {
+  /**
+   * Creating workspace using httpd from BaseOS and tomcats from JWS. It has special care for mod_cluster due to conflicting
+   * modules which cannot be loaded together (mod_proxy, mod_cluster)
+   * @param numberOfAdditionalTomcats number means n+1 tomcats used as workers during testing
+   * @param isModClusterTesting expecting true if any mod_cluster TestSuite is running
+   */
+  WorkspaceHttpdTomcatsBaseOS(int numberOfAdditionalTomcats = 0, Boolean isModClusterTesting = false) {
     super()
     this.numberOfAdditionalTomcats = numberOfAdditionalTomcats
     workspaceHttpd = new WorkspaceHttpdBaseOS()
     workspaceTomcat = new WorkspaceTomcat()
-    isModClusterProfileAcivated = isModClusterProfile
+    modClusterTesting = isModClusterTesting
 
     this.ewsVersion = DefaultProperties.ewsVersion()
   }
@@ -49,7 +55,7 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
     httpd.updateConfSetBindAddress(hostIpAddress)
 
     copyModulesIfMissing(httpd)
-    if (isModClusterProfileAcivated) {
+    if (modClusterTesting) {
       copyModClusterConfIfMissing(httpd)
     }
     workspaceTomcat.prepare(true) //always true due to running with JWS 5 `ewsVersion >= new Version('3.1.0-DR0')`
