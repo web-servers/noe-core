@@ -20,6 +20,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   //
   // SSL common
   private boolean sslEnabled
+  private String protocol
 
   // SSL BIO and NIO
   private String sslProtocol
@@ -50,6 +51,10 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this.sslEnabled
   }
 
+  public String getProtocol() {
+    return protocol
+  }
+
   public Boolean getClientAuth() {
     return this.clientAuth
   }
@@ -76,6 +81,11 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
 
   public String getSslPassword() {
     return this.sslPassword
+  }
+
+  public SecureHttpConnectorTomcat setProtocol(String protocol) {
+    this.protocol = protocol
+    return this
   }
 
   public SecureHttpConnectorTomcat setSslProtocol(String sslProtocol) {
