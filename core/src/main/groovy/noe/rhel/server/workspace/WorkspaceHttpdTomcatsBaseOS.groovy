@@ -21,6 +21,7 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
   protected static WorkspaceTomcat workspaceTomcat
   private List<File> moduleFiles = []
   private FileStateVault fileStateVault = new FileStateVault()
+  private Boolean modClusterTesting
 
   Boolean ews
   Boolean rpm
@@ -28,11 +29,18 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
   String hostIpAddress = DefaultProperties.HOST
   Map<String,String> originalTomcatHosts = [:]
 
-  WorkspaceHttpdTomcatsBaseOS(int numberOfAdditionalTomcats = 0) {
+  /**
+   * Creating workspace using httpd from BaseOS and tomcats from JWS. It has special care for mod_cluster due to conflicting
+   * modules which cannot be loaded together (mod_proxy, mod_cluster)
+   * @param numberOfAdditionalTomcats number means n+1 tomcats used as workers during testing
+   * @param isModClusterTesting expecting true if any mod_cluster TestSuite is running
+   */
+  WorkspaceHttpdTomcatsBaseOS(int numberOfAdditionalTomcats = 0, Boolean isModClusterTesting = false) {
     super()
     this.numberOfAdditionalTomcats = numberOfAdditionalTomcats
     workspaceHttpd = new WorkspaceHttpdBaseOS()
     workspaceTomcat = new WorkspaceTomcat()
+    modClusterTesting = isModClusterTesting
 
     this.ewsVersion = DefaultProperties.ewsVersion()
   }
@@ -47,7 +55,9 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
     httpd.updateConfSetBindAddress(hostIpAddress)
 
     copyModulesIfMissing(httpd)
-    copyConfIfMissing(httpd)
+    if (modClusterTesting) {
+      copyModClusterConfIfMissing(httpd)
+    }
     workspaceTomcat.prepare(true) //always true due to running with JWS 5 `ewsVersion >= new Version('3.1.0-DR0')`
 
     createAdditionalTomcatsWithRegistrations(numberOfAdditionalTomcats)
@@ -77,13 +87,14 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
   }
 
   /**
-   * JBCS modules are provided in different folder then BaseOS httpd expects them and have to be copied for sake of
-   * mod_cluster tests
+   * JBCS mod_cluster config file are present in different folder and BaseOS httpd don't see them by default.
+   * Also mod_cluster config file cannot be copied by default due to conflicting modules preventing httpd to start as
+   * mod_proxy module is loaded by default in conf.modules.d/00-proxy.conf.
    * @link https://issues.jboss.org/browse/JBCS-730
    * @link https://issues.jboss.org/browse/JBCS-734
    * @param httpd Instance of `Httpd` server
    */
-  private void copyConfIfMissing(Httpd httpd) {
+  private void copyModClusterConfIfMissing(Httpd httpd) {
     List<String> confRelativePaths = ["conf.d/mod_cluster.conf"]
     confRelativePaths.each() { String confRelativePath->
       File confPath = new File(httpd.getServerRoot(), confRelativePath)
