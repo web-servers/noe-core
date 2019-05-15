@@ -59,7 +59,8 @@ public final class ProcessUtils {
     public static int getUnixProcessId(final Process process) {
         int processId = UNDEFINED_PROCESS_ID;
 
-        if (process.getClass().getName().equals("java.lang.UNIXProcess")) {
+        if (process.getClass().getName().equals("java.lang.UNIXProcess")
+                || process.getClass().getName().equals("java.lang.ProcessImpl")) {
             /* get the PID on unix/linux systems */
             try {
                 Field f = process.getClass().getDeclaredField("pid");
