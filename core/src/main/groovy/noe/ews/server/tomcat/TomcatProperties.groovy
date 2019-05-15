@@ -17,7 +17,7 @@ class TomcatProperties {
   static {
     TOMCAT_MAJOR_VERSION = Library.getUniversalProperty('tomcat.major.version')
     if (!TOMCAT_MAJOR_VERSION?.trim()) {
-      new IllegalArgumentException("TOMCAT_MAJOR_VERSION is either null or empty")
+      throw new IllegalArgumentException("TOMCAT_MAJOR_VERSION is either null or empty")
     }
 
     PUBLIC_IP_ADDRESS = Library.getUniversalProperty('tomcat.public.ip.address', DefaultProperties.HOST)
