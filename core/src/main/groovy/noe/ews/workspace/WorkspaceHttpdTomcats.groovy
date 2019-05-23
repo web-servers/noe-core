@@ -63,37 +63,39 @@ class WorkspaceHttpdTomcats extends WorkspaceMultipleTomcats {
      */
     createAdditionalTomcatsWithRegistrations(numberOfAdditionalTomcats)
 
-    serverController.getHttpdServerIds().each { httpdServerId ->
-      log.debug("EWS: httpdBasedir:${httpdServerId}")
-      Httpd httpd = serverController.getServerById(httpdServerId)
-      HttpdHelper httpdHelper = new HttpdHelper(platform)
-      httpdHelper.runPostinstall(httpd)
+    if (!context.areInSingleGroup(["jbcs", "rpm"])) {
+      serverController.getHttpdServerIds().each { httpdServerId ->
+        log.debug("EWS: httpdBasedir:${httpdServerId}")
+        Httpd httpd = serverController.getServerById(httpdServerId)
+        HttpdHelper httpdHelper = new HttpdHelper(platform)
+        httpdHelper.runPostinstall(httpd)
 
 
-      if (platform.isWindows()) {
-        serverController.installApacheWindowsService(httpdServerId)
-      } else {
-        def tmpHttpd = serverController.getServerById(httpdServerId)
-        JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + tmpHttpd.binPath + "/apachectl"))
-        if (tmpHttpd.getVersion() < new Version("2.4")) {
-          // httpd2.2 in EWS2.1
-          JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + tmpHttpd.binPath + "/httpd.worker"))
-          if (!platform.isSolaris()) {
-            JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + tmpHttpd.binPath + "/httpd"))
-          }
+        if (platform.isWindows()) {
+          serverController.installApacheWindowsService(httpdServerId)
         } else {
-          // httpd2.4 in JWS3.0
-          JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + tmpHttpd.binPath + "/httpd"))
-          // Logdir is a symlink to /var/log/httpd
-          tmpHttpd.logDirs.each { String logdir ->
-            JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + logdir))
+          def tmpHttpd = serverController.getServerById(httpdServerId)
+          JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + tmpHttpd.binPath + "/apachectl"))
+          if (tmpHttpd.getVersion() < new Version("2.4")) {
+            // httpd2.2 in EWS2.1
+            JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + tmpHttpd.binPath + "/httpd.worker"))
+            if (!platform.isSolaris()) {
+              JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + tmpHttpd.binPath + "/httpd"))
+            }
+          } else {
+            // httpd2.4 in JWS3.0
+            JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + tmpHttpd.binPath + "/httpd"))
+            // Logdir is a symlink to /var/log/httpd
+            tmpHttpd.logDirs.each { String logdir ->
+              JBFile.makeAccessible(new File(tmpHttpd.basedir + "/" + logdir))
+            }
           }
         }
       }
-    }
-    
-    if (!skipEwsPostinstall) {
-      installEws()
+
+      if (!skipEwsPostinstall) {
+        installEws()
+      }
     }
 
     Httpd httpd = serverController.getServerById(serverController.getHttpdServerId())
