@@ -11,13 +11,13 @@ import noe.common.utils.Library
  *
  */
 class TomcatProperties {
-  public static final String EWS_VERSION
+  private static final String EWS_VERSION
   public static final String TOMCAT_MAJOR_VERSION
   public static final String PUBLIC_IP_ADDRESS
 
   static {
 
-    EWS_VERSION = Library.getUniversalProperty('ews.version')
+    EWS_VERSION = noe.common.DefaultProperties.ewsVersion()
     TOMCAT_MAJOR_VERSION = Library.getUniversalProperty('tomcat.major.version')
 
     if (!EWS_VERSION?.trim() && !TOMCAT_MAJOR_VERSION?.trim()) {
