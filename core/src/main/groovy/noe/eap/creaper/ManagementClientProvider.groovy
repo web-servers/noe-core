@@ -6,6 +6,7 @@ import org.wildfly.extras.creaper.core.ManagementClient
 import org.wildfly.extras.creaper.core.ServerVersion
 import org.wildfly.extras.creaper.core.offline.OfflineManagementClient
 import org.wildfly.extras.creaper.core.offline.OfflineOptions
+import org.wildfly.extras.creaper.core.online.ManagementProtocol
 import org.wildfly.extras.creaper.core.online.OnlineManagementClient
 import org.wildfly.extras.creaper.core.online.OnlineOptions
 
@@ -21,14 +22,18 @@ final class ManagementClientProvider {
    */
   static OnlineManagementClient createOnlineManagementClient(AS7 serverInstance) {
     int port = serverInstance.getManagementNativePort()
-    if (ServerVerProvider.provideFor(serverInstance).greaterThanOrEqualTo(ServerVersion.VERSION_2_0_0)) {
+    ManagementProtocol protocol = ManagementProtocol.REMOTE
+    if (ServerVerProvider.provideFor(serverInstance).greaterThan(ServerVersion.VERSION_1_8_0)) {
+      //EAP version > 6.4
       port = serverInstance.getManagementHttpPort()
+      protocol = ManagementProtocol.HTTP_REMOTING
     }
 
     return ManagementClient.onlineLazy(OnlineOptions.standalone()
             .hostAndPort(Library.getUniversalProperty("eap.creaper.client.online.host", serverInstance.getHost()),
                     Integer.parseInt(Library.getUniversalProperty("eap.creaper.client.online.managementport",
                             port.toString())))
+            .protocol(protocol)
             .connectionTimeout(Integer.parseInt(Library.getUniversalProperty("eap.creaper.client.online.connectiontimeout", 10000)))
             .bootTimeout(Integer.parseInt(Library.getUniversalProperty("eap.creaper.client.online.boottimeout", 20000)))
             .build())
