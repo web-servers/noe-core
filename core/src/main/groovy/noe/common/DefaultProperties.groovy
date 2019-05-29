@@ -92,6 +92,9 @@ class DefaultProperties {
   static final Version ewsVersion() {
    return versionOrNull('ews.version')
   }
+  static final Version tomcatVersion() {
+    return versionOrNull('tomcat.major.version')
+  }
   static final Version apacheCoreVersion() {
     return versionOrNull('apache.core.version')
   }
