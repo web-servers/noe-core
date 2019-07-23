@@ -25,7 +25,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   private String sslProtocol
   private String keystoreFile
   private String keystorePass
-  private String clientAuth
+  private boolean clientAuth
 
   // SSL APR
   private String sslCertificateFile
