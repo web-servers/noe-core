@@ -578,7 +578,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
      process.waitFor()
      */
     handleExamplesPermisions()
-    Cmd.executeCommand(startSecurity, new File(getBinDirFullPath()))
+    Cmd.executeCommandConsumeStreams(startSecurity, new File(getBinDirFullPath()))
     waitForStartComplete()
     this.pid = extractPid()
 
