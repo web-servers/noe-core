@@ -124,12 +124,4 @@ class JwsNameHelper {
   void toggleCompatibilityMode() {
     this.compatibilityMode = !compatibilityMode
   }
-
-  /**
-   * Sets architecture separator so that you can get old/new naming scheme of the zipnames.
-   * Architecture separator is used only for Windows and Solaris packages.
-   */
-  void setArchSeparator(String separator) {
-    this.archSeparator = separator
-  }
 }
