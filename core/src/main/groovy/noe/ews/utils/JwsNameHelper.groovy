@@ -15,6 +15,7 @@ class JwsNameHelper {
   Version version
   int jwsMajorVersion
   boolean compatibilityMode = false
+  String archSeparator
   Platform platform
   String productName
 
@@ -23,6 +24,7 @@ class JwsNameHelper {
     this.jwsMajorVersion = version.majorVersion
     this.platform = new Platform()
     productName = jwsMajorVersion <= 2 ? "jboss-ews" : "jws"
+    archSeparator = "."
   }
 
   /**
@@ -105,13 +107,13 @@ class JwsNameHelper {
             " osVersion: ${platform.osVersion}, archModel: ${platform.archModel}, solPreferredArch: ${platform.solPreferredArch}")
       }
     } else if (platform.isWindows()) {
-      result += (platform.isX86() ? "win6.i686" : "win6.x86_64")
+      result += (platform.isX86() ? "win6${archSeparator}i686" : "win6${archSeparator}x86_64")
     } else if (platform.isSolaris()) {
       String ver = '10' // on Solaris 10 and 11 -> build for 10
       String os = 'sun'
-      if (platform.isSparc()) result += "${os}${ver}.sparc64"
+      if (platform.isSparc()) result += "${os}${ver}${archSeparator}sparc64"
       else if (platform.getSolPreferredArch() == 32) result += "${os}${ver}.i386"
-      else result += "${os}${ver}.x86_64"
+      else result += "${os}${ver}${archSeparator}x86_64"
     }
     return result
   }

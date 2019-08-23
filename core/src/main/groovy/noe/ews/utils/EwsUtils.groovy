@@ -125,6 +125,17 @@ class EwsUtils extends InstallerUtils {
     try {
       installJwsZips()
     } catch (FileNotFoundException e) {
+      loadEwsZipNamesInCompatibilityMode()
+    }
+  }
+
+  private void loadEwsZipNamesInCompatibilityMode() {
+    try {
+      nameHelper.archSeparator = "-"
+      loadEwsZipNames()
+      installJwsZips()
+    } catch (FileNotFoundException e) {
+      nameHelper.archSeparator = "."
       loadEwsZipNames(true)
       installJwsZips()
     }
