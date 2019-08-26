@@ -114,6 +114,27 @@ class DirStateVaultTest {
   }
 
   @Test
+  void existingDirectoryWithSubdirectoryPushedAndPoped() {
+    File dir = new File(testDir, 'existing-before-push')
+    File subDir = new File(dir, "subDir1")
+
+    subDir.mkdirs()
+    try {
+      DirStateVault vault = new DirStateVault()
+      vault.push(dir)
+
+      Assume.assumeTrue("Directory (${dir}) must exists.", dir.exists())
+      Assert.assertTrue("Testing directory was pushed, it should be registered in vault.", vault.isPushed(dir))
+
+      vault.popAll()
+    } catch (IllegalStateException ex) {
+      Assert.fail("IllegalStateException was thrown, but shouldn't. ${ex}")
+    }
+    Assert.assertFalse("Testing directory was pushed and then poped, it must not be registered in vault.", vault.isPushed(dir))
+    Assert.assertTrue("Directory (${dir}) must exists.", dir.exists())
+  }
+
+  @Test
   void pushRemoveFilesDirPopRemovedMustBeReverted() {
     LinkedHashMap<File, byte[]> origContent = loadContentFromFiles()
     DirStateVault vault = new DirStateVault().push(testDir)
