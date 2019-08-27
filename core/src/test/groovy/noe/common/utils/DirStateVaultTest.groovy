@@ -233,6 +233,28 @@ class DirStateVaultTest {
     contentEqual(origContent)
   }
 
+  @Test
+  void existingDirectoryWithEmptySubdirectoryPushedAndPopedAll() {
+    File dir = new File(testDir, 'existing-before-push')
+    File subDir = new File(dir, "empty-subdir")
+
+    subDir.mkdirs()
+
+    DirStateVault vault = new DirStateVault()
+    vault.push(dir)
+
+    new File(subDir, 'created-afeter-push-must-be-removed-after-pop').createNewFile()
+
+    Assume.assumeTrue("Directory (${dir}) must exists.", dir.exists())
+    Assert.assertTrue("Testing directory was pushed, it should be registered in vault.", vault.isPushed(dir))
+
+    vault.popAll()
+
+    Assert.assertFalse("Testing directory was pushed and then poped, it must not be registered in vault.", vault.isPushed(dir))
+    Assert.assertTrue("Directory (${dir}) must exists.", dir.exists())
+    Assert.assertTrue("Directory (${dir}) must be empty.", subDir.list().size() == 0)
+  }
+
   private LinkedHashMap<File, byte[]> loadContentFromFiles() {
     Map<File, byte[]> origData = [:]
     testDir.eachFileRecurse(FileType.FILES) { File item ->
