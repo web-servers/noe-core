@@ -118,9 +118,7 @@ class DirStateVault implements StateVault<DirStateVault> {
         dirState.dirStateVault = dirsInDirStateVault
       }
 
-      if (!dirState.isEmpty()) {
-        vault.get(key(toStore)).add(dirState)
-      }
+      vault.get(key(toStore)).add(dirState)
     }
 
     return this
@@ -157,11 +155,12 @@ class DirStateVault implements StateVault<DirStateVault> {
    */
   @Override
   DirStateVault pop(File toRestore) {
-    if (!vault.containsKey(key(toRestore)) || vault.get(key(toRestore)).size() == 0) {
+    if (!vault.containsKey(key(toRestore))) {
       throw new IllegalStateException("Target to re-store '${toRestore}' does not exist in vault.")
     }
 
     DirState dirState = vault.get(key(toRestore)).last()
+
     restoreDirectory(toRestore, dirState)
 
     vault.get(key(toRestore)).pop()
@@ -198,7 +197,7 @@ class DirStateVault implements StateVault<DirStateVault> {
    */
   @Override
   DirStateVault popAll(File toRestore) {
-    if (!vault.containsKey(key(toRestore)) || vault.get(key(toRestore)).size() == 0) {
+    if (!vault.containsKey(key(toRestore))) {
       throw new IllegalStateException("Target to re-store '${toRestore}' does not exist in vault.")
     }
 
@@ -229,6 +228,12 @@ class DirStateVault implements StateVault<DirStateVault> {
     boolean dirDidExist
     FileStateVault fileStateVault = dirState?.fileStateVault
     DirStateVault dirStateVault = dirState?.dirStateVault
+
+    // Directory was empty -> remove content
+    if (dirState.isEmpty()) {
+      JBFile.cleanDirectory(toRestore)
+      return
+    }
 
     // directory did ont exists -> delete
     if (!vault.get(key(toRestore)).last().existed) {
