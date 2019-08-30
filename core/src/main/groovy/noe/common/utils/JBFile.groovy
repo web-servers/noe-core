@@ -45,7 +45,10 @@ class JBFile {
       log.debug("Cleaning directory content with sudo privileges")
       if (trySudo || useAdminPrivileges) {
         if (!platform.isWindows()) {
-          Cmd.executeSudoCommandConsumeStreams(["rm", "-rf", "${dir}/*"], new File('.'))
+          def ret = Cmd.executeSudoCommandConsumeStreams(["/bin/bash", "-c", "rm -rf ${dir}/*"], new File('.'))
+          if (ret['exitValue'] == 0) {
+            return true
+          }
         }
         // TODO administrator cleaning for Windows
       }
