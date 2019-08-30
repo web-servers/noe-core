@@ -33,6 +33,7 @@ class JBFile {
     if (!dir?.exists()) {
       return false
     }
+    def ret = [:]
     // try to delete with ant
     try {
       ant.delete(includeemptydirs: true) {
@@ -45,7 +46,10 @@ class JBFile {
       log.debug("Cleaning directory content with sudo privileges")
       if (trySudo || useAdminPrivileges) {
         if (!platform.isWindows()) {
-          Cmd.executeSudoCommandConsumeStreams(["rm", "-rf", "${dir}/*"], new File('.'))
+          ret = Cmd.executeSudoCommandConsumeStreams(["/bin/bash", "-c", "rm -rf ${dir}/*"], new File('.'))
+          if (ret['exitValue'] == 0) {
+            return true
+          }
         }
         // TODO administrator cleaning for Windows
       }
@@ -55,11 +59,11 @@ class JBFile {
     dir.listFiles().each {file ->
       file.delete()
       if (!platform.isWindows() && file.exists() && (trySudo || useAdminPrivileges)) {
-        Cmd.executeSudoCommandConsumeStreams(["rm", "-rf", "${file.absolutePath}"], new File('.'))
+        ret = Cmd.executeSudoCommandConsumeStreams(["rm", "-rf", "${file.absolutePath}"], new File('.'))
+        if (ret['exitValue'] != 0) {
+          throw new RuntimeException("Cannot remove file or directory: ${file.getAbsolutePath()}")
+        }
       }
-    }
-    if (dir.list().length > 0) {
-      throw new RuntimeException("Cannot clean directory: ${dir.getAbsolutePath()}")
     }
     return true
   }
