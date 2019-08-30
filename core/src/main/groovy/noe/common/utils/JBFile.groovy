@@ -49,6 +49,8 @@ class JBFile {
           ret = Cmd.executeSudoCommandConsumeStreams(["/bin/bash", "-c", "rm -rf ${dir}/*"], new File('.'))
           if (ret['exitValue'] == 0) {
             return true
+          } else {
+            throw new RuntimeException("Cannot clean directory: ${dir.getAbsolutePath()}")
           }
         }
         // TODO administrator cleaning for Windows
