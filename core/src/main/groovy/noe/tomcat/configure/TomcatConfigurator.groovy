@@ -217,7 +217,7 @@ class TomcatConfigurator {
    *
    */
   TomcatConfigurator jmx(JmxTomcat jmx) {
-    new JmxConfiguratorTomcat(tomcatInstance).define(jmx)
+    new JmxConfiguratorTomcat(tomcatInstance, configVault).define(jmx)
 
     if (jmx.port != null) {
       tomcatInstance.jmxPort = jmx.getPort()
