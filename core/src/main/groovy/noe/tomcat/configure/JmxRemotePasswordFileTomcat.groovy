@@ -13,26 +13,16 @@ import noe.server.Tomcat
  * @link http://tomcat.apache.org/tomcat-7.0-doc/monitoring.html#Enabling_JMX_Remote
  */
 class JmxRemotePasswordFileTomcat {
-  /**
-   * JMX remote access require password specified. If not given the default is used.
-   */
-  public static final String DEFAULT_PASSWORD = 'tomcat'
 
   private final File path
-  private final String monitorRolePassword
-  private final String controlRolePassword
+  private final Map<String, String> rolePassword
 
   Tomcat tomcat
 
 
-  JmxRemotePasswordFileTomcat(Tomcat tomcat, File path) {
-    this(tomcat, path, DEFAULT_PASSWORD, DEFAULT_PASSWORD)
-  }
-
-  JmxRemotePasswordFileTomcat(Tomcat tomcat, File path, String monitorRolePassword, String controlRolePassword) {
+  JmxRemotePasswordFileTomcat(Tomcat tomcat, File path, Map<String, String> rolePassword) {
     this.path = path
-    this.monitorRolePassword = monitorRolePassword
-    this.controlRolePassword = controlRolePassword
+    this.rolePassword = rolePassword
     this.tomcat = tomcat
   }
 
@@ -46,11 +36,10 @@ class JmxRemotePasswordFileTomcat {
     path.delete()
 
     def content = ""
-    if (!this.monitorRolePassword.isEmpty()) {
-      content += "monitorRole ${this.monitorRolePassword}" + nl
-    }
-    if (!this.controlRolePassword.isEmpty()) {
-      content += "controlRole ${this.controlRolePassword}" + nl
+
+    rolePassword.each { String role, String password ->
+      content += "${role} ${password}"
+      content += "${nl}"
     }
 
     JBFile.createFile(path, content)

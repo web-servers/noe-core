@@ -16,16 +16,14 @@ class JmxRemoteAccessFileTomcat {
   enum Access { readonly, readwrite }
 
   final private File path
-  private Access monitorRole
-  private Access controlRole
+  private Map<String, Access> roleAccess
 
   Tomcat tomcat
 
 
-  JmxRemoteAccessFileTomcat(Tomcat tomcat, File path) {
+  JmxRemoteAccessFileTomcat(Tomcat tomcat, File path, Map<String, Access> roleAccess) {
     this.path = path
-    this.monitorRole = Access.readonly
-    this.controlRole = Access.readwrite
+    this.roleAccess = roleAccess
     this.tomcat = tomcat
   }
 
@@ -36,10 +34,13 @@ class JmxRemoteAccessFileTomcat {
     String nl = new Platform().nl
     path.delete()
 
-    JBFile.createFile(path,
-      "monitorRole ${this.monitorRole}" + nl +
-      "controlRole ${this.controlRole}" + nl
-    )
+    def content = ""
+    roleAccess.each {String role, Access access ->
+      content += "${role} ${access.toString()}"
+      content += "${nl}"
+    }
+
+    JBFile.createFile(path, content)
 
     JmxTomcatUtils.prepareAccessRights(tomcat, path)
   }
