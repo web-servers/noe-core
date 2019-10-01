@@ -64,8 +64,8 @@ abstract class JmxTomcatConfiguratorIT extends TomcatTestAbstract {
     Boolean testAuthenticate = true
     String setenvBckp
     File setenv = new File(tomcat.basedir, "bin/setenv." + platform.getScriptSuffix())
-    JmxRemotePasswordFileTomcat testPasswordFile = new JmxRemotePasswordFileTomcat(tomcat, new File(tomcat.basedir, 'conf/jmxremote.password'))
-    JmxRemoteAccessFileTomcat testAccessFile = new JmxRemoteAccessFileTomcat(tomcat, new File(tomcat.basedir, 'conf/jmxremote.access'))
+    JmxRemotePasswordFileTomcat testPasswordFile = new JmxRemotePasswordFileTomcat(tomcat, new File(tomcat.basedir, 'conf/jmxremote.password'), ['admin': 'password'])
+    JmxRemoteAccessFileTomcat testAccessFile = new JmxRemoteAccessFileTomcat(tomcat, new File(tomcat.basedir, 'conf/jmxremote.access'), ['admin': JmxRemoteAccessFileTomcat.Access.readwrite])
 
     String expectedValueSetenv = new ZipTomcatEnvVariableAssigmentsGenerator().generateEnvLine("CATALINA_OPTS",
             "-Dcom.sun.management.jmxremote.port=${testJmxPort} " +
@@ -76,12 +76,10 @@ abstract class JmxTomcatConfiguratorIT extends TomcatTestAbstract {
             "-Dcom.sun.management.jmxremote")
 
     String expectedValueJmxRemotePassword =
-      "monitorRole ${JmxRemotePasswordFileTomcat.DEFAULT_PASSWORD}" + platform.nl +
-      "controlRole ${JmxRemotePasswordFileTomcat.DEFAULT_PASSWORD}" + platform.nl
+      "admin password" + platform.nl
 
     String expectedValueJmxRemoteAccess =
-      "monitorRole ${JmxRemoteAccessFileTomcat.Access.readonly}" + platform.nl +
-      "controlRole ${JmxRemoteAccessFileTomcat.Access.readwrite}" + platform.nl
+      "admin ${JmxRemoteAccessFileTomcat.Access.readwrite}" + platform.nl
 
     try {
       setenvBckp = backupSetenvIfExists(setenv)
