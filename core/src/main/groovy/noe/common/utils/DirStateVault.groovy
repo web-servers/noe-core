@@ -243,7 +243,7 @@ class DirStateVault implements StateVault<DirStateVault> {
 
     // target exists but it is file not directory and directory existed (not returned in previous step)
     if (toRestore.exists() && toRestore.isFile()) {
-      JBFile.delete()
+      JBFile.delete(toRestore)
       toRestore.mkdirs()
     }
 
