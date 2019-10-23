@@ -52,7 +52,13 @@ class EnvVarsFileFactoryTest {
       isBaseOsTomcatTestsRunning: { return false }
     ] as RpmTomcatEnvVarsFileFactory.RpmRun)
 
-    Assume.assumeTrue envVars.getEnvFile().getPath() == "/etc/opt/rh/jws5/sysconfig/tomcat"
+    String tomcatServicePath
+    if (platform.isRHEL8()) {
+      tomcatServicePath = "/etc/opt/rh/scls/jws5/sysconfig/tomcat"
+    } else {
+      tomcatServicePath = "/etc/opt/rh/jws5/sysconfig/tomcat"
+    }
+    Assume.assumeTrue envVars.getEnvFile().getPath() == tomcatServicePath
   }
 
   @Test
