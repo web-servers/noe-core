@@ -104,6 +104,14 @@ class Platform {
     return osArch == 'ppc64'
   }
 
+  boolean isS390x() {
+    return osArch == 's390x'
+  }
+
+  boolean isAarch64() {
+    return osArch == 'aarch64'
+  }
+
   boolean isRHEL4() {
     return isRHEL() && (osVersion ==~ /.*EL[^5678][a-zA-Z]*/)
   }
