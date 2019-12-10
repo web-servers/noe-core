@@ -548,12 +548,15 @@ class EwsUtils extends InstallerUtils {
       if (platform.isRHEL5()) fn += "${version}-RHEL5-"
       else if (platform.isRHEL6()) fn += "${version}-RHEL6-"
       else if (platform.isRHEL7()) fn += "${version}-RHEL7-"
+      else if (platform.isRHEL8()) fn += "${version}-RHEL8-"
       if (platform.isX86()) {
         fn += "i386"
       } else if (platform.isX64()) {
         fn += "x86_64"
       } else if (platform.isPpc64()) {
         fn += "ppc64"
+      } else if (platform.isS390x()) {
+        fn += "s390x"
       } else {
         log.error("platformName can't be determined. osName: ${platform.osName}, osArch: ${platform.osArch}," +
                 " osVersion: ${platform.osVersion}, archModel: ${platform.archModel}, solPreferredArch: ${platform.solPreferredArch}")
