@@ -119,6 +119,8 @@ class PlatformSuffixHelper {
         platformName += "x86_64"
       } else if (platform.isPpc64()) {
         platformName += "ppc64"
+      } else if (platform.isS390x()) {
+        platformName += "s390x"
       } else {
         log.error("platformName can't be determined. osName: ${platform.osName}, osArch: ${platform.osArch}, osVersion: ${platform.osVersion}, " +
                 "archModel: ${platform.archModel}, solPreferredArch: ${platform.solPreferredArch}")
