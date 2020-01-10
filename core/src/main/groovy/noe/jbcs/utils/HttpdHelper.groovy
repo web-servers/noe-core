@@ -150,7 +150,9 @@ class HttpdHelper {
     if (Boolean.valueOf(Library.getUniversalProperty('JWS_198_WORKAROUND', false))) {
       JBFile.replace(new File(httpdBasedir, "etc${sep}httpd${sep}conf${sep}httpd.conf"), "<Files ~ \".ht*\">", "<Files ~ \"^\\.ht\">", true)
     }
-    if ( postInstallOutput.exitValue == 0 || postInstallOutput.exitValue == 17) { // 17 means postinstall was already executed
+    // Ignore any output from the postinstall script, it should be used with caution.
+    boolean ignorePostinstallOutput = Boolean.valueOf(Library.getUniversalProperty('IGNORE_POSTINSTALL_OUTPUT', false))
+    if (ignorePostinstallOutput || postInstallOutput.exitValue == 0 || postInstallOutput.exitValue == 17) { // 17 means postinstall was already executed
       if (postInstallOutput.exitValue == 17) {
         log.warn("Postinstall was already executed for " + httpd.getServerId())
       }
