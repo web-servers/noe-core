@@ -161,6 +161,12 @@ class HttpdHelper {
     } else {
       throw new RuntimeException("[${httpd.serverId}] Postinstall went wrong => ${postInstallOutput}")
     }
+
+    // Overrride the user that installed httpd
+    String OVERRIDE_INSTALL_AS_USER = Library.getUniversalProperty('OVERRIDE_INSTALL_AS_USER', '')
+    if(platform.isRHEL() && !OVERRIDE_INSTALL_AS_USER.isEmpty()) {
+      def result = commandExecution(["chown", "-R", "${OVERRIDE_INSTALL_AS_USER}:${OVERRIDE_INSTALL_AS_USER}", "${httpdBasedir}"], new File(httpdBasedir))
+    }
   }
 
   /**
