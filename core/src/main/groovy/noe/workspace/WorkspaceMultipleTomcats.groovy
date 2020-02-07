@@ -1,5 +1,6 @@
 package noe.workspace
 
+import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
 import noe.ews.server.tomcat.TomcatProperties
 import noe.server.Tomcat
@@ -7,6 +8,7 @@ import noe.server.Tomcat
 /**
  * Helper Workspace for multiple tomcat instance setup
  */
+@Slf4j
 class WorkspaceMultipleTomcats extends WorkspaceAbstract{
 
   WorkspaceMultipleTomcats() {
