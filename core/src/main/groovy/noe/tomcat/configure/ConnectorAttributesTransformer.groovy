@@ -76,6 +76,21 @@ class ConnectorAttributesTransformer {
         res.put('redirectPort', connector.getRedirectPort())
       }
 
+      if(connector instanceof AjpConnectorTomcat) {
+        if (connector.getSecretRequired() != null) {
+          res.put('secretRequired', connector.getSecretRequired())
+        }
+
+        if (connector.getSecret() != null && !connector.getSecret().isEmpty()) {
+          res.put('secret', connector.getSecret())
+        }
+
+        if (connector.getAllowedRequestAttributesPattern() != null
+                && !connector.getAllowedRequestAttributesPattern().isEmpty()) {
+          res.put('allowedRequestAttributesPattern', connector.getAllowedRequestAttributesPattern())
+        }
+      }
+
       return res
     }
   }

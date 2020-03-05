@@ -15,4 +15,34 @@ package noe.tomcat.configure
  */
 public class AjpConnectorTomcat extends ConnectorTomcatAbstract<AjpConnectorTomcat> {
 
+  private Boolean secretRequired
+  private String secret
+  private String allowedRequestAttributesPattern
+
+  Boolean getSecretRequired() {
+    return secretRequired
+  }
+
+  String getSecret() {
+    return secret
+  }
+
+  String getAllowedRequestAttributesPattern() {
+    return allowedRequestAttributesPattern
+  }
+
+  public AjpConnectorTomcat setSecretRequired(Boolean secretRequired) {
+    this.secretRequired = secretRequired
+    return this
+  }
+
+  public AjpConnectorTomcat setSecret(String secret) {
+    this.secret = secret
+    return this
+  }
+
+  public AjpConnectorTomcat setAllowedRequestAttributesPattern(String allowedRequestAttributesPattern) {
+    this.allowedRequestAttributesPattern = allowedRequestAttributesPattern
+    return this
+  }
 }
