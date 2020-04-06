@@ -42,6 +42,8 @@ class DefaultProperties {
   public static final String EAP6_RPM_ROOT = Library.getUniversalProperty('eap6.rpm.root', '/usr/share/jbossas/')
   public static final String SERVER_JAVA_HOME = Library.getUniversalProperty("server.java.home")
   public static final String JAVA_HOME = Library.getUniversalProperty("java.home")
+  // Default AJP Secret for Tomcat, modjk and Mod_Cluster tests.
+  public static final String DEFAULT_AJP_SECRET = Library.getUniversalProperty("default.ajp.secret", "SHH_ITS_A_SECRET")
 
   // Default workspace basedir
   public static final String WORKSPACE_BASEDIR = Library.getUniversalProperty('workspace.basedir', new File('.').getCanonicalPath() + "${File.separator}workspace")
