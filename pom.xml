@@ -101,9 +101,9 @@
         <!-- https://github.com/Karm/okhttp/tree/add_cipher_suites -->
         <com.squareup.okhttp3.okhttp.version>3.5.0.l</com.squareup.okhttp3.okhttp.version>
         <org.apache.ant.version>1.9.4</org.apache.ant.version>
-        <version.org.apache.maven.plugins.maven-surefire-plugin>2.17
+        <version.org.apache.maven.plugins.maven-surefire-plugin>2.22.0
         </version.org.apache.maven.plugins.maven-surefire-plugin>
-        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.17
+        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.22.0
         </version.org.apache.maven.plugins.maven-failsafe-plugin>
         <junit.version>4.12</junit.version>
         <org.codehaus.groovy.all.version>2.4.12</org.codehaus.groovy.all.version>
