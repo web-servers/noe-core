@@ -17,8 +17,8 @@ import noe.server.Httpd
 @TypeChecked
 @Slf4j
 class HttpdRpm extends Httpd {
-  protected String serviceName
-  protected String apxsPath
+  String serviceName
+  String apxsPath
 
   HttpdRpm(String basedir, version) {
     super(basedir, version)
