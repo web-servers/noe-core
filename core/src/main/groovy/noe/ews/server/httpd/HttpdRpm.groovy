@@ -46,7 +46,8 @@ class HttpdRpm extends Httpd {
     this.deploymentPath = "/var/www/html"
     this.confDeploymentPath = this.basedir + '/conf.d'
     this.cgiDeploymentPath = "/var/www/cgi-bin"
-    this.modClusterCacheDir = "/var/cache/mod_cluster"
+    this.cachePath = "/var/cache"
+    this.modClusterCacheDir = cachePath + "/mod_cluster"
     this.opensslPath = 'openssl' // openssl is on $PATH on RHEL by OS installation
     this.abPath = "/usr/bin/ab"
     this.htdbmPath = "/usr/bin/htdbm"

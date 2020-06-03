@@ -42,6 +42,7 @@ class HttpdCoreRpm extends HttpdRpm {
     this.httxt2dbmPath = this.baseSCLdir + '/usr/bin/httxt2dbm'
     this.logresolvePath = this.baseSCLdir + '/usr/bin/logresolve'
     this.apxsPath = this.baseSCLdir + '/usr/sbin/apxs'
+    this.cachePath = this.baseSCLdir + '/var/cache/httpd'
 
   }
   
