@@ -35,6 +35,8 @@ class EwsUtils extends InstallerUtils {
   String dbDriverEapVersion
   JwsNameHelper nameHelper
 
+  List<String> sourceZipTested = []
+
 
 
   /**
@@ -125,7 +127,11 @@ class EwsUtils extends InstallerUtils {
     try {
       installJwsZips()
     } catch (FileNotFoundException e) {
-      loadEwsZipNamesInCompatibilityMode()
+      try {
+        loadEwsZipNamesInCompatibilityMode()
+      } catch (FileNotFoundException e) {
+        throw new FileNotFoundException("There were multiple attempts for extracting zip content from various zip compatibility names, but non of them succeed. They don't exists. ${sourceZipTested}")
+      }
     }
   }
 
@@ -143,12 +149,15 @@ class EwsUtils extends InstallerUtils {
 
   private void installJwsZips() {
     if (version.getMajorVersion() <= 4) {
+      sourceZipTested.add(ewsApplicationServer)
       installZipFile(ewsApplicationServer)
     } else {
+      sourceZipTested.add(jwsBaseZipName)
       // JWS 5 and newer base ZIP file without natives
       installZipFile(jwsBaseZipName)
 
       if (installNatives) {
+        sourceZipTested(ewsApplicationServer)
         installZipFile(ewsApplicationServer)
       }
     }
@@ -176,7 +185,12 @@ class EwsUtils extends InstallerUtils {
       String downloadZipUrl = "${pathToSource}/${ewsHibernate}"
       Library.downloadFile(downloadZipUrl, zipFileDest)
     } else {
-      JBFile.copy(zipFileSource, new File(basedir))
+      if (!JBFile.isExistingFile(zipFileSource)) {
+        throw new FileNotFoundException("Expected zip file ${zipFileSource} doesn't exist.")
+      }
+      if (!JBFile.copy(zipFileSource, new File(basedir))) {
+        throw new FileNotFoundException("Something has gone wrong with copying file ${zipFileSource} to the targed directory ${basedir}. Check debug log for more information.")
+      }
     }
 
     if (!zipFileDest.exists()) {
