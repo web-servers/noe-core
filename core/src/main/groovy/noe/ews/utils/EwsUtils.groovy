@@ -130,7 +130,7 @@ class EwsUtils extends InstallerUtils {
       try {
         loadEwsZipNamesInCompatibilityMode()
       } catch (FileNotFoundException e) {
-        throw new FileNotFoundException("There were multiple attempts for extracting zip content from various zip compatibility names, but non of them succeed. They don't exists. ${sourceZipTested}")
+        throw new FileNotFoundException("There were multiple attempts for extracting zip content from various zip compatibility names, but none of them succeed. They don't exists. ${sourceZipTested}")
       }
     }
   }
@@ -149,19 +149,36 @@ class EwsUtils extends InstallerUtils {
 
   private void installJwsZips() {
     if (version.getMajorVersion() <= 4) {
-      sourceZipTested.add(ewsApplicationServer)
-      installZipFile(ewsApplicationServer)
+      try {
+        installZipFile(ewsApplicationServer)
+      } catch (FileNotFoundException ex) {
+        sourceZipTested.add(ewsApplicationServer)
+        throw ex
+      }
     } else {
-      sourceZipTested.add(jwsBaseZipName)
       // JWS 5 and newer base ZIP file without natives
-      installZipFile(jwsBaseZipName)
+      try {
+        installZipFile(jwsBaseZipName)
+      } catch (FileNotFoundException ex) {
+        sourceZipTested.add(jwsBaseZipName)
+        throw ex
+      }
 
       if (installNatives) {
-        sourceZipTested(ewsApplicationServer)
-        installZipFile(ewsApplicationServer)
+        try {
+          installZipFile(ewsApplicationServer)
+        } catch (FileNotFoundException ex) {
+          sourceZipTested.add(ewsApplicationServer)
+          throw ex
+        }
       }
     }
-    installZipFile(ewsExamples)
+    try {
+      installZipFile(ewsExamples)
+    } catch (FileNotFoundException ex) {
+      sourceZipTested.add(ewsExamples)
+      throw ex
+    }
   }
 
   /**
