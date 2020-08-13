@@ -129,7 +129,9 @@ class EwsUtils extends InstallerUtils {
     } catch (FileNotFoundException e) {
       try {
         loadEwsZipNamesInCompatibilityMode()
-      } catch (FileNotFoundException e) {
+      } catch (FileNotFoundException ex) {
+        log.debug(e.message)
+        log.debug(ex.message)
         throw new FileNotFoundException("There were multiple attempts for extracting zip content from various zip compatibility names, but none of them succeed. They don't exists. ${sourceZipTested}")
       }
     }
@@ -141,6 +143,7 @@ class EwsUtils extends InstallerUtils {
       loadEwsZipNames()
       installJwsZips()
     } catch (FileNotFoundException e) {
+      log.debug("Exception caught [${e.message}]")
       nameHelper.archSeparator = "."
       loadEwsZipNames(true)
       installJwsZips()
