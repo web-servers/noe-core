@@ -80,8 +80,13 @@ class InstallerUtils {
       log.info ("Downloading ${downloadZipUrl} to ${zipDest}")
       Library.downloadFile(downloadZipUrl, zipDest)
     } else {
+      if (!JBFile.isExistingFile(zipSource)) {
+        throw new FileNotFoundException("Expected zip file ${zipSource} doesn't exist.")
+      }
       File dest = new File(basedir)
-      JBFile.copy(zipSource, dest)
+      if (!JBFile.copy(zipSource, dest)) {
+        throw new FileNotFoundException("Something has gone wrong with copying file ${zipSource} to the targed directory ${dest}. Check debug log for more information.")
+      }
       log.info ("Copying ${zipSource} to ${dest.canonicalPath}")
     }
 
