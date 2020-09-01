@@ -5,6 +5,11 @@ import noe.common.DefaultProperties
 import noe.server.ServerAbstract
 import noe.workspace.WorkspaceAbstract
 
+import javax.xml.bind.DatatypeConverter
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.security.MessageDigest
+
 /**
  * Shared for all utils classes, zip installation is similar
  * @author Bogdan Sikora <bsikora@redhat.com>
@@ -95,9 +100,25 @@ class InstallerUtils {
       log.error("Zip file $zipSource, exist = ${zipSource.exists()}")
       throw new FileNotFoundException("Zip installation failed, $zipDest doesn't exits")
     }
+    logSha256Hash(zipDest)
     JBFile.nativeUnzip(zipDest, new File(basedir))
     if (DefaultProperties.isRemoveZipAfterUnzip()) {
       JBFile.delete(zipDest)
     }
+  }
+
+  /**
+   * Compute SHA-256 hash for zip file
+   * @param zipFile
+   */
+  void logSha256Hash(File zipFile) throws FileNotFoundException {
+    if (!zipFile.exists()) {
+      throw new FileNotFoundException("Zip file ${zipFile} for computing SHA-256 doesn't exists.")
+    }
+    MessageDigest md = MessageDigest.getInstance("SHA-256")
+    md.update(Files.readAllBytes(Paths.get(zipFile.getAbsolutePath())))
+    byte[] digest = md.digest()
+    String digestInHex = DatatypeConverter.printHexBinary(digest).toUpperCase()
+    log.info("Zip file ${zipFile} SHA-256 hash is: ${digestInHex}")
   }
 }
