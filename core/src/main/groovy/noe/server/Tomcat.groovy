@@ -706,4 +706,20 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     return file.exists() ? file : null
   }
 
+  /**
+   * Check log files for ERRORS and WARNINGS
+   * and filter out
+   * 'WARNING [main] org.apache.catalina.util.SessionIdGeneratorBase.createSecureRandom Creation of SecureRandom
+   * instance for session ID generation using [SHA1PRNG] took [8000] milliseconds.'
+   * due to lack of entropy at virtual environment
+   */
+  List<String> verifyLogs() {
+    List<String> affectedLines
+    String expectedSecureRandomWarning = 'WARNING [main] org.apache.catalina.util.SessionIdGeneratorBase.createSecureRandom Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took ['
+
+    affectedLines = super.verifyLogs()
+    log.debug('Filtering expected warning due to lack of entropy at virtualized environment.')
+    affectedLines.removeAll { it.contains(expectedSecureRandomWarning) }
+  }
+
 }
