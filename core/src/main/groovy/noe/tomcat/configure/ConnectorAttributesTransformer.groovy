@@ -62,6 +62,9 @@ class ConnectorAttributesTransformer {
       if (connector.getScheme() != null && !connector.getScheme().isEmpty()) {
         res.put('scheme', connector.getScheme())
       }
+      if (connector.getUpgradeProtocol() != null && !connector.getUpgradeProtocol().isEmpty()) {
+        res.put('UpgradeProtocol', connector.getUpgradeProtocol())
+      }
 
       if (connector.getMaxThreads() != null && connector.getMaxThreads() > 0) {
         res.put('maxThreads', connector.getMaxThreads())
@@ -119,6 +122,18 @@ class ConnectorAttributesTransformer {
       if (connector.getKeystorePass() != null && !connector.getKeystorePass().isEmpty()) {
         res.put('keystorePass', connector.getKeystorePass())
       }
+      if (connector.getKeystoreType() != null && !connector.getKeystoreType().isEmpty()) {
+        res.put('keystoreType', connector.getKeystoreType())
+      }
+      if (connector.getTruststoreFile() != null && !connector.getTruststoreFile().isEmpty()) {
+        res.put('truststoreFile', connector.getTruststoreFile())
+      }
+      if (connector.getTruststorePass() != null && !connector.getTruststorePass().isEmpty()) {
+        res.put('truststorePass', connector.getTruststorePass())
+      }
+      if (connector.getTruststoreType() != null && !connector.getTruststoreType().isEmpty()) {
+        res.put('truststoreType', connector.getTruststoreType())
+      }
       if (connector.getClientAuth() != null) {
         res.put('clientAuth', connector.getClientAuth())
       }
@@ -127,11 +142,20 @@ class ConnectorAttributesTransformer {
       if (connector.getSslCertificateFile() != null && !connector.getSslCertificateFile().isEmpty()) {
         res.put('SSLCertificateFile', connector.getSslCertificateFile())
       }
+      if (connector.getSslCACertificateFile() != null && !connector.getSslCACertificateFile().isEmpty()) {
+        res.put('SSLCACertificateFile', connector.getSslCACertificateFile())
+      }
       if (connector.getSslCertificateKeyFile() != null && !connector.getSslCertificateKeyFile().isEmpty()) {
         res.put('SSLCertificateKeyFile', connector.getSslCertificateKeyFile())
       }
       if (connector.getSslPassword() != null && !connector.getSslPassword().isEmpty()) {
         res.put('SSLPassword', connector.getSslPassword())
+      }
+      if (connector.getSslImplementationName() != null && !connector.getSslImplementationName().isEmpty()) {
+        res.put('sslImplementationName', connector.getSslImplementationName())
+      }
+      if (connector.getSslEnabledProtocols() != null && connector.getSslEnabledProtocols()) {
+        res.put('sslEnabledProtocols', connector.getSslEnabledProtocols())
       }
 
       return res

@@ -272,6 +272,39 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     assertEquals newValue, newProps.getProperty(propName)
   }
 
+  @Test
+  void addSpecificListenerOfServerXml() {
+    String value = 'customListener'
+    TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
+            .addListener(value)
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals value, Server.Listener.find { it.@className=value }.@className.toString()
+  }
+
+  @Test
+  void removeSpecificListenerOfServerXml() {
+    String value = "org.apache.catalina.core.AprLifecycleListener"
+    TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals value, Server.Listener.find { it.@className=value }.@className.toString()
+  }
+
+  @Test
+  void upgradeProtocolToHTTP2ProtocolSecureAndNonSecureConnector() {
+    String value = "org.apache.coyote.http2.Http2Protocol"
+    TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
+            .httpsConnector(
+                    new SecureHttpConnectorTomcat().setUpgradeProtocolToHttp2Protocol())
+            .httpConnector(
+                    new NonSecureHttpConnectorTomcat().setUpgradeProtocolToHttp2Protocol())
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals value, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@UpgradeProtocol.toString()
+    assertEquals value, Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.@UpgradeProtocol.toString()
+  }
+
   boolean isSecuredHttpProtocol(GPathResult connector) {
     return isSecure(connector) && (connector.@protocol in getDefHttpProtocol())
   }

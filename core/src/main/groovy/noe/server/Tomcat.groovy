@@ -628,6 +628,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     this.updateConfReplaceRegExp('server.xml', '<Connector port="8009" protocol="AJP/1.3"', '<Connector port="' + Integer.valueOf(8009 + offset) + '" protocol="AJP/1.3"', true, true)
   }
 
+  @Deprecated
   void enableSslJsse() {
     def nl = platform.nl
     def aprListener = '<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />'
@@ -642,6 +643,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     updateConfReplaceRegExp('server.xml', dummyComment, enableJavaSsl, true, true)
   }
 
+  @Deprecated
   void enableSslOpenSsl() {
     def nl = platform.nl
     def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
@@ -655,6 +657,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     updateConfReplaceRegExp('server.xml', dummyComment, enableOpenSsl, true, true)
   }
 
+  @Deprecated
   void enableSslNIOProtocol() {
     def nl = platform.nl
     def aprListener = '<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />'
