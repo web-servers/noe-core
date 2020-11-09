@@ -62,9 +62,6 @@ class ConnectorAttributesTransformer {
       if (connector.getScheme() != null && !connector.getScheme().isEmpty()) {
         res.put('scheme', connector.getScheme())
       }
-      if (connector.getUpgradeProtocol() != null && !connector.getUpgradeProtocol().isEmpty()) {
-        res.put('UpgradeProtocol', connector.getUpgradeProtocol())
-      }
 
       if (connector.getMaxThreads() != null && connector.getMaxThreads() > 0) {
         res.put('maxThreads', connector.getMaxThreads())
@@ -91,6 +88,12 @@ class ConnectorAttributesTransformer {
         if (connector.getAllowedRequestAttributesPattern() != null
                 && !connector.getAllowedRequestAttributesPattern().isEmpty()) {
           res.put('allowedRequestAttributesPattern', connector.getAllowedRequestAttributesPattern())
+        }
+      }
+
+      if(connector instanceof NonSecureHttpConnectorTomcat) {
+        if (connector.getUpgradeProtocol() != null && !connector.getUpgradeProtocol().isEmpty()) {
+          res.put('UpgradeProtocol', connector.getUpgradeProtocol())
         }
       }
 
@@ -156,6 +159,9 @@ class ConnectorAttributesTransformer {
       }
       if (connector.getSslEnabledProtocols() != null && connector.getSslEnabledProtocols()) {
         res.put('sslEnabledProtocols', connector.getSslEnabledProtocols())
+      }
+      if (connector.getUpgradeProtocol() != null && !connector.getUpgradeProtocol().isEmpty()) {
+        res.put('UpgradeProtocol', connector.getUpgradeProtocol())
       }
 
       return res

@@ -293,16 +293,19 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
 
   @Test
   void upgradeProtocolToHTTP2ProtocolSecureAndNonSecureConnector() {
+    Integer testHttpsPort = 18443
+    Integer testHttpPort = 18080
+
     String value = "org.apache.coyote.http2.Http2Protocol"
     TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
             .httpsConnector(
-                    new SecureHttpConnectorTomcat().setUpgradeProtocolToHttp2Protocol())
+                    new SecureHttpConnectorTomcat().setPort(testHttpsPort).setUpgradeProtocolToHttp2Protocol())
             .httpConnector(
-                    new NonSecureHttpConnectorTomcat().setUpgradeProtocolToHttp2Protocol())
+                    new NonSecureHttpConnectorTomcat().setPort(testHttpPort).setUpgradeProtocolToHttp2Protocol())
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
-    assertEquals value, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@UpgradeProtocol.toString()
     assertEquals value, Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.@UpgradeProtocol.toString()
+    assertEquals value, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@UpgradeProtocol.toString()
   }
 
   boolean isSecuredHttpProtocol(GPathResult connector) {

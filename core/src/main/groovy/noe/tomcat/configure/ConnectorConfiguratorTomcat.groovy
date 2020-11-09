@@ -124,14 +124,31 @@ class ConnectorConfiguratorTomcat {
   }
 
   private void createNewConnector(Map<String, Object> attributes) {
+    Map<String, Object> res = [:]
+    Node connector
+
+    attributes.each {
+      if (it.key != "UpgradeProtocol") {
+        res.put(it.key, it.value)
+      }
+    }
+
     server.Service.each { service ->
-      service.appendNode ("Connector", attributes)
+      connector = service.appendNode ("Connector", res)
+    }
+
+    attributes.each {
+      if (it.key == "UpgradeProtocol") {
+        connector.appendNode ("UpgradeProtocol", ["className": it.value])
+      }
     }
   }
 
   private void updateExistingConnector(Node Connector, Map<String, Object> attributes) {
-    attributes.each { attribute ->
-      Connector.@"${attribute.key}" = attribute.value
+    attributes.each {
+      if (it.key == "UpgradeProtocol" && hasUpgradeProtocol(Connector)) Connector.appendNode("UpgradeProtocol", ["className": it.value])
+      else if (it.key == "UpgradeProtocol" && hasUpgradeProtocol(Connector)) Connector.UpgradeProtocol.@className = it.value
+      else Connector.@"${it.key}" = it.value
     }
   }
 
@@ -165,6 +182,10 @@ class ConnectorConfiguratorTomcat {
 
   private boolean hasAjpProtocol(Node connector) {
     return connector.@protocol != null && connector.@protocol.toString() in ConnectorTomcatUtils.retrieveAllAjpProtocols()
+  }
+
+  private boolean hasUpgradeProtocol(Node connector) {
+    return connector.UpgradeProtocol.@className.toString() != null
   }
 
 }
