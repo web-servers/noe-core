@@ -124,7 +124,8 @@ class ConnectorConfiguratorTomcat {
   }
 
   private void createNewConnector(Map<String, Object> attributes) {
-    def res, connector
+    Map<String, Object> res
+    Node connector
 
     res = ConnectorConfiguratorUtils.mapAttributesForConnectorOnly(attributes)
 
