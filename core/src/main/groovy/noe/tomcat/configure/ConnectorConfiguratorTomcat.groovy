@@ -124,31 +124,21 @@ class ConnectorConfiguratorTomcat {
   }
 
   private void createNewConnector(Map<String, Object> attributes) {
-    Map<String, Object> res = [:]
-    Node connector
+    def res, connector
 
-    attributes.each {
-      if (it.key != "UpgradeProtocol") {
-        res.put(it.key, it.value)
-      }
-    }
+    res = ConnectorConfiguratorUtils.mapAttributesForConnectorOnly(attributes)
 
     server.Service.each { service ->
       connector = service.appendNode ("Connector", res)
     }
 
-    attributes.each {
-      if (it.key == "UpgradeProtocol") {
-        connector.appendNode ("UpgradeProtocol", ["className": it.value])
-      }
-    }
+    ConnectorConfiguratorUtils.createNewUpgradeProtocol(connector, attributes)
   }
 
   private void updateExistingConnector(Node Connector, Map<String, Object> attributes) {
     attributes.each {
-      if (it.key == "UpgradeProtocol" && hasUpgradeProtocol(Connector)) Connector.appendNode("UpgradeProtocol", ["className": it.value])
-      else if (it.key == "UpgradeProtocol" && hasUpgradeProtocol(Connector)) Connector.UpgradeProtocol.@className = it.value
-      else Connector.@"${it.key}" = it.value
+      if (!ConnectorConfiguratorUtils.updateExistingUpgradeProtocol(Connector, it)) {
+        Connector.@"${it.key}" = it.value}
     }
   }
 
@@ -182,10 +172,6 @@ class ConnectorConfiguratorTomcat {
 
   private boolean hasAjpProtocol(Node connector) {
     return connector.@protocol != null && connector.@protocol.toString() in ConnectorTomcatUtils.retrieveAllAjpProtocols()
-  }
-
-  private boolean hasUpgradeProtocol(Node connector) {
-    return connector.UpgradeProtocol.@className.toString() != null
   }
 
 }

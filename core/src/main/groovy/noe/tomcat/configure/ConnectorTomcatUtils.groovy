@@ -12,6 +12,8 @@ final class ConnectorTomcatUtils {
   public static String PROTOCOL_CLASS_HTTP_NIO = "org.apache.coyote.http11.Http11NioProtocol"
   public static String PROTOCOL_CLASS_HTTP_APR = "org.apache.coyote.http11.Http11AprProtocol"
 
+  public static String UPGRADE_PROTOCOL_HTTP2 = "org.apache.coyote.http2.Http2Protocol"
+
   private ConnectorTomcatUtils() {
     // no instance creation
   }
@@ -31,6 +33,12 @@ final class ConnectorTomcatUtils {
       PROTOCOL_CLASS_AJP,
       PROTOCOL_CLASS_AJP_NIO,
       PROTOCOL_CLASS_AJP_APR
+    ]
+  }
+
+  static retrieveAllUpgradeProtocols() {
+    return [
+            UPGRADE_PROTOCOL_HTTP2
     ]
   }
 
