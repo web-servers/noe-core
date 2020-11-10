@@ -139,17 +139,9 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this
   }
 
-  public SecureHttpConnectorTomcat setDefaultKeyStoreFile() {
-    setKeystoreFile(keystoreFilePath)
-  }
-
   public SecureHttpConnectorTomcat setKeystorePass(String keystorePass) {
     this.keystorePass = keystorePass
     return this
-  }
-
-  public SecureHttpConnectorTomcat setDefaultKeystorePass() {
-    setKeystorePass(password)
   }
 
   public SecureHttpConnectorTomcat setKeystoreType(String keystoreType) {
@@ -182,10 +174,6 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this
   }
 
-  public SecureHttpConnectorTomcat setDefaultSslCertificateFile() {
-    setSslCertificateFile(sslCertificate)
-  }
-
   public SecureHttpConnectorTomcat setSslCACertificateFile(String sslCACertificateFile) {
     this.sslCACertificateFile = sslCACertificateFile
     return this
@@ -196,17 +184,9 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this
   }
 
-  public SecureHttpConnectorTomcat setDefaultSslCertificateKeyFile() {
-    setSslCertificateKeyFile(sslCertificateKey)
-  }
-
   public SecureHttpConnectorTomcat setSslPassword(String sslPassword) {
     this.sslPassword = sslPassword
     return this
-  }
-
-  public SecureHttpConnectorTomcat setDefaultSslPassword() {
-    setSslCertificateKeyFile(sslCertificateKey)
   }
 
   public SecureHttpConnectorTomcat setSslImplementationName(String sslImplementationName) {
@@ -224,9 +204,32 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this
   }
 
+  public SecureHttpConnectorTomcat setDefaultSslCertificateFile() {
+    setSslCertificateFile(sslCertificate)
+  }
+
+  public SecureHttpConnectorTomcat setDefaultSslCertificateKeyFile() {
+    setSslCertificateKeyFile(sslCertificateKey)
+  }
+
+  public SecureHttpConnectorTomcat setDefaultKeyStoreFile() {
+    setKeystoreFile(keystoreFilePath)
+  }
+
+  public SecureHttpConnectorTomcat setDefaultKeystorePass() {
+    setKeystorePass(password)
+  }
+
+  public SecureHttpConnectorTomcat setDefaultTrustorePassword() {
+    setTruststorePass(password)
+  }
+
+  public SecureHttpConnectorTomcat setDefaultSslPassword() {
+    setSslPassword(password)
+  }
+
   public SecureHttpConnectorTomcat setUpgradeProtocolToHttp2Protocol() {
     setUpgradeProtocol('org.apache.coyote.http2.Http2Protocol')
-    return this
   }
 
 }
