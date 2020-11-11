@@ -141,6 +141,14 @@ class ConnectorAttributesTransformer {
         res.put('clientAuth', connector.getClientAuth())
       }
 
+      // HTTP2
+      if (connector.getUpgradeProtocol() != null && !connector.getUpgradeProtocol().isEmpty()) {
+        res.put('UpgradeProtocol', connector.getUpgradeProtocol())
+      }
+      if (connector.getSslImplementationName() != null && !connector.getSslImplementationName().isEmpty()) {
+        res.put('sslImplementationName', connector.getSslImplementationName())
+      }
+
       // SSL APR
       if (connector.getSslCertificateFile() != null && !connector.getSslCertificateFile().isEmpty()) {
         res.put('SSLCertificateFile', connector.getSslCertificateFile())
@@ -154,14 +162,8 @@ class ConnectorAttributesTransformer {
       if (connector.getSslPassword() != null && !connector.getSslPassword().isEmpty()) {
         res.put('SSLPassword', connector.getSslPassword())
       }
-      if (connector.getSslImplementationName() != null && !connector.getSslImplementationName().isEmpty()) {
-        res.put('sslImplementationName', connector.getSslImplementationName())
-      }
       if (connector.getSslEnabledProtocols() != null && connector.getSslEnabledProtocols()) {
         res.put('sslEnabledProtocols', connector.getSslEnabledProtocols())
-      }
-      if (connector.getUpgradeProtocol() != null && !connector.getUpgradeProtocol().isEmpty()) {
-        res.put('UpgradeProtocol', connector.getUpgradeProtocol())
       }
 
       return res
