@@ -286,9 +286,10 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
   void removeSpecificListenerOfServerXml() {
     String value = "org.apache.catalina.core.AprLifecycleListener"
     TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
+            .removeListener(value)
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
-    assertEquals value, Server.Listener.find { it.@className=value }.@className.toString()
+    assertEquals null, Server.Listener.find { it.@className.contains('AprLifecycleListener') }
   }
 
   @Test
