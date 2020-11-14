@@ -75,6 +75,10 @@ class ConnectorAttributesTransformer {
       if (connector.getRedirectPort() != null && connector.getRedirectPort() > 0) {
         res.put('redirectPort', connector.getRedirectPort())
       }
+      if (connector.getUpgradeProtocol() != null) {
+        res.put('UpgradeProtocol', connector.getUpgradeProtocol())
+      }
+
 
       if(connector instanceof AjpConnectorTomcat) {
         if (connector.getSecretRequired() != null) {
@@ -88,12 +92,6 @@ class ConnectorAttributesTransformer {
         if (connector.getAllowedRequestAttributesPattern() != null
                 && !connector.getAllowedRequestAttributesPattern().isEmpty()) {
           res.put('allowedRequestAttributesPattern', connector.getAllowedRequestAttributesPattern())
-        }
-      }
-
-      if(connector instanceof NonSecureHttpConnectorTomcat) {
-        if (connector.getUpgradeProtocol() != null && !connector.getUpgradeProtocol().isEmpty()) {
-          res.put('UpgradeProtocol', connector.getUpgradeProtocol())
         }
       }
 
@@ -142,9 +140,6 @@ class ConnectorAttributesTransformer {
       }
 
       // HTTP2
-      if (connector.getUpgradeProtocol() != null && !connector.getUpgradeProtocol().isEmpty()) {
-        res.put('UpgradeProtocol', connector.getUpgradeProtocol())
-      }
       if (connector.getSslImplementationName() != null && !connector.getSslImplementationName().isEmpty()) {
         res.put('sslImplementationName', connector.getSslImplementationName())
       }

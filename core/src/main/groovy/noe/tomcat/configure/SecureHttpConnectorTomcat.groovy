@@ -36,7 +36,6 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   private String truststoreType
   private String sslImplementationName
   private boolean sslEnabledProtocols
-  private String upgradeProtocol
 
   // SSL APR
   private String sslCACertificateFile
@@ -125,10 +124,6 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this.sslEnabledProtocols
   }
 
-  public String getUpgradeProtocol() {
-    return this.upgradeProtocol
-  }
-
   public SecureHttpConnectorTomcat setSslProtocol(String sslProtocol) {
     this.sslProtocol = sslProtocol
     return this
@@ -199,11 +194,6 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this
   }
 
-  public SecureHttpConnectorTomcat setUpgradeProtocol(String upgradeProtocol) {
-    this.upgradeProtocol = upgradeProtocol
-    return this
-  }
-
   public SecureHttpConnectorTomcat setDefaultSslCertificateFile() {
     setSslCertificateFile(sslCertificate)
   }
@@ -226,10 +216,6 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
 
   public SecureHttpConnectorTomcat setDefaultSslPassword() {
     setSslPassword(password)
-  }
-
-  public SecureHttpConnectorTomcat setUpgradeProtocolToHttp2Protocol() {
-    setUpgradeProtocol('org.apache.coyote.http2.Http2Protocol')
   }
 
 }

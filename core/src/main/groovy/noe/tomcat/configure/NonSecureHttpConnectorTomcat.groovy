@@ -17,31 +17,19 @@ package noe.tomcat.configure
  */
 public class NonSecureHttpConnectorTomcat extends ConnectorTomcatAbstract<NonSecureHttpConnectorTomcat> {
 
-  private String upgradeProtocol
-
   public NonSecureHttpConnectorTomcat() {
     super.setSecure(false)
+    protocol = "HTTP/1.1"
+    connectionTimeout = 20000
   }
 
-  public String getUpgradeProtocol() {
-    return this.upgradeProtocol
-  }
+
 
   /**
    * Input argument secure is ignored secure is set 'false' always.
    */
   @Override
   NonSecureHttpConnectorTomcat setSecure(boolean secure) {
-    return this
-  }
-
-  public NonSecureHttpConnectorTomcat setUpgradeProtocol(String upgradeProtocol) {
-    this.upgradeProtocol = upgradeProtocol
-    return this
-  }
-
-  public NonSecureHttpConnectorTomcat setUpgradeProtocolToHttp2Protocol() {
-    setUpgradeProtocol('org.apache.coyote.http2.Http2Protocol')
     return this
   }
 }

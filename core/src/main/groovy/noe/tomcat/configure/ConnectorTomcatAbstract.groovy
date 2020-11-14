@@ -28,6 +28,8 @@ abstract public class ConnectorTomcatAbstract<E extends ConnectorTomcatAbstract>
   private String address
   private Integer connectionTimeout
   private Integer redirectPort
+  private UpgradeProtocol upgradeProtocol
+
   // - ^^^ ------------------------------------------------------
 
 
@@ -61,6 +63,10 @@ abstract public class ConnectorTomcatAbstract<E extends ConnectorTomcatAbstract>
 
   public Integer getRedirectPort() {
     return redirectPort
+  }
+
+  public UpgradeProtocol getUpgradeProtocol() {
+    return upgradeProtocol
   }
 
   public E setPort(int port) {
@@ -100,6 +106,21 @@ abstract public class ConnectorTomcatAbstract<E extends ConnectorTomcatAbstract>
 
   public E setScheme(String scheme) {
     this.scheme = scheme
+    return (E) this
+  }
+
+  public E setUpgradeProtocol(UpgradeProtocol upgradeProtocol = new UpgradeProtocol()) {
+    this.upgradeProtocol = upgradeProtocol
+    return (E) this
+  }
+
+  public E setUpgradeProtocolClassName(String className) {
+    upgradeProtocol.setClassName(className)
+    return (E) this
+  }
+
+  public E setUpgradeProtocolToHttp2Protocol() {
+    setUpgradeProtocolClassName('org.apache.coyote.http2.Http2Protocol')
     return (E) this
   }
 
