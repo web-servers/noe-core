@@ -9,10 +9,9 @@ final class ConnectorConfiguratorUtils {
     static void createNewUpgradeProtocol(Node connector, UpgradeProtocol upgradeProtocol) {
         Map<String, String> upgradeProtocolAttributes = new HashMap<String, String>()
 
-            if (upgradeProtocol.className != null && !upgradeProtocol.className.isEmpty()) {
-                upgradeProtocolAttributes.put('className', upgradeProtocol.className)
-            }
-
+        if (upgradeProtocol.className != null && !upgradeProtocol.className.isEmpty()) {
+            upgradeProtocolAttributes.put('className', upgradeProtocol.className)
+        }
         connector.appendNode ("UpgradeProtocol", upgradeProtocolAttributes)
     }
 
