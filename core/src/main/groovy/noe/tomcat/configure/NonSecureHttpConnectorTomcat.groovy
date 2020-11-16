@@ -19,11 +19,7 @@ public class NonSecureHttpConnectorTomcat extends ConnectorTomcatAbstract<NonSec
 
   public NonSecureHttpConnectorTomcat() {
     super.setSecure(false)
-    protocol = "HTTP/1.1"
-    connectionTimeout = 20000
   }
-
-
 
   /**
    * Input argument secure is ignored secure is set 'false' always.

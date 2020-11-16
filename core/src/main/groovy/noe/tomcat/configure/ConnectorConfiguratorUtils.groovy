@@ -6,7 +6,7 @@ final class ConnectorConfiguratorUtils {
         // no instance creation
     }
 
-    static void createNewUpgradeProtocol(connector, UpgradeProtocol upgradeProtocol) {
+    static void createNewUpgradeProtocol(Node connector, UpgradeProtocol upgradeProtocol) {
         Map<String, String> upgradeProtocolAttributes = new HashMap<String, String>()
 
             if (upgradeProtocol.className != null && !upgradeProtocol.className.isEmpty()) {
@@ -18,14 +18,13 @@ final class ConnectorConfiguratorUtils {
 
     static void updateExistingUpgradeProtocol(Node connector, UpgradeProtocol upgradeProtocol) {
         if (connector.UpgradeProtocol.find { true } != null) {
-            println("Got inside ! ! !")
-            println(connector.UpgradeProtocol.find { true })
-            println("Connector " + connector)
-            connector.remove(connector.UpgradeProtocol.find { true })
-            println("Connector " + connector)
+            removeExistingUpgradeProtocol(connector)
         }
-
         createNewUpgradeProtocol(connector, upgradeProtocol)
+    }
+
+    static void removeExistingUpgradeProtocol(Node connector) {
+        connector.remove(connector.UpgradeProtocol.find { true })
     }
 
 }

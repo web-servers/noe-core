@@ -31,9 +31,7 @@ class ConnectorConfiguratorTomcat {
     }
     if (httpConnectorSize == 1) {
       Node Connector = loadExistingHttpConnector()
-      Node Parent = Connector.parent()
-
-      createNewConnector(new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
+      updateExistingConnector(Connector, new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
     } else {
       createNewConnector(new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
     }
@@ -53,9 +51,7 @@ class ConnectorConfiguratorTomcat {
     }
     if (httpsConnectorSize == 1) {
       Node Connector = loadExistingHttpsConnector()
-      Connector.parent().remove(Connector)
-
-      createNewConnector(new ConnectorAttributesTransformer(connector).secureHttpConnector())
+      updateExistingConnector(Connector, new ConnectorAttributesTransformer(connector).secureHttpConnector())
     } else {
       createNewConnector(new ConnectorAttributesTransformer(connector).secureHttpConnector())
     }
@@ -77,9 +73,7 @@ class ConnectorConfiguratorTomcat {
     }
     if (ajpConnectorSize == 1) {
       Node Connector = loadExistingAjpConnector()
-      Connector.parent().remove(Connector)
-
-      createNewConnector(new ConnectorAttributesTransformer(connector).ajpConnector())
+      updateExistingConnector(Connector, new ConnectorAttributesTransformer(connector).ajpConnector())
     } else {
       createNewConnector(new ConnectorAttributesTransformer(connector).ajpConnector())
     }
@@ -135,10 +129,22 @@ class ConnectorConfiguratorTomcat {
     UpgradeProtocol upgradeProtocol = (UpgradeProtocol) attributes.remove('UpgradeProtocol')
 
     server.Service.each { service ->
-      connector = service.appendNode ("Connector", attributes)
+      connector = service.appendNode("Connector", attributes)
     }
 
     if (upgradeProtocol != null) ConnectorConfiguratorUtils.createNewUpgradeProtocol(connector, upgradeProtocol)
+  }
+
+  private void updateExistingConnector(Node Connector, Map<String, Object> attributes) {
+    UpgradeProtocol upgradeProtocol = (UpgradeProtocol) attributes.remove('UpgradeProtocol')
+
+    attributes.each {
+        Connector.@"${it.key}" = it.value
+    }
+
+    if (upgradeProtocol != null) {
+      ConnectorConfiguratorUtils.updateExistingUpgradeProtocol(Connector, upgradeProtocol)
+    } else ConnectorConfiguratorUtils.removeExistingUpgradeProtocol(Connector)
   }
 
   /**
