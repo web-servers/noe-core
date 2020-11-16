@@ -1,6 +1,6 @@
 package noe.tomcat.configure
 
-class UpgradeProtocol {
+class UpgradeProtocolTomcat {
 
     public String className
 

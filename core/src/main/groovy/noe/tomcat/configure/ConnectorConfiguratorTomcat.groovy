@@ -126,7 +126,7 @@ class ConnectorConfiguratorTomcat {
   private void createNewConnector(Map<String, Object> attributes) {
     Node connector
 
-    UpgradeProtocol upgradeProtocol = (UpgradeProtocol) attributes.remove('UpgradeProtocol')
+    UpgradeProtocolTomcat upgradeProtocol = (UpgradeProtocolTomcat) attributes.remove('UpgradeProtocol')
 
     server.Service.each { service ->
       connector = service.appendNode("Connector", attributes)
@@ -136,7 +136,7 @@ class ConnectorConfiguratorTomcat {
   }
 
   private void updateExistingConnector(Node Connector, Map<String, Object> attributes) {
-    UpgradeProtocol upgradeProtocol = (UpgradeProtocol) attributes.remove('UpgradeProtocol')
+    UpgradeProtocolTomcat upgradeProtocol = (UpgradeProtocolTomcat) attributes.remove('UpgradeProtocol')
 
     attributes.each {
         Connector.@"${it.key}" = it.value

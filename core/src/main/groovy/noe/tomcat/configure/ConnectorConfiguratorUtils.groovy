@@ -6,7 +6,7 @@ final class ConnectorConfiguratorUtils {
         // no instance creation
     }
 
-    static void createNewUpgradeProtocol(Node connector, UpgradeProtocol upgradeProtocol) {
+    static void createNewUpgradeProtocol(Node connector, UpgradeProtocolTomcat upgradeProtocol) {
         Map<String, String> upgradeProtocolAttributes = new HashMap<String, String>()
 
         if (upgradeProtocol.className != null && !upgradeProtocol.className.isEmpty()) {
@@ -15,7 +15,7 @@ final class ConnectorConfiguratorUtils {
         connector.appendNode ("UpgradeProtocol", upgradeProtocolAttributes)
     }
 
-    static void updateExistingUpgradeProtocol(Node connector, UpgradeProtocol upgradeProtocol) {
+    static void updateExistingUpgradeProtocol(Node connector, UpgradeProtocolTomcat upgradeProtocol) {
         if (connector.UpgradeProtocol.find { true } != null) {
             removeExistingUpgradeProtocol(connector)
         }

@@ -28,7 +28,7 @@ abstract public class ConnectorTomcatAbstract<E extends ConnectorTomcatAbstract>
   private String address
   private Integer connectionTimeout
   private Integer redirectPort
-  private UpgradeProtocol upgradeProtocol
+  private UpgradeProtocolTomcat upgradeProtocol
 
   // - ^^^ ------------------------------------------------------
 
@@ -65,7 +65,7 @@ abstract public class ConnectorTomcatAbstract<E extends ConnectorTomcatAbstract>
     return redirectPort
   }
 
-  public UpgradeProtocol getUpgradeProtocol() {
+  public UpgradeProtocolTomcat getUpgradeProtocol() {
     return upgradeProtocol
   }
 
@@ -109,7 +109,7 @@ abstract public class ConnectorTomcatAbstract<E extends ConnectorTomcatAbstract>
     return (E) this
   }
 
-  public E setUpgradeProtocol(UpgradeProtocol upgradeProtocol = new UpgradeProtocol()) {
+  public E setUpgradeProtocol(UpgradeProtocolTomcat upgradeProtocol = new UpgradeProtocolTomcat()) {
     this.upgradeProtocol = upgradeProtocol
     return (E) this
   }
