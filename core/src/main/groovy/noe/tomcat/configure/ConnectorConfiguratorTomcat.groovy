@@ -144,7 +144,7 @@ class ConnectorConfiguratorTomcat {
 
     if (upgradeProtocol != null) {
       ConnectorConfiguratorUtils.updateExistingUpgradeProtocol(Connector, upgradeProtocol)
-    } else ConnectorConfiguratorUtils.removeExistingUpgradeProtocol(Connector)
+    }
   }
 
   /**
