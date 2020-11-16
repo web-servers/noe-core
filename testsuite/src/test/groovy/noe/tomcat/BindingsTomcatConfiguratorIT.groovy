@@ -290,7 +290,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
             .removeListener(value)
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
-    assertEquals isEmpty, Server.Listener.find { it.@className.contains('AprLifecycleListener') }
+    assertEquals isEmpty, Server.Listener.find { it.@className.contains('AprLifecycleListener') }.toString()
   }
 
   @Test
@@ -301,9 +301,9 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     String value = "org.apache.coyote.http2.Http2Protocol"
     TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
             .httpsConnector(
-                    new SecureHttpConnectorTomcat().setPort(testHttpsPort).setUpgradeProtocolToHttp2Protocol())
+                    new SecureHttpConnectorTomcat().setPort(testHttpsPort).setUpgradeProtocol().setUpgradeProtocolToHttp2Protocol())
             .httpConnector(
-                    new NonSecureHttpConnectorTomcat().setPort(testHttpPort).setUpgradeProtocolToHttp2Protocol())
+                    new NonSecureHttpConnectorTomcat().setPort(testHttpPort).setUpgradeProtocol().setUpgradeProtocolToHttp2Protocol())
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
     assertEquals value, Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.UpgradeProtocol.@className.toString()
