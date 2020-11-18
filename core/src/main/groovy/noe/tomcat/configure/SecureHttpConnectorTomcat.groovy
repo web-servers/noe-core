@@ -49,6 +49,9 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   String sslCertificateKey = PathHelper.join(sslStringDir, "server.key")
   String keystoreFilePath = PathHelper.join(sslStringDir, "server.jks")
   String password = "changeit"
+
+  // Inner elements
+  private ConnectorUpgradeProtocolTomcat upgradeProtocol
   // - ^^^ ------------------------------------------------------
 
   public SecureHttpConnectorTomcat() {
@@ -216,6 +219,20 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
 
   public SecureHttpConnectorTomcat setDefaultSslPassword() {
     setSslPassword(password)
+  }
+
+  public ConnectorUpgradeProtocolTomcat getUpgradeProtocol() {
+    return upgradeProtocol
+  }
+
+  public SecureHttpConnectorTomcat setUpgradeProtocol(ConnectorUpgradeProtocolTomcat upgradeProtocol) {
+    this.upgradeProtocol = upgradeProtocol
+    return this
+  }
+
+  public SecureHttpConnectorTomcat setUpgradeProtocolToHttp2Protocol() {
+    setUpgradeProtocol(new ConnectorUpgradeProtocolTomcat().setClassName(ConnectorUpgradeProtocolTomcat.PROTOCOL_CLASS_HTTP2))
+    return this
   }
 
 }

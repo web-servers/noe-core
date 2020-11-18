@@ -10,6 +10,7 @@ import noe.tomcat.configure.ShutdownTomcat
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue
 
 /**
  * Abstract class for Tomcat bindings testing.
@@ -275,8 +276,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
   @Test
   void addSpecificListenerOfServerXml() {
     String value = 'customListener'
-    TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
-            .addListener(value)
+    new TomcatConfigurator(tomcat).addListener(value)
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
     assertEquals value, Server.Listener.find { it.@className=value }.@className.toString()
@@ -285,12 +285,10 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
   @Test
   void removeSpecificListenerOfServerXml() {
     String value = "org.apache.catalina.core.AprLifecycleListener"
-    String isEmpty = ""
-    TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
-            .removeListener(value)
+    new TomcatConfigurator(tomcat).removeListener(value)
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
-    assertEquals isEmpty, Server.Listener.find { it.@className.contains('AprLifecycleListener') }.toString()
+    assertTrue Server.Listener.find { it.@className.contains('AprLifecycleListener') }.toString().isEmpty()
   }
 
   @Test
@@ -299,11 +297,15 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     Integer testHttpPort = 18080
 
     String value = "org.apache.coyote.http2.Http2Protocol"
-    TomcatConfigurator tConfigurator = new TomcatConfigurator(tomcat)
-            .httpsConnector(
-                    new SecureHttpConnectorTomcat().setPort(testHttpsPort).setUpgradeProtocol().setUpgradeProtocolToHttp2Protocol())
-            .httpConnector(
-                    new NonSecureHttpConnectorTomcat().setPort(testHttpPort).setUpgradeProtocol().setUpgradeProtocolToHttp2Protocol())
+    new TomcatConfigurator(tomcat)
+      .httpsConnector(
+        new SecureHttpConnectorTomcat()
+          .setPort(testHttpsPort)
+          .setUpgradeProtocolToHttp2Protocol())
+      .httpConnector(
+        new NonSecureHttpConnectorTomcat()
+          .setPort(testHttpPort)
+          .setUpgradeProtocolToHttp2Protocol())
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
     assertEquals value, Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.UpgradeProtocol.@className.toString()

@@ -30,8 +30,8 @@ class ConnectorConfiguratorTomcat {
       throw new IllegalStateException("Unexpected server.xml format - one non secure connector expected at most")
     }
     if (httpConnectorSize == 1) {
-      Node Connector = loadExistingHttpConnector()
-      updateExistingConnector(Connector, new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
+      Node ConnectorElement = loadExistingHttpConnector()
+      updateExistingConnector(ConnectorElement, new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
     } else {
       createNewConnector(new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
     }
@@ -123,27 +123,32 @@ class ConnectorConfiguratorTomcat {
     return connector.@secure.toString().toLowerCase().trim() == "true"
   }
 
-  private void createNewConnector(Map<String, Object> attributes) {
-    Node connector
 
-    UpgradeProtocolTomcat upgradeProtocol = (UpgradeProtocolTomcat) attributes.remove('UpgradeProtocol')
-
-    server.Service.each { service ->
-      connector = service.appendNode("Connector", attributes)
+  private void createNewConnector(Node element) {
+    server.Service.each { Node service ->
+      service.appendNode(element, element.attributes(), element.value())
     }
-
-    if (upgradeProtocol != null) ConnectorConfiguratorUtils.createNewUpgradeProtocol(connector, upgradeProtocol)
   }
 
-  private void updateExistingConnector(Node Connector, Map<String, Object> attributes) {
-    UpgradeProtocolTomcat upgradeProtocol = (UpgradeProtocolTomcat) attributes.remove('UpgradeProtocol')
-
-    attributes.each {
-        Connector.@"${it.key}" = it.value
+  private void updateExistingConnector(Node Connector, Node newConnector) {
+    // update attributes
+    newConnector.attributes().each { attribute ->
+      Connector.@"${attribute.key}" = attribute.value
     }
 
-    if (upgradeProtocol != null) {
-      ConnectorConfiguratorUtils.updateExistingUpgradeProtocol(Connector, upgradeProtocol)
+    // update nodes
+    newConnector.each { Node newSubelement ->
+      if (newSubelement.name() == ConnectorUpgradeProtocolTomcat.ELEMENT_NAME) {
+        // create new element
+        Connector.appendNode(newSubelement, newSubelement.attributes(), newSubelement.value())
+
+        // upgrade existing element
+        Connector.findAll { it.name() == ConnectorUpgradeProtocolTomcat.ELEMENT_NAME }.each { upgradeProtocol ->
+          newSubelement.attributes() { attribute ->
+            upgradeProtocol.@"${attribute.key}" = attribute.value
+          }
+        }
+      }
     }
   }
 
