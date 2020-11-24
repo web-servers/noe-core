@@ -43,13 +43,6 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   private String sslCertificateKeyFile
   private String sslPassword
 
-  static Platform platform = new Platform() /// platform identification
-  String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "self_signed")
-  String sslCertificate = PathHelper.join(sslStringDir, "server.crt")
-  String sslCertificateKey = PathHelper.join(sslStringDir, "server.key")
-  String keystoreFilePath = PathHelper.join(sslStringDir, "server.jks")
-  String password = "changeit"
-
   // Inner elements
   private ConnectorUpgradeProtocolTomcat upgradeProtocol
   // - ^^^ ------------------------------------------------------
@@ -57,6 +50,32 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   public SecureHttpConnectorTomcat() {
     super.setSecure(true)
     sslEnabled = true
+  }
+
+  /**
+   * Configure secure http connector to expect certificates in ${SYSTEM_TEMP}/ssl/self_signed directory
+   * Expected names:
+   *  <ul>
+   *    <li>certificate = server.crt</li>
+   *    <li>key file = server.key</li>
+   *    <li>keystore = server.jks</li>
+   *    <li></li>
+   *  </ul>
+   *  Password for keystore, trustore and SSL sets to "changeit" (without apostrophes).
+   */
+  SecureHttpConnectorTomcat setDefaultCertificatesConfiguration() {
+    String sslStringDir = new File(new Platform().getTmpDir(), "ssl", "self_signed").getCanonicalPath()
+    String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
+    String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
+    String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
+    String password = "changeit"
+
+    setSslCertificateFile(sslCertificate)
+    setSslCertificateKeyFile(sslCertificateKey)
+    setKeystoreFile(keystoreFilePath)
+    setKeystorePass(password)
+    setTruststorePass(password)
+    setSslPassword(password)
   }
 
   /**
@@ -195,30 +214,6 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   public SecureHttpConnectorTomcat setSslEnabledProtocols(String sslEnabledProtocols) {
     this.sslEnabledProtocols = sslEnabledProtocols
     return this
-  }
-
-  public SecureHttpConnectorTomcat setDefaultSslCertificateFile() {
-    setSslCertificateFile(sslCertificate)
-  }
-
-  public SecureHttpConnectorTomcat setDefaultSslCertificateKeyFile() {
-    setSslCertificateKeyFile(sslCertificateKey)
-  }
-
-  public SecureHttpConnectorTomcat setDefaultKeyStoreFile() {
-    setKeystoreFile(keystoreFilePath)
-  }
-
-  public SecureHttpConnectorTomcat setDefaultKeystorePass() {
-    setKeystorePass(password)
-  }
-
-  public SecureHttpConnectorTomcat setDefaultTrustorePassword() {
-    setTruststorePass(password)
-  }
-
-  public SecureHttpConnectorTomcat setDefaultSslPassword() {
-    setSslPassword(password)
   }
 
   public ConnectorUpgradeProtocolTomcat getUpgradeProtocol() {

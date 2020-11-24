@@ -130,20 +130,20 @@ class ConnectorConfiguratorTomcat {
     }
   }
 
-  private void updateExistingConnector(Node Connector, Node newConnector) {
+  private void updateExistingConnector(Node connector, Node newConnector) {
     // update attributes
     newConnector.attributes().each { attribute ->
-      Connector.@"${attribute.key}" = attribute.value
+      connector.@"${attribute.key}" = attribute.value
     }
 
     // update nodes
     newConnector.each { Node newSubelement ->
       if (newSubelement.name() == ConnectorUpgradeProtocolTomcat.ELEMENT_NAME) {
         // create new element
-        Connector.appendNode(newSubelement, newSubelement.attributes(), newSubelement.value())
+        connector.appendNode(newSubelement, newSubelement.attributes(), newSubelement.value())
 
         // upgrade existing element
-        Connector.findAll { it.name() == ConnectorUpgradeProtocolTomcat.ELEMENT_NAME }.each { upgradeProtocol ->
+        connector.findAll { it.name() == ConnectorUpgradeProtocolTomcat.ELEMENT_NAME }.each { upgradeProtocol ->
           newSubelement.attributes() { attribute ->
             upgradeProtocol.@"${attribute.key}" = attribute.value
           }
