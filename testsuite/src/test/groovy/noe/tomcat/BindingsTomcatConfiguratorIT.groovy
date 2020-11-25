@@ -9,6 +9,8 @@ import noe.tomcat.configure.SecureHttpConnectorTomcat
 import noe.tomcat.configure.ShutdownTomcat
 import org.junit.Test
 
+import noe.common.utils.PathHelper
+import noe.common.utils.Platform
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
 
