@@ -252,8 +252,12 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
     String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
     String password = "changeit"
+    Integer testHttpsPort = 8443
 
-    new TomcatConfigurator(tomcat).httpsConnector(new SecureHttpConnectorTomcat().setDefaultCertificatesConfiguration())
+    new TomcatConfigurator(tomcat)
+            .httpsConnector(new SecureHttpConnectorTomcat()
+                    .setPort(testHttpsPort)
+                    .setDefaultCertificatesConfiguration())
 
     assertEquals sslCertificate, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCertificateFile.toString())
     assertEquals sslCertificate, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCACertificateFile.toString())
