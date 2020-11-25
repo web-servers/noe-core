@@ -244,6 +244,25 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
   }
 
   @Test
+  void testCertificateDefaultsServerXmlChangeExpected() {
+    String sslStringDir = new File(new Platform().getTmpDir(), new PathHelper().join("ssl", "self_signed")).getCanonicalPath()
+    String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
+    String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
+    String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
+    String password = "changeit"
+
+    new TomcatConfigurator(tomcat).httpsConnector(new SecureHttpConnectorTomcat().setDefaultCertificatesConfiguration())
+
+    assertEquals sslCertificate, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCertificateFile.toString())
+    assertEquals sslCertificate, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCACertificateFile.toString())
+    assertEquals sslCertificateKey, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCertificateKeyFile.toString())
+    assertEquals keystoreFilePath, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@keystoreFile.toString())
+    assertEquals password, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLPassword.toString())
+    assertEquals password, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@truststorePass.toString())
+    assertEquals password, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@keystorePass.toString())
+  }
+
+  @Test
   void customModificationDefaltServerXmlChangeExpected() {
     Integer testShutdownPort = 1609
 

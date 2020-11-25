@@ -3,6 +3,8 @@ package noe.tomcat.configure
 import noe.common.utils.PathHelper
 import noe.common.utils.Platform
 
+import java.nio.file.Path
+
 /**
  * Abstraction for secure HTTP connector to configure Tomcat server.xml.
  * It is used for transfer data from user to `TomcatConfigurator`.
@@ -64,7 +66,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
    *  Password for keystore, trustore and SSL sets to "changeit" (without apostrophes).
    */
   SecureHttpConnectorTomcat setDefaultCertificatesConfiguration() {
-    String sslStringDir = new File(new Platform().getTmpDir(), "ssl", "self_signed").getCanonicalPath()
+    String sslStringDir = new File(new Platform().getTmpDir(), new PathHelper().join("ssl", "self_signed")).getCanonicalPath()
     String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
     String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
     String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
