@@ -1,9 +1,6 @@
 package noe.tomcat.configure
 
-import noe.common.utils.PathHelper
 import noe.common.utils.Platform
-
-import java.nio.file.Path
 
 /**
  * Abstraction for secure HTTP connector to configure Tomcat server.xml.
