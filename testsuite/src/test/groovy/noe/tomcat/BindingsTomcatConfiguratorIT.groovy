@@ -9,7 +9,10 @@ import noe.tomcat.configure.SecureHttpConnectorTomcat
 import noe.tomcat.configure.ShutdownTomcat
 import org.junit.Test
 
+import noe.common.utils.PathHelper
+import noe.common.utils.Platform
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue
 
 /**
  * Abstract class for Tomcat bindings testing.
@@ -243,6 +246,31 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
   }
 
   @Test
+  void testCertificateDefaultsServerXmlChangeExpected() {
+    String sslRoot = new File(new Platform().getTmpDir(), "ssl").getCanonicalPath()
+    String sslStringDir = new File(sslRoot, "self_signed").getCanonicalPath()
+    String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
+    String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
+    String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
+    String password = "changeit"
+    Integer testHttpsPort = 8443
+
+    new TomcatConfigurator(tomcat)
+      .httpsConnector(new SecureHttpConnectorTomcat()
+        .setPort(testHttpsPort)
+        .setDefaultCertificatesConfiguration())
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals sslCertificate, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCertificateFile.toString()
+    assertEquals sslCertificate, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCACertificateFile.toString()
+    assertEquals sslCertificateKey, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCertificateKeyFile.toString()
+    assertEquals keystoreFilePath, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@keystoreFile.toString()
+    assertEquals password, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLPassword.toString()
+    assertEquals password, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@truststorePass.toString()
+    assertEquals password, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@keystorePass.toString()
+  }
+
+  @Test
   void customModificationDefaltServerXmlChangeExpected() {
     Integer testShutdownPort = 1609
 
@@ -270,6 +298,45 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     newProps.load(new File(tomcat.basedir, "conf/${propFile}").newDataInputStream())
 
     assertEquals newValue, newProps.getProperty(propName)
+  }
+
+  @Test
+  void addSpecificListenerOfServerXml() {
+    String value = 'customListener'
+    new TomcatConfigurator(tomcat).addListener(value)
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals value, Server.Listener.find { it.@className=value }.@className.toString()
+  }
+
+  @Test
+  void removeSpecificListenerOfServerXml() {
+    String value = "org.apache.catalina.core.AprLifecycleListener"
+    new TomcatConfigurator(tomcat).removeListener(value)
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertTrue Server.Listener.find { it.@className.contains('AprLifecycleListener') }.toString().isEmpty()
+  }
+
+  @Test
+  void upgradeProtocolToHTTP2ProtocolSecureAndNonSecureConnector() {
+    Integer testHttpsPort = 18443
+    Integer testHttpPort = 18080
+
+    String value = "org.apache.coyote.http2.Http2Protocol"
+    new TomcatConfigurator(tomcat)
+      .httpsConnector(
+        new SecureHttpConnectorTomcat()
+          .setPort(testHttpsPort)
+          .setUpgradeProtocolToHttp2Protocol())
+      .httpConnector(
+        new NonSecureHttpConnectorTomcat()
+          .setPort(testHttpPort)
+          .setUpgradeProtocolToHttp2Protocol())
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals value, Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.UpgradeProtocol.@className.toString()
+    assertEquals value, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.UpgradeProtocol.@className.toString()
   }
 
   boolean isSecuredHttpProtocol(GPathResult connector) {

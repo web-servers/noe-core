@@ -14,25 +14,25 @@ class ConnectorAttributesTransformer {
 
   /**
    * Provides attributes for non secure HTTP connector.
-   * Returns map of key:value corresponding with attributes in Tomcat server.xml.
+   * Returns Node applicable into Tomcat server.xml.
    */
-  Map<String, Object> nonSecureHttpConnector() {
+  Node nonSecureHttpConnector() {
     return new CommonConnectorTransformer(connector).transform()
   }
 
   /**
    * Provides attributes for secure HTTP connector.
-   * Returns map of key:value corresponding with attributes in Tomcat server.xml.
+   * Returns Node applicable into Tomcat server.xml.
    */
-  Map<String, Object> secureHttpConnector() {
+  Node secureHttpConnector() {
     return new SecureHttpTransformer(connector).transform()
   }
 
   /**
    * Provides attributes for AJP connector.
-   * Returns map of key:value corresponding with attributes in Tomcat server.xml.
+   * Returns Node applicable into Tomcat server.xml.
    */
-  Map<String, Object> ajpConnector() {
+  Node ajpConnector() {
     return new CommonConnectorTransformer(connector).transform()
   }
 
@@ -47,51 +47,65 @@ class ConnectorAttributesTransformer {
       this.connector = connector
     }
 
-    Map<String, Object> transform() {
-      Map<String, Object> res = [:]
+    Node transform() {
+      Map<String, Object> attributes = [:]
 
+      // -- attributes -------------------------
       if (connector.getPort() != null && connector.getPort() > 0) {
-        res.put('port', connector.getPort())
+        attributes.put('port', connector.getPort())
       }
       if (connector.getProtocol() != null && !connector.getProtocol().isEmpty()) {
-        res.put('protocol', connector.getProtocol())
+        attributes.put('protocol', connector.getProtocol())
       }
       if (connector.getSecure() != null) {
-        res.put('secure', connector.getSecure())
+        attributes.put('secure', connector.getSecure())
       }
       if (connector.getScheme() != null && !connector.getScheme().isEmpty()) {
-        res.put('scheme', connector.getScheme())
+        attributes.put('scheme', connector.getScheme())
       }
 
       if (connector.getMaxThreads() != null && connector.getMaxThreads() > 0) {
-        res.put('maxThreads', connector.getMaxThreads())
+        attributes.put('maxThreads', connector.getMaxThreads())
       }
       if (connector.getAddress() != null && !connector.getAddress().isEmpty()) {
-        res.put('address', connector.getAddress())
+        attributes.put('address', connector.getAddress())
       }
       if (connector.getConnectionTimeout() != null && connector.getConnectionTimeout() > 0) {
-        res.put('connectionTimeout', connector.getConnectionTimeout())
+        attributes.put('connectionTimeout', connector.getConnectionTimeout())
       }
       if (connector.getRedirectPort() != null && connector.getRedirectPort() > 0) {
-        res.put('redirectPort', connector.getRedirectPort())
+        attributes.put('redirectPort', connector.getRedirectPort())
       }
 
       if(connector instanceof AjpConnectorTomcat) {
         if (connector.getSecretRequired() != null) {
-          res.put('secretRequired', connector.getSecretRequired())
+          attributes.put('secretRequired', connector.getSecretRequired())
         }
 
         if (connector.getSecret() != null && !connector.getSecret().isEmpty()) {
-          res.put('secret', connector.getSecret())
+          attributes.put('secret', connector.getSecret())
         }
 
         if (connector.getAllowedRequestAttributesPattern() != null
                 && !connector.getAllowedRequestAttributesPattern().isEmpty()) {
-          res.put('allowedRequestAttributesPattern', connector.getAllowedRequestAttributesPattern())
+          attributes.put('allowedRequestAttributesPattern', connector.getAllowedRequestAttributesPattern())
         }
       }
+      // ---------------------
 
-      return res
+
+      Node node = new Node(null, "Connector", attributes)
+
+
+      // -- sub elements -----
+      if (connector instanceof NonSecureHttpConnectorTomcat) {
+        if (connector.getUpgradeProtocol() != null) {
+          node.appendNode("UpgradeProtocol", ['className': connector.getUpgradeProtocol().getClassName()])
+        }
+      }
+      // --------------------
+
+      return node
     }
   }
 
@@ -102,39 +116,69 @@ class ConnectorAttributesTransformer {
       this.connector = connector
     }
 
-    Map<String, Object> transform() {
-      Map<String, Object> res = new CommonConnectorTransformer(connector).transform()
+    Node transform() {
+      Node node = new CommonConnectorTransformer(connector).transform()
+      Map<String, Object> attributes = node.attributes()
 
+      // -- attributes -------------------------
       if (connector.getSslEnabled() != null) {
-        res.put('SSLEnabled', connector.getSslEnabled())
+        attributes.put('SSLEnabled', connector.getSslEnabled())
       }
 
       // SSL BIO and NIO
       if (connector.getSslProtocol() != null && !connector.getSslProtocol().isEmpty()) {
-        res.put('sslProtocol', connector.getSslProtocol())
+        attributes.put('sslProtocol', connector.getSslProtocol())
       }
       if (connector.getKeystoreFile() != null && !connector.getKeystoreFile().isEmpty()) {
-        res.put('keystoreFile', connector.getKeystoreFile())
+        attributes.put('keystoreFile', connector.getKeystoreFile())
       }
       if (connector.getKeystorePass() != null && !connector.getKeystorePass().isEmpty()) {
-        res.put('keystorePass', connector.getKeystorePass())
+        attributes.put('keystorePass', connector.getKeystorePass())
+      }
+      if (connector.getKeystoreType() != null && !connector.getKeystoreType().isEmpty()) {
+        attributes.put('keystoreType', connector.getKeystoreType())
+      }
+      if (connector.getTruststoreFile() != null && !connector.getTruststoreFile().isEmpty()) {
+        attributes.put('truststoreFile', connector.getTruststoreFile())
+      }
+      if (connector.getTruststorePass() != null && !connector.getTruststorePass().isEmpty()) {
+        attributes.put('truststorePass', connector.getTruststorePass())
+      }
+      if (connector.getTruststoreType() != null && !connector.getTruststoreType().isEmpty()) {
+        attributes.put('truststoreType', connector.getTruststoreType())
       }
       if (connector.getClientAuth() != null) {
-        res.put('clientAuth', connector.getClientAuth())
+        attributes.put('clientAuth', connector.getClientAuth())
+      }
+
+      // HTTP2
+      if (connector.getSslImplementationName() != null && !connector.getSslImplementationName().isEmpty()) {
+        attributes.put('sslImplementationName', connector.getSslImplementationName())
       }
 
       // SSL APR
       if (connector.getSslCertificateFile() != null && !connector.getSslCertificateFile().isEmpty()) {
-        res.put('SSLCertificateFile', connector.getSslCertificateFile())
+        attributes.put('SSLCertificateFile', connector.getSslCertificateFile())
+      }
+      if (connector.getSslCACertificateFile() != null && !connector.getSslCACertificateFile().isEmpty()) {
+        attributes.put('SSLCACertificateFile', connector.getSslCACertificateFile())
       }
       if (connector.getSslCertificateKeyFile() != null && !connector.getSslCertificateKeyFile().isEmpty()) {
-        res.put('SSLCertificateKeyFile', connector.getSslCertificateKeyFile())
+        attributes.put('SSLCertificateKeyFile', connector.getSslCertificateKeyFile())
       }
       if (connector.getSslPassword() != null && !connector.getSslPassword().isEmpty()) {
-        res.put('SSLPassword', connector.getSslPassword())
+        attributes.put('SSLPassword', connector.getSslPassword())
+      }
+      if (connector.getSslEnabledProtocols() != null && connector.getSslEnabledProtocols()) {
+        attributes.put('sslEnabledProtocols', connector.getSslEnabledProtocols())
+      }
+      // ---------------------
+
+      if (connector.getUpgradeProtocol() != null) {
+        node.appendNode("UpgradeProtocol", ['className': connector.getUpgradeProtocol().getClassName()])
       }
 
-      return res
+      return node
     }
   }
 

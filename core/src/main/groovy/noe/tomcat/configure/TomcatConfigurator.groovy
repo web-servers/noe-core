@@ -368,6 +368,26 @@ class TomcatConfigurator {
   }
 
   /**
+   * Removes the specified listener to server.xml
+   * @param listenerFQCN the fully qualified class name of the listener
+   * @return this
+   */
+  TomcatConfigurator removeListener(String listenerFQCN) {
+    File serverXml = getServerXml()
+
+    if (serverXml?.exists()) {
+      configVault.push(serverXml)
+      Node serverNode = getParsedConfig(serverXml)
+      Node listener = serverNode.Listener.find { it.@className.contains(listenerFQCN) }
+      serverNode.remove(listener)
+      printNodeToFile(serverXml, serverNode)
+    } else {
+      missingConfigFile('server.xml')
+    }
+    return this
+  }
+
+  /**
    * Persists parsed properties-configuration.
    * The file will be created/updated in `TOMCAT_HOME/conf` directory.
    */

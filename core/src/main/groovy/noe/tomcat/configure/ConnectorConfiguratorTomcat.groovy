@@ -27,11 +27,11 @@ class ConnectorConfiguratorTomcat {
     int httpConnectorSize = loadHttpConnectorSize()
 
     if (httpConnectorSize > 1) {
-      throw new IllegalStateException("Unexpected server.xml format - one secure connector expected at most")
+      throw new IllegalStateException("Unexpected server.xml format - one non secure connector expected at most")
     }
     if (httpConnectorSize == 1) {
-      Node Connector = loadExistingHttpConnector()
-      updateExistingConnector(Connector, new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
+      Node ConnectorElement = loadExistingHttpConnector()
+      updateExistingConnector(ConnectorElement, new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
     } else {
       createNewConnector(new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
     }
@@ -104,7 +104,7 @@ class ConnectorConfiguratorTomcat {
     } else if (connectors.size() < 1) {
       return null
     } else {
-      throw new IllegalStateException("Unexpected server.xml format - one http connector expected")
+      throw new IllegalStateException("Unexpected server.xml format - one https connector expected at most")
     }
   }
 
@@ -115,7 +115,7 @@ class ConnectorConfiguratorTomcat {
     } else if (connectors.size() < 1) {
       return null
     } else {
-      throw new IllegalStateException("Unexpected server.xml format - one http connector expected at most")
+      throw new IllegalStateException("Unexpected server.xml format - one ajp connector expected at most")
     }
   }
 
@@ -123,15 +123,36 @@ class ConnectorConfiguratorTomcat {
     return connector.@secure.toString().toLowerCase().trim() == "true"
   }
 
-  private void createNewConnector(Map<String, Object> attributes) {
-    server.Service.each { service ->
-      service.appendNode ("Connector", attributes)
+
+  private void createNewConnector(Node element) {
+    server.Service.each { Node service ->
+      service.appendNode(element, element.attributes(), element.value())
     }
   }
 
-  private void updateExistingConnector(Node Connector, Map<String, Object> attributes) {
-    attributes.each { attribute ->
-      Connector.@"${attribute.key}" = attribute.value
+  private void updateExistingConnector(Node connector, Node newConnector) {
+    // update attributes
+    newConnector.attributes().each { attribute ->
+      connector.@"${attribute.key}" = attribute.value
+    }
+
+    // update nodes
+    newConnector.each { Node newSubelement ->
+      String UpgradeProtocol = ConnectorUpgradeProtocolTomcat.ELEMENT_NAME
+
+      if (newSubelement.name() == UpgradeProtocol) {
+        if (connector.find { it.name() == UpgradeProtocol } == null) {
+          // create new element
+          connector.appendNode(newSubelement, newSubelement.attributes(), newSubelement.value())
+        } else {
+          // upgrade existing element
+          connector.findAll { it.name() == UpgradeProtocol }.each { upgradeProtocol ->
+            newSubelement.attributes() { attribute ->
+              upgradeProtocol.@"${attribute.key}" = attribute.value
+            }
+          }
+        }
+      }
     }
   }
 
