@@ -66,7 +66,8 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
    *  Password for keystore, trustore and SSL sets to "changeit" (without apostrophes).
    */
   SecureHttpConnectorTomcat setDefaultCertificatesConfiguration() {
-    String sslStringDir = new File(new Platform().getTmpDir(), new PathHelper().join("ssl", "self_signed")).getCanonicalPath()
+    String sslRoot = new File(new Platform().getTmpDir(), "ssl").getCanonicalPath()
+    String sslStringDir = new File(sslRoot, "self_signed").getCanonicalPath()
     String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
     String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
     String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()

@@ -118,7 +118,7 @@ class ConnectorAttributesTransformer {
 
     Node transform() {
       Node node = new CommonConnectorTransformer(connector).transform()
-      Map<String, Object> attributes = [:]
+      Map<String, Object> attributes = node.attributes()
 
       // -- attributes -------------------------
       if (connector.getSslEnabled() != null) {
@@ -173,11 +173,6 @@ class ConnectorAttributesTransformer {
         attributes.put('sslEnabledProtocols', connector.getSslEnabledProtocols())
       }
       // ---------------------
-
-
-      attributes.each { attribute ->
-        node.@"${attribute.key}" = attribute.value
-      }
 
       if (connector.getUpgradeProtocol() != null) {
         node.appendNode("UpgradeProtocol", ['className': connector.getUpgradeProtocol().getClassName()])

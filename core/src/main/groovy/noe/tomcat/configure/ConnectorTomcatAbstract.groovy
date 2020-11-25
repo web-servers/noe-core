@@ -28,8 +28,6 @@ abstract public class ConnectorTomcatAbstract<E extends ConnectorTomcatAbstract>
   private String address
   private Integer connectionTimeout
   private Integer redirectPort
-
-
   // - ^^^ ------------------------------------------------------
 
 

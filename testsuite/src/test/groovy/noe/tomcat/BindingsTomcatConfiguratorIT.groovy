@@ -255,9 +255,9 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     Integer testHttpsPort = 8443
 
     new TomcatConfigurator(tomcat)
-            .httpsConnector(new SecureHttpConnectorTomcat()
-                    .setPort(testHttpsPort)
-                    .setDefaultCertificatesConfiguration())
+      .httpsConnector(new SecureHttpConnectorTomcat()
+        .setPort(testHttpsPort)
+        .setDefaultCertificatesConfiguration())
 
     assertEquals sslCertificate, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCertificateFile.toString())
     assertEquals sslCertificate, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCACertificateFile.toString())
