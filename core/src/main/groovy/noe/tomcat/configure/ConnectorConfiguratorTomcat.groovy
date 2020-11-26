@@ -83,7 +83,7 @@ class ConnectorConfiguratorTomcat {
 
   private void defineRedirectPorts(Integer port) {
     defineHttpConnector(new NonSecureHttpConnectorTomcat().setRedirectPort(port))
-    defineAjpConnector(new AjpConnectorTomcat().setRedirectPort(port))
+    defineAjpConnector(new AjpConnectorTomcat().setSecretRequired(false).setRedirectPort(port))
   }
 
   private Node loadExistingHttpConnector() {

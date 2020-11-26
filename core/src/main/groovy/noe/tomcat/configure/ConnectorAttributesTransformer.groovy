@@ -169,7 +169,7 @@ class ConnectorAttributesTransformer {
       if (connector.getSslPassword() != null && !connector.getSslPassword().isEmpty()) {
         attributes.put('SSLPassword', connector.getSslPassword())
       }
-      if (connector.getSslEnabledProtocols() != null && connector.getSslEnabledProtocols()) {
+      if (connector.getSslEnabledProtocols() != null) {
         attributes.put('sslEnabledProtocols', connector.getSslEnabledProtocols())
       }
       // ---------------------

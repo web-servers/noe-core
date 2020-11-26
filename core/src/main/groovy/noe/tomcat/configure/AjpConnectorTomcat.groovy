@@ -20,6 +20,7 @@ public class AjpConnectorTomcat extends ConnectorTomcatAbstract<AjpConnectorTomc
   private String allowedRequestAttributesPattern
 
   public AjpConnectorTomcat() {
+    port = "0"
     protocol = "AJP/1.3"
   }
 

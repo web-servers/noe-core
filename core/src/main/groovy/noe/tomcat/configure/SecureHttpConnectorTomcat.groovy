@@ -127,7 +127,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   }
 
   public String getSslCACertificateFile() {
-    return this.sslCertificateFile
+    return this.sslCACertificateFile
   }
 
   public String getSslCertificateKeyFile() {
