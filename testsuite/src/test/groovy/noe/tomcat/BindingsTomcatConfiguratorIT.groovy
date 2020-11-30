@@ -203,7 +203,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
     assertEquals testAjpPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@port.toString())
     assertEquals testProtocol, Server.Service.Connector.find { isAjpProtocol(it) }.@protocol.toString()
-    assertEquals testRedirectPort, Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString()
+    assertEquals testRedirectPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
     assertEquals testSecretRequired, Boolean.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@secretRequired.toString())
     assertEquals testSecret, Server.Service.Connector.find { isAjpProtocol(it) }.@secret.toString()
     assertEquals testAllowedRequestAttributesPattern, Server.Service.Connector.find { isAjpProtocol(it) }.@allowedRequestAttributesPattern.toString()
