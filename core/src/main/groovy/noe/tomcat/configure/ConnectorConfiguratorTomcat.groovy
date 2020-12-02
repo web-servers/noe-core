@@ -56,8 +56,6 @@ class ConnectorConfiguratorTomcat {
       createNewConnector(new ConnectorAttributesTransformer(connector).secureHttpConnector())
     }
 
-    defineRedirectPorts(connector.getPort())
-
     return server
   }
 
@@ -79,11 +77,6 @@ class ConnectorConfiguratorTomcat {
     }
 
     return server
-  }
-
-  private void defineRedirectPorts(Integer port) {
-    defineHttpConnector(new NonSecureHttpConnectorTomcat().setRedirectPort(port))
-    defineAjpConnector(new AjpConnectorTomcat().setRedirectPort(port))
   }
 
   private Node loadExistingHttpConnector() {
