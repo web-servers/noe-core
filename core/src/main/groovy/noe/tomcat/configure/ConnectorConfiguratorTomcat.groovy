@@ -124,29 +124,33 @@ class ConnectorConfiguratorTomcat {
   }
 
   private void updateExistingConnector(Node connector, Node newConnector) {
-    // update attributes
+    // update connector attributes
     newConnector.attributes().each { attribute ->
       connector.@"${attribute.key}" = attribute.value
     }
 
-    // update nodes
     newConnector.each { Node newSubelement ->
-      String UpgradeProtocol = ConnectorUpgradeProtocolTomcat.ELEMENT_NAME
+      updateInnerElements(connector, newSubelement)
+    }
+  }
 
-      if (newSubelement.name() == UpgradeProtocol) {
-        if (connector.find { it.name() == UpgradeProtocol } == null) {
-          // create new element
-          connector.appendNode(newSubelement, newSubelement.attributes(), newSubelement.value())
-        } else {
-          // upgrade existing element
-          connector.findAll { it.name() == UpgradeProtocol }.each { upgradeProtocol ->
-            newSubelement.attributes() { attribute ->
-              upgradeProtocol.@"${attribute.key}" = attribute.value
-            }
-          }
-        }
+  /**
+   *
+   * @param connector
+   * @param newSubElement
+   *
+   * Search for existing inner element to remove and replace with new one
+   * Note: SSLHostConfig inner elements can exist more than one
+   */
+  private void updateInnerElements(Node connector, Node newSubElement) {
+    if (connector.find { it.name() == newSubElement.name() } != null) {
+      Node oldElement = (Node) connector.find { it.name() == newSubElement.name()}
+      if (oldElement.name() != "SSLHostConfig") {
+        connector.remove(oldElement)
       }
     }
+
+    connector.appendNode(newSubElement, newSubElement.attributes(), newSubElement.value())
   }
 
   /**

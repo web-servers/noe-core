@@ -44,6 +44,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
 
   // Inner elements
   private ConnectorUpgradeProtocolTomcat upgradeProtocol
+  private ConnectorSSLHostConfigTomcat SSLHostConfig
   // - ^^^ ------------------------------------------------------
 
   public SecureHttpConnectorTomcat() {
@@ -216,6 +217,8 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this
   }
 
+  //--------------
+
   public ConnectorUpgradeProtocolTomcat getUpgradeProtocol() {
     return upgradeProtocol
   }
@@ -227,6 +230,17 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
 
   public SecureHttpConnectorTomcat setUpgradeProtocolToHttp2Protocol() {
     setUpgradeProtocol(new ConnectorUpgradeProtocolTomcat().setClassName(ConnectorUpgradeProtocolTomcat.PROTOCOL_CLASS_HTTP2))
+    return this
+  }
+
+  //--------------
+
+  public ConnectorSSLHostConfigTomcat getSSLHostConfig() {
+    return SSLHostConfig
+  }
+
+  public SecureHttpConnectorTomcat setSSLHostConfig(ConnectorSSLHostConfigTomcat SSLHostConfig) {
+    this.SSLHostConfig = SSLHostConfig
     return this
   }
 

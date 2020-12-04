@@ -4,6 +4,7 @@ import groovy.util.slurpersupport.GPathResult
 import noe.server.Tomcat
 import noe.tomcat.configure.AjpConnectorTomcat
 import noe.tomcat.configure.TomcatConfigurator
+import noe.tomcat.configure.ConnectorSSLHostConfigTomcat
 import noe.tomcat.configure.NonSecureHttpConnectorTomcat
 import noe.tomcat.configure.SecureHttpConnectorTomcat
 import noe.tomcat.configure.ShutdownTomcat
@@ -383,6 +384,43 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
     assertEquals value, Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.UpgradeProtocol.@className.toString()
     assertEquals value, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.UpgradeProtocol.@className.toString()
+  }
+
+  @Test
+  void sslHostConfigCreateSecureConnector() {
+    Integer testHttpsPort = 18443
+    String certFile = "server.key"
+    String certPath = "path/to/cert"
+    String tType = "ttype"
+    String tFile = "tfile"
+    String tPass = "tpasswd"
+    String tProvider = "tprovider"
+    String protocols = "protocols"
+    String sslProtocol = "sslprotocol"
+    String ciphers = "several_ciphers"
+
+    Object sslHostConfObj = new ConnectorSSLHostConfigTomcat().setCaCertificateFile(certFile).setCaCertificatePath(certPath)
+      .setTruststoreType(tType).setTruststoreFile(tFile).setTruststorePassword(tPass).setTruststoreProvider(tProvider).setProtocols(protocols)
+      .setSSLProtocol(sslProtocol).setCiphers(ciphers)
+
+    new TomcatConfigurator(tomcat)
+      .httpsConnector(
+        new SecureHttpConnectorTomcat()
+          .setPort(testHttpsPort)
+          .setSSLHostConfig(sslHostConfObj)
+      )
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals certFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@caCertificateFile.toString()
+    assertEquals certPath, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@caCertificatePath.toString()
+    assertEquals tFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreFile.toString()
+    assertEquals tPass, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststorePassword.toString()
+    assertEquals tType, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreType.toString()
+    assertEquals tProvider, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreProvider.toString()
+    assertEquals protocols, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@protocol.toString()
+    assertEquals sslProtocol, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@sslProtocol.toString()
+    assertEquals ciphers, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@ciphers.toString()
+
   }
 
   boolean isSecuredHttpProtocol(GPathResult connector) {
