@@ -417,7 +417,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     assertEquals tPass, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststorePassword.toString()
     assertEquals tType, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreType.toString()
     assertEquals tProvider, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreProvider.toString()
-    assertEquals protocols, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@protocol.toString()
+    assertEquals protocols, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@protocols.toString()
     assertEquals sslProtocol, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@sslProtocol.toString()
     assertEquals ciphers, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@ciphers.toString()
 
