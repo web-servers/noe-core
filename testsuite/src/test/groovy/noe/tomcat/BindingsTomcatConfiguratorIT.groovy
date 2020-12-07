@@ -399,9 +399,16 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     String sslProtocol = "sslprotocol"
     String ciphers = "several_ciphers"
 
-    Object sslHostConfObj = new ConnectorSSLHostConfigTomcat().setCaCertificateFile(certFile).setCaCertificatePath(certPath)
-      .setTruststoreType(tType).setTruststoreFile(tFile).setTruststorePassword(tPass).setTruststoreProvider(tProvider).setProtocols(protocols)
-      .setSSLProtocol(sslProtocol).setCiphers(ciphers)
+    Object sslHostConfObj = new ConnectorSSLHostConfigTomcat()
+      .setCaCertificateFile(certFile)
+      .setCaCertificatePath(certPath)
+      .setTruststoreType(tType)
+      .setTruststoreFile(tFile)
+      .setTruststorePassword(tPass)
+      .setTruststoreProvider(tProvider)
+      .setProtocols(protocols)
+      .setSSLProtocol(sslProtocol)
+      .setCiphers(ciphers)
 
     new TomcatConfigurator(tomcat)
       .httpsConnector(
