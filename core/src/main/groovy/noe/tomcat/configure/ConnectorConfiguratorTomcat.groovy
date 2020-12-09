@@ -130,7 +130,7 @@ class ConnectorConfiguratorTomcat {
     }
 
     newConnector.each { Node newSubelement ->
-      updateInnerElements(connector, newSubelement)
+      replaceInnerElements(connector, newSubelement)
     }
   }
 
@@ -142,7 +142,7 @@ class ConnectorConfiguratorTomcat {
    * Search for existing inner element to remove and replace with new one
    * Note: SSLHostConfig inner elements can exist more than one
    */
-  private void updateInnerElements(Node connector, Node newSubElement) {
+  private void replaceInnerElements(Node connector, Node newSubElement) {
     if (connector.find { it.name() == newSubElement.name() } != null) {
       Node oldElement = (Node) connector.find { it.name() == newSubElement.name()}
       if (oldElement.name() != "SSLHostConfig") {

@@ -1,7 +1,5 @@
 package noe.tomcat.configure
 
-import com.fasterxml.jackson.databind.ObjectMapper
-
 /**
  * Provides data for connectors specified in Tomcat server.xml.
  */
@@ -180,14 +178,21 @@ class ConnectorAttributesTransformer {
       }
 
       if (connector.getSSLHostConfig() != null) {
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> elements = mapper.convertValue(connector.getSSLHostConfig(), Map.class)
-        Map nodeAttributes = [:]
+        Map<String, Object> sslHostConfig = connector.getSSLHostConfig().properties
+        Object certificateObj = sslHostConfig.get("certificateConfig")
 
-        elements.each {
-          if (it.value != null) nodeAttributes.put(it.key, it.value)
+        sslHostConfig.remove("certificateConfig")
+        sslHostConfig.entrySet().removeIf({ e -> (e.value == null || e.value instanceof Class) })
+
+        if (certificateObj != null ) {
+          Map<String, String> certificateElement = certificateObj.properties
+
+          certificateElement.entrySet().removeIf({ e -> (e.value == null || e.value instanceof Class) })
+
+          node.appendNode("SSLHostConfig", sslHostConfig).appendNode("Certificate", certificateElement)
+        } else {
+          node.appendNode("SSLHostConfig", sslHostConfig)
         }
-        node.appendNode("SSLHostConfig", nodeAttributes)
       }
 
       return node
