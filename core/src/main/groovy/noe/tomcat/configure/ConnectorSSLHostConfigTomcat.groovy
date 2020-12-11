@@ -25,7 +25,7 @@ class ConnectorSSLHostConfigTomcat {
   public String truststoreProvider
   public String truststoreType
 
-  private ConnectorCertificateTomcat certificateConfig
+  private ConnectorCertificateTomcat certificate
 
   public String getCaCertificateFile() {
     return this.caCertificateFile
@@ -110,12 +110,12 @@ class ConnectorSSLHostConfigTomcat {
 
   //--------------
 
-  public ConnectorCertificateTomcat getCertificateConfig() {
-    return certificateConfig
+  public ConnectorCertificateTomcat getCertificate() {
+    return certificate
   }
 
-  public ConnectorSSLHostConfigTomcat setCertificateConfig(ConnectorCertificateTomcat certificateConfig) {
-    this.certificateConfig = certificateConfig
+  public ConnectorSSLHostConfigTomcat setCertificate(ConnectorCertificateTomcat certificate) {
+    this.certificate = certificate
     return this
   }
 }
