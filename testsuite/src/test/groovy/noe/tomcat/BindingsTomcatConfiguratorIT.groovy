@@ -463,7 +463,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
       .httpsConnector(
         new SecureHttpConnectorTomcat()
           .setPort(testHttpsPort)
-          .setSSLHostConfig(sslHostConfObj)
+          .setSSLHostConfigs(sslHostConfObj)
       )
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
