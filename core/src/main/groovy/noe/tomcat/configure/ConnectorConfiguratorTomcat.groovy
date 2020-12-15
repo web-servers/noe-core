@@ -143,7 +143,7 @@ class ConnectorConfiguratorTomcat {
    */
   private void replaceInnerElements(Node connector, Node newSubElement) {
     if (connector.find { it.name() == newSubElement.name() } != null) {
-      ArrayList<Node> innerElements = connector.findAll { it.name() == newSubElement.name()}
+      List<Node> innerElements = connector.findAll { it.name() == newSubElement.name()}
       innerElements.each { element ->
         connector.remove(element)
       }
