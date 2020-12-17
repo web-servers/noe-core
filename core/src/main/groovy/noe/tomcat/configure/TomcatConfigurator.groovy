@@ -99,10 +99,8 @@ class TomcatConfigurator {
    * no unique id.
    *
    * If there is no secure HTTP connector then new secure HTTP connector is created.
-   * If there is already one, the connector attributes will be updated
-   * and the inner elements will be replaced with the ones from the new secure HTTP connector
-   *
-   * Secure connector is distingushed that has attribute secure=true.
+   * If there is already one connectors, its new attributes will be added along with the old ones
+   * Inner elements have to be written to their exact format as a whole
    *
    * Http connector has one of the following protocols and is secured
    *   HTTP/1.1
