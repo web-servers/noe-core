@@ -389,6 +389,8 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
   @Test
   void sslHostConfigCreateSecureConnector() {
     Integer testHttpsPort = 18443
+    String hostName = "myHostName"
+    String certificateVerification = "certVerification"
     String certFile = "server.key"
     String certPath = "path/to/cert"
     String tType = "ttype"
@@ -400,6 +402,8 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     String ciphers = "several_ciphers"
 
     ConnectorSSLHostConfigTomcat sslHostConfObj = new ConnectorSSLHostConfigTomcat()
+      .setHostName(hostName)
+      .setCertificateVerification(certificateVerification)
       .setCaCertificateFile(certFile)
       .setCaCertificatePath(certPath)
       .setTruststoreType(tType)
@@ -418,6 +422,8 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
       )
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals hostName, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@hostName.toString()
+    assertEquals certificateVerification, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@certificateVerification.toString()
     assertEquals certFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@caCertificateFile.toString()
     assertEquals certPath, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@caCertificatePath.toString()
     assertEquals tFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreFile.toString()
@@ -427,7 +433,6 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     assertEquals protocols, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@protocols.toString()
     assertEquals sslProtocol, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@sslProtocol.toString()
     assertEquals ciphers, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@ciphers.toString()
-
   }
 
   @Test

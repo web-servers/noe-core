@@ -15,6 +15,8 @@ package noe.tomcat.configure
  */
 class ConnectorSSLHostConfigTomcat {
 
+  public String hostName
+  public String certificateVerification
   public String caCertificateFile
   public String caCertificatePath
   public String ciphers
@@ -26,6 +28,14 @@ class ConnectorSSLHostConfigTomcat {
   public String truststoreType
 
   private ConnectorCertificateTomcat certificate
+
+  public String getHostName() {
+    return this.hostName
+  }
+
+  public String getCertificateVerification() {
+    return this.certificateVerification
+  }
 
   public String getCaCertificateFile() {
     return this.caCertificateFile
@@ -61,6 +71,16 @@ class ConnectorSSLHostConfigTomcat {
 
   public String getTruststoreType() {
     return this.truststoreType
+  }
+
+  public ConnectorSSLHostConfigTomcat setCertificateVerification(String certificateVerification) {
+    this.certificateVerification = certificateVerification
+    return this
+  }
+
+  public ConnectorSSLHostConfigTomcat setHostName(String hostName) {
+    this.hostName = hostName
+    return this
   }
 
   public ConnectorSSLHostConfigTomcat setCaCertificateFile(String caCertificateFile) {

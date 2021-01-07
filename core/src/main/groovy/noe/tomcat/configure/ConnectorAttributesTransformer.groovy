@@ -168,7 +168,7 @@ class ConnectorAttributesTransformer {
       if (connector.getSslPassword() != null && !connector.getSslPassword().isEmpty()) {
         attributes.put('SSLPassword', connector.getSslPassword())
       }
-      if (connector.getSslEnabledProtocols() != null) {
+      if (connector.getSslEnabledProtocols() != null && !connector.getSslEnabledProtocols().isEmpty()) {
         attributes.put('sslEnabledProtocols', connector.getSslEnabledProtocols())
       }
       // ---------------------
@@ -182,6 +182,12 @@ class ConnectorAttributesTransformer {
 
           Map<String, Object> sslHostConfigAttributes = [:]
 
+          if (sslHostConfig.getHostName() != null && !sslHostConfig.getHostName().isEmpty()) {
+            sslHostConfigAttributes.put('hostName', sslHostConfig.getHostName())
+          }
+          if (sslHostConfig.getCertificateVerification() != null && !sslHostConfig.getCertificateVerification().isEmpty()) {
+            sslHostConfigAttributes.put('certificateVerification', sslHostConfig.getCertificateVerification())
+          }
           if (sslHostConfig.getCaCertificateFile() != null && !sslHostConfig.getCaCertificateFile().isEmpty()) {
             sslHostConfigAttributes.put('caCertificateFile', sslHostConfig.getCaCertificateFile())
           }

@@ -29,12 +29,12 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   private String keystoreFile
   private String keystorePass
   private String keystoreType
-  private boolean clientAuth
+  private Boolean clientAuth
   private String truststoreFile
   private String truststorePass
   private String truststoreType
   private String sslImplementationName
-  private boolean sslEnabledProtocols
+  private String sslEnabledProtocols
 
   // SSL APR
   private String sslCACertificateFile
@@ -143,7 +143,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this.sslImplementationName
   }
 
-  public Boolean getSslEnabledProtocols() {
+  public String getSslEnabledProtocols() {
     return this.sslEnabledProtocols
   }
 
