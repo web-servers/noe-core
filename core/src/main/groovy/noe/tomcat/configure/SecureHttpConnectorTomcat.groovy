@@ -29,12 +29,12 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   private String keystoreFile
   private String keystorePass
   private String keystoreType
-  private boolean clientAuth
+  private Boolean clientAuth
   private String truststoreFile
   private String truststorePass
   private String truststoreType
   private String sslImplementationName
-  private boolean sslEnabledProtocols
+  private String sslEnabledProtocols
 
   // SSL APR
   private String sslCACertificateFile
@@ -44,6 +44,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
 
   // Inner elements
   private ConnectorUpgradeProtocolTomcat upgradeProtocol
+  private List<ConnectorSSLHostConfigTomcat> SSLHostConfigs
   // - ^^^ ------------------------------------------------------
 
   public SecureHttpConnectorTomcat() {
@@ -142,7 +143,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this.sslImplementationName
   }
 
-  public Boolean getSslEnabledProtocols() {
+  public String getSslEnabledProtocols() {
     return this.sslEnabledProtocols
   }
 
@@ -216,6 +217,8 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
     return this
   }
 
+  //--------------
+
   public ConnectorUpgradeProtocolTomcat getUpgradeProtocol() {
     return upgradeProtocol
   }
@@ -227,6 +230,17 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
 
   public SecureHttpConnectorTomcat setUpgradeProtocolToHttp2Protocol() {
     setUpgradeProtocol(new ConnectorUpgradeProtocolTomcat().setClassName(ConnectorUpgradeProtocolTomcat.PROTOCOL_CLASS_HTTP2))
+    return this
+  }
+
+  //--------------
+
+  public ConnectorSSLHostConfigTomcat[] getSSLHostConfigs() {
+    return SSLHostConfigs
+  }
+
+  public SecureHttpConnectorTomcat setSSLHostConfigs(ConnectorSSLHostConfigTomcat... SSLHostConfigs) {
+    this.SSLHostConfigs = SSLHostConfigs
     return this
   }
 

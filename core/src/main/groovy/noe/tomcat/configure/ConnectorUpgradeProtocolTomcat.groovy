@@ -7,8 +7,6 @@ package noe.tomcat.configure
  */
 class ConnectorUpgradeProtocolTomcat {
 
-  public static String ELEMENT_NAME = "UpgradeProtocol"
-
   public static String PROTOCOL_CLASS_HTTP2 = "org.apache.coyote.http2.Http2Protocol"
 
   public String className
