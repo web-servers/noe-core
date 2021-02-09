@@ -120,25 +120,22 @@ abstract class WorkspaceAbstract implements IWorkspace {
   }
 
   /**
-   * Copies self-signed, pre-generated certificates from noe core to ${tmpdir}/ssl/self_signed directory.
+   * Copies intermediate certs, pre-generated certificates from noe core to ${tmpdir}/ssl/proper/generated/ca/intermediate directory.
    *
    */
   void copyCertificates() {
-    List<String> certificates = ["server.crt", "server.jks", "server.key", "server.p12"]
-    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "self_signed")
-    File sslDir = new File(sslStringDir)
-    String resourcesPath = "ssl/self_signed/"  //resources jar path is always separated by /
+    String sslIntermediateDir = PathHelper.join(platform.tmpDir, "ssl", "proper", "generated", "ca", "intermediate")
+    File intermediateTmpDir = new File(sslIntermediateDir)
+    String intermediatePath = "ssl/proper/generated/ca/intermediate/"
 
-    if (!sslDir.exists()) {
-      JBFile.mkdir(sslDir)
+    if (!intermediateTmpDir.exists()) {
+      JBFile.mkdir(intermediateTmpDir)
     }
 
-    JBFile.makeAccessible(sslDir)
+    JBFile.makeAccessible(intermediateTmpDir)
 
-    for (String certName : certificates) {
-      File certFile = Library.retrieveResourceAsFile("${resourcesPath}${certName}")
-      JBFile.move(certFile, sslDir)
-    }
+    File sslIntermediateFile = Library.retrieveResourceAsFile("${intermediatePath}")
+    JBFile.move(sslIntermediateFile, intermediateTmpDir)
   }
 
   void downloadClusterBench() {

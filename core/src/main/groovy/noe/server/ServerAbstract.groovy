@@ -98,11 +98,11 @@ abstract class ServerAbstract implements IApp {
     this.serverRoot = basedir
     this.host = (host) ?: DefaultProperties.HOST
     this.ignoreShutdownPort = true
-    this.sslCertificate = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}self_signed${platform.sep}server.crt"
-    this.sslKey = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}self_signed${platform.sep}server.key"
-    this.keystorePath = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}self_signed${platform.sep}server.jks"
-    this.truststorePassword = 'changeit'
-    this.sslKeystorePassword = 'changeit'
+    this.sslCertificate = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}proper${platform.sep}generated${platform.sep}ca${platform.sep}intermediate${platform.sep}certs${platform.sep}localhost.server.cert.pem"
+    this.sslKey = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}proper${platform.sep}generated${platform.sep}ca${platform.sep}intermediate${platform.sep}private${platform.sep}localhost.server.key.pem"
+    this.keystorePath = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}proper${platform.sep}generated${platform.sep}ca${platform.sep}intermediate${platform.sep}keystores${platform.sep}localhost.server.keystore.jks"
+    this.truststorePassword = 'testpass'
+    this.sslKeystorePassword = 'testpass'
     this.pid = null
     setRunAs(loadRunAs())
     this.processCode = String.valueOf(Math.abs(this.hashCode()))
