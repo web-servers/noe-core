@@ -31,6 +31,7 @@ class TomcatConfigurator {
   private final Tomcat tomcatInstance
   private Map<File, Node> parsedConfigs = [:]
   private final FileStateVault configVault = new FileStateVault()
+  private boolean keepDefaultAddressAndPort = false
 
 
   TomcatConfigurator(Tomcat tomcatInstance) {
@@ -38,6 +39,11 @@ class TomcatConfigurator {
   }
 
   // - Methods ----------------------------------------------------------------------------------------
+
+  TomcatConfigurator setKeepDefaultAddressAndPort(boolean flag) {
+    keepDefaultAddressAndPort = flag
+    return this
+  }
 
   /**
    * Set JVM route
@@ -82,8 +88,10 @@ class TomcatConfigurator {
       Node Server = getParsedConfig(serverXml)
       setParsedConfig(serverXml, new ConnectorConfiguratorTomcat(Server).defineHttpConnector(connector))
 
-      if (connector.getPort() > 0) tomcatInstance.mainHttpPort = connector.getPort()
-      if (connector.getAddress() != null) tomcatInstance.host = connector.getAddress()
+      if(!keepDefaultAddressAndPort) {
+        if (connector.getPort() > 0) tomcatInstance.mainHttpPort = connector.getPort()
+        if (connector.getAddress() != null) tomcatInstance.host = connector.getAddress()
+      }
     } else {
       missingConfigFile('server.xml')
     }
@@ -116,9 +124,10 @@ class TomcatConfigurator {
     if (serverXml?.exists()) {
       Node Server = getParsedConfig(serverXml)
       setParsedConfig(serverXml, new ConnectorConfiguratorTomcat(Server).defineHttpsConnector(connector))
-
-      if (connector.getPort() > 0) tomcatInstance.mainHttpsPort = connector.getPort()
-      if (connector.getAddress() != null) tomcatInstance.host = connector.getAddress()
+      if(!keepDefaultAddressAndPort) {
+        if (connector.getPort() > 0) tomcatInstance.mainHttpsPort = connector.getPort()
+        if (connector.getAddress() != null) tomcatInstance.host = connector.getAddress()
+      }
     } else {
       missingConfigFile('server.xml')
     }
@@ -151,8 +160,10 @@ class TomcatConfigurator {
       Node Server = getParsedConfig(serverXml)
       setParsedConfig(serverXml, new ConnectorConfiguratorTomcat(Server).defineAjpConnector(connector))
 
-      if (connector.getPort() != null) tomcatInstance.ajpPort = connector.getPort()
-      if (connector.getAddress() != null) tomcatInstance.host = connector.getAddress()
+      if(!keepDefaultAddressAndPort) {
+        if (connector.getPort() != null) tomcatInstance.ajpPort = connector.getPort()
+        if (connector.getAddress() != null) tomcatInstance.host = connector.getAddress()
+      }
     } else {
       missingConfigFile('server.xml')
     }
