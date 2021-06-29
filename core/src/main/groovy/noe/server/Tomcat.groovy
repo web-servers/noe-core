@@ -17,6 +17,7 @@ import noe.ews.server.tomcat.TomcatWindows
 import noe.rhel.server.tomcat.TomcatJwsRpmScl
 import noe.rhel.server.tomcat.TomcatRpm
 import noe.server.jk.WorkerServer
+import noe.tomcat.configure.SecureHttpConnectorTomcat
 import noe.tomcat.configure.TomcatConfigurator
 
 import java.util.concurrent.TimeUnit
@@ -628,48 +629,46 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     this.updateConfReplaceRegExp('server.xml', '<Connector port="8009" protocol="AJP/1.3"', '<Connector port="' + Integer.valueOf(8009 + offset) + '" protocol="AJP/1.3"', true, true)
   }
 
-  @Deprecated
   void enableSslJsse() {
-    def nl = platform.nl
-    def aprListener = '<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />'
-    def commentAprListener = '<!-- <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /> -->'
-    def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1" SSLEnabled="true"' + nl +
-        'maxThreads="150" scheme="https" secure="true"' + nl +
-        'keystoreFile="' + this.keystorePath + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
-        'clientAuth="false" sslProtocol="TLS" />'
-
-    updateConfReplaceRegExp('server.xml', aprListener, commentAprListener, true, true)
-    updateConfReplaceRegExp('server.xml', dummyComment, enableJavaSsl, true, true)
+    TomcatConfigurator configurator = new TomcatConfigurator(this)
+    configurator.httpsConnector(new SecureHttpConnectorTomcat()
+            .setPort(this.getMainHttpsPort())
+            .setMaxThreads(150)
+            .setClientAuth(false)
+            .setProtocol("HTTP/1.1")
+            .setSslProtocol('TLS')
+            .setKeystoreFile(this.keystorePath)
+            .setKeystorePass(this.sslKeystorePassword)
+            .setScheme('https'))
+            .removeListener("org.apache.catalina.core.AprLifecycleListener")
+            .setKeepDefaultAddressAndPort(true)
   }
 
-  @Deprecated
   void enableSslOpenSsl() {
-    def nl = platform.nl
-    def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableOpenSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" SSLEnabled="true"' + nl +
-        'maxThreads="200" scheme="https" secure="true"' + nl +
-        'SSLCertificateFile="' + this.sslCertificate + '"' + nl +
-        'SSLCertificateKeyFile="' + this.sslKey + '"' + nl +
-        'SSLPassword="' + this.sslKeystorePassword + '"' + nl +
-        '/>'
-
-    updateConfReplaceRegExp('server.xml', dummyComment, enableOpenSsl, true, true)
+    TomcatConfigurator configurator = new TomcatConfigurator(this)
+    configurator.httpsConnector(new SecureHttpConnectorTomcat()
+            .setPort(this.getMainHttpsPort())
+            .setMaxThreads(200)
+            .setSslCertificateFile( this.sslCertificate)
+            .setSslCertificateKeyFile(this.sslKey)
+            .setSslPassword(this.sslKeystorePassword)
+            .setScheme('https'))
+            .setKeepDefaultAddressAndPort(true)
   }
 
-  @Deprecated
   void enableSslNIOProtocol() {
-    def nl = platform.nl
-    def aprListener = '<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />'
-    def commentAprListener = '<!-- <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /> -->'
-    def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableNIOSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"' + nl +
-        'maxThreads="150" scheme="https" secure="true"' + nl +
-        'keystoreFile="' + this.keystorePath + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
-        'clientAuth="false" sslProtocol="TLS" />'
-
-    updateConfReplaceRegExp('server.xml', aprListener, commentAprListener, true, true)
-    updateConfReplaceRegExp('server.xml', dummyComment, enableNIOSsl, true, true)
+    TomcatConfigurator configurator = new TomcatConfigurator(this)
+    configurator.httpsConnector(new SecureHttpConnectorTomcat()
+            .setPort(this.getMainHttpsPort())
+            .setMaxThreads(150)
+            .setProtocol("HTTP/1.1")
+            .setClientAuth(false)
+            .setSslProtocol('org.apache.coyote.http11.Http11NioProtocol')
+            .setKeystoreFile(this.keystorePath)
+            .setKeystorePass(this.sslKeystorePassword)
+            .setScheme('https'))
+            .removeListener("org.apache.catalina.core.AprLifecycleListener")
+            .setKeepDefaultAddressAndPort(true)
   }
 
   Map defaultSslProps = [
