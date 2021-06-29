@@ -132,6 +132,10 @@ class Platform {
     return (isRHEL() && (osVersion ==~ /.*el8.*/)) || forceRhel8()
   }
 
+  boolean isRHEL9() {
+    return (isRHEL() && (osVersion ==~ /.*el9.*/)) || forceRhel9()
+  }
+
   boolean isSolaris11() {
     return isSolaris() && (osVersion ==~ /5\.11/)
   }
@@ -185,5 +189,14 @@ class Platform {
    */
   private boolean forceRhel8() {
     return Boolean.parseBoolean(Library.getUniversalProperty('force.rhel.8', 'false'))
+  }
+
+  /**
+   * As on Docker, the 'os.name' of the system is determined by the host OS and not the container one, to make tests
+   * work it is necessary to mock that we are, indeed, using RHEL9 machine.
+   * @return value of the 'force.rhel.9' property
+   */
+  private boolean forceRhel9() {
+    return Boolean.parseBoolean(Library.getUniversalProperty('force.rhel.9', 'false'))
   }
 }
