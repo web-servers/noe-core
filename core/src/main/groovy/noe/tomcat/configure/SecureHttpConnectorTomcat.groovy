@@ -1,6 +1,7 @@
 package noe.tomcat.configure
 
 import noe.common.utils.Platform
+import noe.common.utils.PathHelper
 
 /**
  * Abstraction for secure HTTP connector to configure Tomcat server.xml.
@@ -53,23 +54,22 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   }
 
   /**
-   * Configure secure http connector to expect certificates in ${SYSTEM_TEMP}/ssl/self_signed directory
+   * Configure secure http connector to expect certificates in ${SYSTEM_TEMP}/ssl/proper/generated/ca/intermediate directory
    * Expected names:
    *  <ul>
-   *    <li>certificate = server.crt</li>
-   *    <li>key file = server.key</li>
-   *    <li>keystore = server.jks</li>
+   *    <li>certificate = localhost.server.cert.pem</li>
+   *    <li>key file = localhost.server.key.pem</li>
+   *    <li>keystore = localhost.server.keystore.jks</li>
    *    <li></li>
    *  </ul>
    *  Password for keystore, trustore and SSL sets to "changeit" (without apostrophes).
    */
   SecureHttpConnectorTomcat setDefaultCertificatesConfiguration() {
-    String sslRoot = new File(new Platform().getTmpDir(), "ssl").getCanonicalPath()
-    String sslStringDir = new File(sslRoot, "self_signed").getCanonicalPath()
-    String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
-    String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
-    String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
-    String password = "changeit"
+    String sslIntermediate = PathHelper.join(new Platform().getTmpDir(), "ssl", "proper", "generated", "ca", "intermediate")
+    String sslCertificate = new File(PathHelper.join(sslIntermediate, "certs"), "localhost.server.cert.pem").getCanonicalPath()
+    String sslCertificateKey = new File(PathHelper.join(sslIntermediate, "private"), "localhost.server.key.pem").getCanonicalPath()
+    String keystoreFilePath = new File(PathHelper.join(sslIntermediate, "keystores"), "localhost.server.keystore.jks").getCanonicalPath()
+    String password = "testpass"
 
     setSslCertificateFile(sslCertificate)
     setSslCertificateKeyFile(sslCertificateKey)

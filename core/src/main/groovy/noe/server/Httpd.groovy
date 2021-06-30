@@ -50,7 +50,6 @@ abstract class Httpd extends ServerAbstract {
   String cachePath // directory for mod_cache caching
   File postInstallErrFile
   File postInstallOutFile
-  File sslCertDir
 
   Httpd(String basedir, version) {
     super(basedir, version)
@@ -67,11 +66,10 @@ abstract class Httpd extends ServerAbstract {
     this.cachePath = this.basedir + platform.sep + 'cache'
     postInstallErrFile = new File(getHttpdServerRootFull(), 'httpdPostInstallErr.log')
     postInstallOutFile = new File(getHttpdServerRootFull(), 'httpdPostInstallOut.log')
-    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "self_signed")
-    this.sslCertDir = new File(sslStringDir)
-    this.sslCertificate = new File(sslCertDir, "server.crt").absolutePath
-    this.sslKey = new File(sslCertDir, "server.key").absolutePath
-    this.keystorePath = new File(sslCertDir, "server.jks").absolutePath
+    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "proper", "generated", "ca", "intermediate")
+    this.sslCertificate = new File(PathHelper.join(sslStringDir, "certs"), "localhost.server.cert.pem").absolutePath
+    this.sslKey = new File(PathHelper.join(sslStringDir, "private"), "localhost.server.key.pem").absolutePath
+    this.keystorePath = new File(PathHelper.join(sslStringDir, "keystores"),"localhost.server.keystore.jks").absolutePath
   }
 
   static ServerAbstract getInstance(String basedir, version, String httpdDir = '', NoeContext context = NoeContext.forCurrentContext()) {

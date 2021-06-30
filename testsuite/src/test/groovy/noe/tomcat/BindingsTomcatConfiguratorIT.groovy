@@ -12,6 +12,7 @@ import noe.tomcat.configure.ShutdownTomcat
 import org.junit.Test
 
 import noe.common.utils.Platform
+import noe.common.utils.PathHelper
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
 
@@ -295,12 +296,11 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
 
   @Test
   void testCertificateDefaultsServerXmlChangeExpected() {
-    String sslRoot = new File(new Platform().getTmpDir(), "ssl").getCanonicalPath()
-    String sslStringDir = new File(sslRoot, "self_signed").getCanonicalPath()
-    String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
-    String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
-    String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
-    String password = "changeit"
+    String sslIntermediate = PathHelper.join(new Platform().getTmpDir(), "ssl", "proper", "generated", "ca", "intermediate")
+    String sslCertificate = new File(PathHelper.join(sslIntermediate, "certs"), "localhost.server.cert.pem").getCanonicalPath()
+    String sslCertificateKey = new File(PathHelper.join(sslIntermediate, "private"), "localhost.server.key.pem").getCanonicalPath()
+    String keystoreFilePath = new File(PathHelper.join(sslIntermediate, "keystores"), "localhost.server.keystore.jks").getCanonicalPath()
+    String password = "testpass"
     Integer testHttpsPort = 8443
 
     new TomcatConfigurator(tomcat)
