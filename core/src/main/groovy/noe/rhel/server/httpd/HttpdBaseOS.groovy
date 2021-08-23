@@ -34,7 +34,7 @@ class HttpdBaseOS extends Httpd {
     this.logDirs = ['/logs']
     // what path will be taken as relative for star/stop cmd
     this.binPath = '/'
-    if (platform.isRHEL8() || platform.isRHEL7()) {
+    if (platform.isRHEL9() || platform.isRHEL8() || platform.isRHEL7()) {
       this.start = ['systemctl', 'start', serviceName]
       this.stop = ['systemctl', 'stop', serviceName]
     } else if (platform.isRHEL6()) {
