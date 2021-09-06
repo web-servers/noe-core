@@ -95,7 +95,7 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
    * @param httpd Instance of `Httpd` server
    */
   private void copyModClusterConfIfMissing(Httpd httpd) {
-    List<String> confRelativePaths = ["conf.d/mod_cluster.conf"]
+    List<String> confRelativePaths = ["conf.d/${DefaultProperties.MOD_CLUSTER_CONFIG_FILE}"]
     confRelativePaths.each() { String confRelativePath->
       File confPath = new File(httpd.getServerRoot(), confRelativePath)
       File sclConfPath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/etc/httpd/${confRelativePath}")

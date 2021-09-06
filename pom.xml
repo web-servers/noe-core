@@ -5,6 +5,12 @@
     <groupId>org.jboss.qa.noe</groupId>
     <artifactId>noe-core-parent</artifactId>
     <version>0.17.7-SNAPSHOT</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.qa.noe</groupId>
+            <artifactId>noe-core</artifactId>
+        </dependency>
+    </dependencies>
     <packaging>pom</packaging>
 
     <name>Noe core: Parent</name>
