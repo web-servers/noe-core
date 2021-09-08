@@ -37,7 +37,7 @@ class HttpdKillTestIT extends TestAbstract {
       JBFile.delete(sslConfFile)
       // we are not testing mod_cluster here, lets remove mod_cluster
       def mod_clusterConfFile = new File(httpdServer.getConfDeploymentPath(), DefaultProperties.MOD_CLUSTER_CONFIG_FILE)
-      log.debug("Deleting mod-cluster.conf: $mod_clusterConfFile.absolutePath")
+      log.debug("Deleting ${DefaultProperties.MOD_CLUSTER_CONFIG_FILE}: $mod_clusterConfFile.absolutePath")
       JBFile.delete(mod_clusterConfFile)
     }
   }
