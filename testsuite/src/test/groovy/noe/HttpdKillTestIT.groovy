@@ -1,6 +1,7 @@
 package noe
 
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.TestAbstract
 import noe.common.utils.JBFile
 import noe.common.utils.Platform
@@ -35,8 +36,8 @@ class HttpdKillTestIT extends TestAbstract {
       log.debug("Deleting ssl.conf: $sslConfFile.absolutePath")
       JBFile.delete(sslConfFile)
       // we are not testing mod_cluster here, lets remove mod_cluster
-      def mod_clusterConfFile = new File(httpdServer.getConfDeploymentPath(), "mod_cluster.conf")
-      log.debug("Deleting mod-cluster.conf: $mod_clusterConfFile.absolutePath")
+      def mod_clusterConfFile = new File(httpdServer.getConfDeploymentPath(), DefaultProperties.MOD_CLUSTER_CONFIG_FILE)
+      log.debug("Deleting ${DefaultProperties.MOD_CLUSTER_CONFIG_FILE}: $mod_clusterConfFile.absolutePath")
       JBFile.delete(mod_clusterConfFile)
     }
   }
