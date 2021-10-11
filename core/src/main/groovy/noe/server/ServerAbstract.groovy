@@ -47,7 +47,7 @@ abstract class ServerAbstract implements IApp {
 
   // process management
   Process process // running server process (if was started on background)
-  Integer pid // process pid
+  Long pid // process pid
   String processCode // for process identification
   String runAs // under who user run the process, empty value means actual user
   String runContext // commandline context
@@ -216,8 +216,8 @@ abstract class ServerAbstract implements IApp {
    *  - server run with some unique id (processCode) 
    *  - running process is filtered by this id 
    */
-  Integer extractPid() {
-    Integer extractedPid = null
+  Long extractPid() {
+    Long extractedPid = null
     if (process != null && ProcessUtils.isProcAlive(process)) {
       log.debug("Process is running, trying to extract pid directly from it")
       extractedPid = ProcessUtils.getProcessId(process)

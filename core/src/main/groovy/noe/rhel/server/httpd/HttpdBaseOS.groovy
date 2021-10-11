@@ -64,8 +64,8 @@ class HttpdBaseOS extends Httpd {
     return new File("/var/run/${serviceName}/${serviceName}.pid")
   }
 
-  Integer extractPid() {
-    int pid
+  Long extractPid() {
+    long pid
     try {
       String pidFromFile = JBFile.read(pidFile).trim().replaceAll('"','')
       pid = Integer.valueOf(pidFromFile)

@@ -27,11 +27,11 @@ public enum PsCmdFormat {
     /**
      * Id of process.
      */
-    PROCESS_ID(false, Integer.class),
+    PROCESS_ID(false, Long.class),
     /**
      * Pid of process parent.
      */
-    PARENT_PROCESS_ID(false, Integer.class),
+    PARENT_PROCESS_ID(false, Long.class),
     /**
      * Priority (nice) of the process.
      */

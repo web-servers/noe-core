@@ -372,7 +372,7 @@ abstract class Httpd extends ServerAbstract {
     }
   }
 
-  Integer extractPid() {
+  Long extractPid() {
     String stringPid = null
     File pidFile = getPidFile()
     if (!pidFile.exists()) {
@@ -383,7 +383,7 @@ abstract class Httpd extends ServerAbstract {
     if ( stringPid.isEmpty() ) {
       throw new RuntimeException("Extraction of httpd PID went wrong, ${pidFile} is empty")
     }
-    pid = stringPid.toInteger()
+    pid = stringPid.toLong()
     return pid
   }
 

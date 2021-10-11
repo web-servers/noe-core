@@ -76,7 +76,7 @@ public class Fuse extends ServerAbstract {
   }
 
   @Override
-  Integer extractPid() {
+  Long extractPid() {
     File instancePropsFile = new File(basedir, "instances${platform.sep}instance.properties")
     if (instancePropsFile.exists()) {
       int serverPid = retrievePidFromInstancesPropsFile(instancePropsFile)
