@@ -42,7 +42,6 @@ class Tomcat extends ServerAbstract implements WorkerServer {
   def rootBasedir
   File postInstallErrFile
   File postInstallOutFile
-  File sslCertDir //Path to directory holding ssl certificates
 
   Tomcat(String basedir, version) {
     super(basedir, version)
@@ -62,11 +61,10 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     this.cfgHost = (cfgHost) ?: ''
     postInstallErrFile = new File(basedir,  'tomcatPostInstallErr.log')
     postInstallOutFile = new File(basedir,  'tomcatPostInstallOut.log')
-    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "self_signed")
-    this.sslCertDir = new File(sslStringDir)
-    this.sslCertificate = new File(sslCertDir, "server.crt").absolutePath
-    this.sslKey = new File(sslCertDir, "server.key").absolutePath
-    this.keystorePath = new File(sslCertDir, "server.jks").absolutePath
+    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "proper", "generated", "ca", "intermediate")
+    this.sslCertificate = new File(PathHelper.join(sslStringDir, "certs"), "localhost.server.cert.pem").absolutePath
+    this.sslKey = new File(PathHelper.join(sslStringDir, "private"), "localhost.server.key.pem").absolutePath
+    this.keystorePath = new File(PathHelper.join(sslStringDir, "keystores"),"localhost.server.keystore.jks").absolutePath
 
   }
 
