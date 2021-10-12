@@ -32,7 +32,7 @@ class OpenSslVersionTest {
   @Test
   public void testCompareTo() {
     // <=> calls compareTo(...) explicitly
-    List<Tuple<String, String>> values = new LinkedList<>()
+    List<Tuple> values = new LinkedList<>()
     values.add(new Tuple("0.9.8", "0.9.9"))
     values.add(new Tuple("0.9.8b", "0.9.8c"))
     values.add(new Tuple("1.0.2c", "1.2.3a"))
