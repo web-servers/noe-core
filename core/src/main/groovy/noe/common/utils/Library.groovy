@@ -826,7 +826,7 @@ class Library {
    * @return generated classpath for groovy with ant
    */
   static String groovyWithAntAsClasspath(File libDir = null) {
-    def groovyAndAntLibs = ["groovy-all-2.2.1.jar", "ant-1.9.2.jar", "ant-launcher-1.9.2.jar"]
+    def groovyAndAntLibs = ["groovy-3.0.9.jar", "groovy-ant-3.0.9.jar", "ant-1.9.2.jar", "ant-launcher-1.9.2.jar"]
     def libDirToUse = (libDir) ?: new File(Library.getRootPath(), "lib")
     def classpath = []
     if (!libDirToUse.exists()) {
