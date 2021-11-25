@@ -120,14 +120,28 @@ abstract class WorkspaceAbstract implements IWorkspace {
   }
 
   /**
-   * Copies self-signed, pre-generated certificates from noe core to ${tmpdir}/ssl/self_signed directory.
+   * Copies self-signed, pre-generated certificates from noe core to ${tmpdir}/ssl/self_signed(_fips) directory.
    *
    */
   void copyCertificates() {
     List<String> certificates = ["server.crt", "server.jks", "server.key", "server.p12"]
-    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "self_signed")
+    def secFiles = [
+            "java.security.ibm-java-1.8",
+            "java.security.openjdk-1.8",
+            "java.security.openjdk-11",
+            "java.security.openjdk-17",
+            "java.security.oracle-java-1.8",
+            "java.security.oracle-java-11",
+            "java.security.oracle-java-17",
+            "nss.fips.cfg",
+            "nss.oraclefips.cfg",
+            "nss.cfg"]
+    if (platform.isFips()) {
+      certificates = certificates + secFiles
+    }
+    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE)
     File sslDir = new File(sslStringDir)
-    String resourcesPath = "ssl/self_signed/"  //resources jar path is always separated by /
+    String resourcesPath = "ssl/" + DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE + "/"  //resources jar path is always separated by /
 
     if (!sslDir.exists()) {
       JBFile.mkdir(sslDir)
@@ -138,6 +152,18 @@ abstract class WorkspaceAbstract implements IWorkspace {
     for (String certName : certificates) {
       File certFile = Library.retrieveResourceAsFile("${resourcesPath}${certName}")
       JBFile.move(certFile, sslDir)
+    }
+    if (platform.isFips()) {
+      for (String file: secFiles){
+        JBFile.replace(new File(sslDir,file),"/tmp/ssl/self_signed_fips",sslStringDir)
+      }
+      List<String> keystore = [ "cert9.db", "key4.db", "pkcs11.txt", "secmod.db"]
+      File keystoreDir = new File(PathHelper.join(sslStringDir, "nssdb"))
+      resourcesPath = resourcesPath + "nssdb/"
+      for (String db : keystore) {
+        File dbFile = Library.retrieveResourceAsFile("${resourcesPath}${db}")
+        JBFile.move(dbFile,keystoreDir)
+      }
     }
   }
 

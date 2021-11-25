@@ -1,5 +1,6 @@
 package noe.tomcat.configure
 
+import noe.common.DefaultProperties
 import noe.common.utils.Platform
 
 /**
@@ -53,7 +54,7 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
   }
 
   /**
-   * Configure secure http connector to expect certificates in ${SYSTEM_TEMP}/ssl/self_signed directory
+   * Configure secure http connector to expect certificates in ${SYSTEM_TEMP}/ssl/self_signed(_fips) directory
    * Expected names:
    *  <ul>
    *    <li>certificate = server.crt</li>
@@ -65,11 +66,14 @@ public class SecureHttpConnectorTomcat extends ConnectorTomcatAbstract<SecureHtt
    */
   SecureHttpConnectorTomcat setDefaultCertificatesConfiguration() {
     String sslRoot = new File(new Platform().getTmpDir(), "ssl").getCanonicalPath()
-    String sslStringDir = new File(sslRoot, "self_signed").getCanonicalPath()
+    String sslStringDir = new File(sslRoot, DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE).getCanonicalPath()
     String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
     String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
     String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
     String password = "changeit"
+    if(new Platform().isFips()) {
+      keystoreFilePath = new File(sslStringDir, "nssdb").getCanonicalPath()
+    }
 
     setSslCertificateFile(sslCertificate)
     setSslCertificateKeyFile(sslCertificateKey)

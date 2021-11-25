@@ -62,11 +62,10 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     this.cfgHost = (cfgHost) ?: ''
     postInstallErrFile = new File(basedir,  'tomcatPostInstallErr.log')
     postInstallOutFile = new File(basedir,  'tomcatPostInstallOut.log')
-    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "self_signed")
+    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE)
     this.sslCertDir = new File(sslStringDir)
     this.sslCertificate = new File(sslCertDir, "server.crt").absolutePath
     this.sslKey = new File(sslCertDir, "server.key").absolutePath
-    this.keystorePath = new File(sslCertDir, "server.jks").absolutePath
 
   }
 
@@ -121,7 +120,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
       File f = new File(keystorePath)
       URL certUrl = f.toURI().toURL()
       webClient.getOptions().setUseInsecureSSL(true)
-      webClient.getOptions().setSSLClientCertificate(certUrl, sslKeystorePassword, "jks")
+      webClient.getOptions().setSSLClientCertificate(certUrl, sslKeystorePassword, keystoreType)
       serverUrl = this.getUrl('', true)
     } else {
       serverUrl = this.getUrl()
@@ -636,9 +635,16 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
     def enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1" SSLEnabled="true"' + nl +
         'maxThreads="150" scheme="https" secure="true"' + nl +
-        'keystoreFile="' + this.keystorePath + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
+        'keystoreFile="' + this.keystorePath + '" keystoreType="' + this.keystoreType + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
         'clientAuth="false" sslProtocol="TLS" />'
-
+    if (platform.isFips()) {
+      enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1"' + nl +
+              '          SSLEnabled="true" maxThreads="150" scheme="https" secure="true"' + nl +
+              '          clientAuth="false" sslEnabledProtocols="TLSv1.1+TLSv1.2"' + nl +
+              '          keystorePass="' + this.sslKeystorePassword + '"' + nl +
+              '          keystoreType="' + this.keystoreType + '"' + nl +
+              '          ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS+ '" />'
+      }
     updateConfReplaceRegExp('server.xml', aprListener, commentAprListener, true, true)
     updateConfReplaceRegExp('server.xml', dummyComment, enableJavaSsl, true, true)
   }
@@ -651,8 +657,11 @@ class Tomcat extends ServerAbstract implements WorkerServer {
         'maxThreads="200" scheme="https" secure="true"' + nl +
         'SSLCertificateFile="' + this.sslCertificate + '"' + nl +
         'SSLCertificateKeyFile="' + this.sslKey + '"' + nl +
-        'SSLPassword="' + this.sslKeystorePassword + '"' + nl +
-        '/>'
+        'SSLPassword="' + this.sslKeystorePassword + '"' + nl
+    if(platform.isFips()) {
+      enableOpenSsl += 'ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS + '"'
+    }
+    enableOpenSsl += '/>'
 
     updateConfReplaceRegExp('server.xml', dummyComment, enableOpenSsl, true, true)
   }
@@ -666,7 +675,13 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     def enableNIOSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"' + nl +
         'maxThreads="150" scheme="https" secure="true"' + nl +
         'keystoreFile="' + this.keystorePath + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
-        'clientAuth="false" sslProtocol="TLS" />'
+        'clientAuth="false" '
+    if(platform.isFips()) {
+      enableNIOSsl += 'sslEnabledProtocols="TLSv1.1+TLSv1.2" '
+    } else {
+      enableNIOSsl += 'sslProtocol="TLS" '
+    }
+    enableNIOSsl +=  'keystoreType="' + this.keystoreType + '" />'
 
     updateConfReplaceRegExp('server.xml', aprListener, commentAprListener, true, true)
     updateConfReplaceRegExp('server.xml', dummyComment, enableNIOSsl, true, true)
