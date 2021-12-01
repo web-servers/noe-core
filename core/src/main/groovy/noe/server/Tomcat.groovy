@@ -192,6 +192,19 @@ class Tomcat extends ServerAbstract implements WorkerServer {
   }
 
   /**
+   * Check log files for ERRORS and WARNINGS
+   */
+  List<String> verifyLogs() {
+    final List<String> defaultFilteredLines = platform.isFips() ? Arrays.asList(
+            "Creation of SecureRandom instance for session ID generation using \\[.*\\] took \\[",
+            "Exception initializing random number generator using algorithm \\[SHA1PRNG\\]",
+            "ErrorReportValve\\.java"
+    ) : Arrays.asList(
+            "Creation of SecureRandom instance for session ID generation using \\[.*\\] took \\[")
+    return super.verifyLogs(defaultFilteredLines)
+  }
+
+  /**
    * Start the server Tomcat with JSVC wrapper
    */
   void startJaas(conf = [:]) {

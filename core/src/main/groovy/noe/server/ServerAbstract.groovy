@@ -13,6 +13,7 @@ import noe.common.utils.Version
 import noe.common.utils.processid.ProcessUtils
 
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 
 @Slf4j
@@ -615,10 +616,10 @@ abstract class ServerAbstract implements IApp {
   }
 
   /**
-   * Check log files for ERRORS and WARNINGS
+   * Check log files for ERRORS and WARNINGS, ignoring a list of patterns, empty by default
    * TODO add offsets for logs (or delete logs before each test - replace symlinks)
    */
-  List<String> verifyLogs() {
+  List<String> verifyLogs( List<String>filtered=[]) {
     def affectedLines = []
 
     logDirs.each { logDir ->
@@ -638,6 +639,13 @@ abstract class ServerAbstract implements IApp {
             }
           }
 
+        }
+        affectedLines.removeIf { line-> filtered.any {
+          pat -> if(line =~ pat) {
+            log.debug("Filtered Warning: ${line}")
+            return true
+            }
+          }
         }
       }
     }
