@@ -52,6 +52,16 @@ abstract class ApacheDS extends ServerAbstract {
 
     portsAvailable()
     CmdCommand cmdCommand = new CmdBuilder<>(start).setWorkDir(new File(apacheDSBin)).build()
+    Map cmdProps = cmdCommand.getEnvProperties()
+    if(platform.isFips()) {
+      //ApacheDS won't start with FIPS
+      def opts = cmdProps.getOrDefault("JAVA_OPTS","")
+      if(opts.size()>0) {
+        opts+=' '
+      }
+      opts+='-Dcom.redhat.fips=false'
+      cmdProps.put("JAVA_OPTS", opts)
+    }
     process = Cmd.startProcess(cmdCommand)
     process.consumeProcessOutput(System.out, System.err)
     waitForStartComplete()
