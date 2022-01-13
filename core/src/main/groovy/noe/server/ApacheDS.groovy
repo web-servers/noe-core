@@ -5,6 +5,8 @@ import noe.common.newcmd.CmdBuilder
 import noe.common.newcmd.CmdCommand
 import noe.common.utils.Cmd
 import noe.common.utils.JBFile
+import noe.common.utils.Java
+
 /**
  *  Class for manipulting with ApacheDS server
  *    - Pure java LDAP, Kerberos server
@@ -60,6 +62,14 @@ abstract class ApacheDS extends ServerAbstract {
         opts+=' '
       }
       opts+='-Dcom.redhat.fips=false'
+      cmdProps.put("JAVA_OPTS", opts)
+    }
+    if(Java.isJdkXOrHigher("17")) {
+      def opts = cmdProps.getOrDefault("JAVA_OPTS", "")
+      if (opts.size() > 0) {
+        opts += ' '
+      }
+      opts += '--add-exports=java.base/sun.security.util=ADD-UNNAMED'
       cmdProps.put("JAVA_OPTS", opts)
     }
     process = Cmd.startProcess(cmdCommand)
