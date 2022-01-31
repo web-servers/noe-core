@@ -2,7 +2,7 @@ package noe.tomcat
 
 import groovy.util.slurpersupport.GPathResult
 import noe.server.Tomcat
-import noe.server.common.DefaultProperties
+import noe.common.DefaultProperties
 import noe.tomcat.configure.AjpConnectorTomcat
 import noe.tomcat.configure.TomcatConfigurator
 import noe.tomcat.configure.ConnectorSSLHostConfigTomcat
