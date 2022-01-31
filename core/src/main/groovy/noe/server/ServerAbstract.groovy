@@ -6,12 +6,14 @@ import noe.app.IApp
 import noe.common.DefaultProperties
 import noe.common.utils.Cmd
 import noe.common.utils.JBFile
+import noe.common.utils.Java
 import noe.common.utils.Library
 import noe.common.utils.Platform
 import noe.common.utils.Version
 import noe.common.utils.processid.ProcessUtils
 
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 
 @Slf4j
@@ -54,6 +56,8 @@ abstract class ServerAbstract implements IApp {
   String sslCertificate
   String sslKey
   String keystorePath
+  String keystoreType
+  String securityPath
   String sslKeystorePassword
 
   // truststore related properties
@@ -98,11 +102,20 @@ abstract class ServerAbstract implements IApp {
     this.serverRoot = basedir
     this.host = (host) ?: DefaultProperties.HOST
     this.ignoreShutdownPort = true
-    this.sslCertificate = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}self_signed${platform.sep}server.crt"
-    this.sslKey = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}self_signed${platform.sep}server.key"
-    this.keystorePath = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}self_signed${platform.sep}server.jks"
-    this.truststorePassword = 'changeit'
+    this.sslCertificate = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}${DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE}${platform.sep}server.crt"
+    this.sslKey = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}${DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE}${platform.sep}server.key"
+    if( platform.isFips() ) {
+      this.keystorePath = "${platform.tmpDir}${platform.sep}ssl${platform.sep}${DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE}${platform.sep}nssdb"
+      this.keystoreType = 'PKCS11'
+      def variant = (Java.openJDK ? "openjdk" : (Java.oracleJDK ? "oracle-java" : "ibm-java")) +
+              (Java.isJdk8() ? "-1.8" : ( Java.isJdk11()? "-11" : "-17"))
+      this.securityPath = "${platform.tmpDir}${platform.sep}ssl${platform.sep}${DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE}${platform.sep}java.security."+ variant
+    } else{
+      this.keystorePath = getDeplSrcPath() + "${platform.sep}ssl${platform.sep}${DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE}${platform.sep}server.jks"
+      this.keystoreType = 'jks'
+    }
     this.sslKeystorePassword = 'changeit'
+    this.truststorePassword = 'changeit'
     this.pid = null
     setRunAs(loadRunAs())
     this.processCode = String.valueOf(Math.abs(this.hashCode()))
@@ -603,10 +616,10 @@ abstract class ServerAbstract implements IApp {
   }
 
   /**
-   * Check log files for ERRORS and WARNINGS
+   * Check log files for ERRORS and WARNINGS, ignoring a list of patterns, empty by default
    * TODO add offsets for logs (or delete logs before each test - replace symlinks)
    */
-  List<String> verifyLogs() {
+  List<String> verifyLogs( List<String>filtered=[]) {
     def affectedLines = []
 
     logDirs.each { logDir ->
@@ -626,6 +639,13 @@ abstract class ServerAbstract implements IApp {
             }
           }
 
+        }
+        affectedLines.removeIf { line-> filtered.any {
+          pat -> if(line =~ pat) {
+            log.debug("Filtered Warning: ${line}")
+            return true
+            }
+          }
         }
       }
     }
@@ -871,8 +891,12 @@ abstract class ServerAbstract implements IApp {
   Boolean verifySecuredUrl(int code = 200, String content = "", long timeout = 30000, Boolean allowRedirects = true, Boolean setReqProp = false,
                            String reqKey = "", String reqValue = "", String urlPath = '') {
     System.setProperty('javax.net.ssl.trustStore', getKeystorePath())
+    System.setProperty('javax.net.ssl.trustStoreType', getKeystoreType())
+    System.setProperty('javax.net.ssl.trustStorePassword', getSslKeystorePassword())
     def ret = Library.verifyUrl(getUrl(urlPath, true), code, content, timeout, allowRedirects, setReqProp, reqKey, reqValue)
     System.clearProperty('javax.net.ssl.trustStore')
+    System.clearProperty('javax.net.ssl.trustStoreType')
+    System.clearProperty('javax.net.ssl.trustStorePassword')
     return ret
   }
 

@@ -2,6 +2,7 @@ package noe.tomcat
 
 import groovy.util.slurpersupport.GPathResult
 import noe.server.Tomcat
+import noe.server.common.DefaultProperties
 import noe.tomcat.configure.AjpConnectorTomcat
 import noe.tomcat.configure.TomcatConfigurator
 import noe.tomcat.configure.ConnectorSSLHostConfigTomcat
@@ -296,7 +297,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
   @Test
   void testCertificateDefaultsServerXmlChangeExpected() {
     String sslRoot = new File(new Platform().getTmpDir(), "ssl").getCanonicalPath()
-    String sslStringDir = new File(sslRoot, "self_signed").getCanonicalPath()
+    String sslStringDir = new File(sslRoot, DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE).getCanonicalPath()
     String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
     String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
     String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()

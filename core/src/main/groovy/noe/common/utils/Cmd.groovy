@@ -854,7 +854,8 @@ public class Cmd {
         try {
           javaPids.add(Integer.parseInt(pid))
         } catch (NumberFormatException ex) {
-          throw new NumberFormatException("Guys, I can't parse Integer from:${pid}", ex)
+          log.error("Error trying to parse process ID from: \"${pid}\"")
+          throw ex
         }
       }
 
@@ -897,7 +898,8 @@ public class Cmd {
       try {
         pids.add(Integer.parseInt(pid))
       } catch (NumberFormatException ex) {
-        throw new NumberFormatException("Guys, I can't parse Integer from:${pid}", ex)
+        log.error("Error trying to parse process ID from: \"${pid}\"")
+        throw ex
       }
     }
 
@@ -952,7 +954,8 @@ public class Cmd {
           try {
             pids.add(Integer.parseInt(pid))
           } catch (NumberFormatException ex) {
-            throw new NumberFormatException("Guys, I can't parse Integer from:${pid}", ex)
+            log.error("Error trying to parse process ID from: \"${pid}\"")
+            throw ex
           }
         } else {
           log.error("WIDLE match didn't succeed :-) it was: match.size():${match.size()}")
@@ -1053,9 +1056,9 @@ public class Cmd {
    */
   static boolean waitForPidsRemoved(List<Integer> pids, int timeout, TimeUnit timeUnit) {
     long maxTime = System.currentTimeMillis() + timeUnit.toMillis(timeout)
-    boolean anyPidExist = getPidList().intersect(pids).isEmpty()
+    boolean anyPidExist = !getPidList().intersect(pids).isEmpty()
     while (anyPidExist && System.currentTimeMillis() <= maxTime) {
-      anyPidExist = getPidList().intersect(pids).isEmpty()
+      anyPidExist = !getPidList().intersect(pids).isEmpty()
       Library.letsSleep(42)
     }
     if (anyPidExist) {

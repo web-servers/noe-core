@@ -61,6 +61,11 @@ class DefaultProperties {
       "${JENKINS_JOBS_DIR_PREFIX}/clusterbench-mod_cluster-mbabacek/lastSuccessful/archive/clusterbench-ee6-web-nondist/target/clusterbench.war")
   public static final boolean SOLARIS_DEFAULT_LIBRARY_PATH_CLEAN = Boolean.valueOf(Library.getUniversalProperty('solaris.default.library.path.clean', 'false'))
 
+  // Get the fips self signed directory depending on whether fips on the OS is enabled or not
+  public static final String SELF_SIGNED_CERTIFICATE_RESOURCE = Library.getUniversalProperty('self_signed.certificate.resource',
+      new Platform().isFips() ? "self_signed_fips" : "self_signed")
+  public static final String FIPS_140_2_CIPHERS = "SSL_RSA_WITH_3DES_EDE_CBC_SHA,SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_DSS_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_DSS_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA,TLS_ECDH_anon_WITH_AES_128_CBC_SHA,TLS_ECDH_anon_WITH_AES_256_CBC_SHA"
+
   /**
    * Method which tries to retrieve version from property, if it doesn't succeed, null is returned
    */
