@@ -137,9 +137,9 @@ class IIS extends ServerAbstract {
     }
 
     // remove last ","
-    propertiesString = propertiesString.substring(0, propertiesString.length() - 2)
+    String props = propertiesString.substring(0, propertiesString.length() - 2).toString()
 
-    return executeAppcmd("set config /section:${section} /${op}\"[${propertiesString}]\"")
+    return executeAppcmd("set config /section:${section} /${op}\"[${props}]\"")
   }
 
   /**
