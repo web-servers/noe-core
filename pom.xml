@@ -105,6 +105,8 @@
         </version.org.apache.maven.plugins.maven-surefire-plugin>
         <version.org.apache.maven.plugins.maven-failsafe-plugin>2.22.0
         </version.org.apache.maven.plugins.maven-failsafe-plugin>
+        <version.org.apache.maven.plugins.maven-deploy-plugin>2.8.2
+        </version.org.apache.maven.plugins.maven-deploy-plugin>
         <junit.version>4.13</junit.version>
         <org.codehaus.groovy.all.version>2.4.19</org.codehaus.groovy.all.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
@@ -385,6 +387,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-deploy-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.groovy</groupId>
