@@ -2,6 +2,7 @@ package noe.ews.server.httpd
 
 import groovy.transform.TypeChecked
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.utils.Cmd
 import noe.common.utils.JBFile
 import noe.common.utils.Library
@@ -44,7 +45,7 @@ class HttpdRpm extends Httpd {
     this.stop = "service ${serviceName} stop"  // stopping as service
     this.apachectl = ['/usr/sbin/apachectl']
     this.deploymentPath = "/var/www/html"
-    this.confDeploymentPath = this.basedir + '/conf.d'
+    this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
     this.cgiDeploymentPath = "/var/www/cgi-bin"
     this.cachePath = "/var/cache"
     this.modClusterCacheDir = cachePath + "/mod_cluster"

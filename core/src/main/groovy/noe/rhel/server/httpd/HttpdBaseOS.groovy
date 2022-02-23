@@ -1,6 +1,7 @@
 package noe.rhel.server.httpd
 
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.utils.DirStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.Library
@@ -47,7 +48,7 @@ class HttpdBaseOS extends Httpd {
     }
     this.apachectl = ['/usr/sbin/apachectl']
     this.deploymentPath = "/var/www/html"
-    this.confDeploymentPath = this.basedir + '/conf.d'
+    this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
     this.cgiDeploymentPath = "/var/www/cgi-bin"
     this.modClusterCacheDir = "/var/cache/mod_cluster"
     this.opensslPath = 'openssl' // openssl is on $PATH on RHEL by OS installation

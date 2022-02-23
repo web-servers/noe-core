@@ -2,6 +2,7 @@ package noe.ews.server.httpd
 
 import groovy.transform.TypeChecked
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.utils.JBFile
 
 /**
@@ -31,7 +32,7 @@ class Httpd24Rpm extends HttpdRpm {
     this.stop = "service ${serviceName} stop"  // stopping as service
     this.apachectl = ['/usr/sbin/apachectl24']
     this.deploymentPath = "/var/www/${serviceName}"
-    this.confDeploymentPath = this.basedir + '/conf.d'
+    this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
     this.cgiDeploymentPath = this.deploymentPath + "/cgi-bin"
     this.abPath = "/usr/bin/ab24"
     this.htdbmPath = "/usr/bin/htdbm24"
