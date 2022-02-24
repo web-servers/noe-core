@@ -83,7 +83,7 @@ class HttpdHelper {
         if (Boolean.valueOf(Library.getUniversalProperty('BZ1093674_WORKAROUND', false))) {
           [
                   new File(httpdBasedir, "etc/httpd/${DefaultProperties.CONF_DIRECTORY}/manual.conf.in"),
-                  new File(httpdBasedir, "etc/httpd/conf.d/ssl.conf.in"),
+                  new File(httpdBasedir, "etc/httpd/${DefaultProperties.CONF_DIRECTORY}/ssl.conf.in"),
                   new File(httpdBasedir, "etc/httpd/conf/httpd.conf.in")
           ].each { file ->
             JBFile.replace(file, "\"/bin", "\"@installroot@/bin")
