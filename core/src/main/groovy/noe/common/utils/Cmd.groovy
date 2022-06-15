@@ -442,7 +442,7 @@ public class Cmd {
    * @param id ... unique identificator of the java process
    * @return pid of the java process or null if such process isn't found
    */
-  static Integer getJavaPid(String id) {
+  static Long getJavaPid(String id) {
     if (!platform.isWindows()) {
       def p
       def jps = DefaultProperties.JAVA_HOME + "${platform.sep}bin${platform.sep}jps"
@@ -465,7 +465,7 @@ public class Cmd {
       }
       String o = t.nextElement()
       // expects format pid  ....
-      return Integer.valueOf(o)
+      return Long.valueOf(o)
     }
   }
 
@@ -475,7 +475,7 @@ public class Cmd {
    * TODO variant only for PID
    *
    */
-  static int kill(Integer pid, winappname) {
+  static int kill(Long pid, winappname) {
     log.debug("Forcibly killing process with PID=${pid}, Window title=${winappname}")
     // TODO: Get rid of black magic :-(
     if (platform.isRHEL()) {
@@ -495,7 +495,7 @@ public class Cmd {
    * returns kill process exit code. If PID is not defined on non-windows platform, -1 is returned
    * TODO: properly implement it for Unix/Linux systems as pkill -P kills only processes with given parent PID, it doesn't go recursively killing from bottom to top
    */
-  static int killTree(Integer pid, winappname) {
+  static int killTree(Long pid, winappname) {
     if (platform.isWindows()) {
       if (pid != null) {
         log.debug("killtree(): MS Windows taskkill command: taskkill /PID ${pid} /f /t")
@@ -564,7 +564,7 @@ public class Cmd {
       log.debug("Process {} is already dead", process)
       return false
     }
-    int pid = ProcessUtils.getProcessId(process)
+    long pid = ProcessUtils.getProcessId(process)
     if (pid == ProcessUtils.UNDEFINED_PROCESS_ID) {
       log.warn("Failed to extract pid from process")
       return false
@@ -573,7 +573,7 @@ public class Cmd {
     return destroyProcessWithTree(pid)
   }
 
-  private static synchronized boolean destroyProcessWithTree(final Integer pid) {
+  private static synchronized boolean destroyProcessWithTree(final Long pid) {
     // getting tree of processes running under launched cmd
     ListProcess listProcessUtil = new ListProcess();
     List<Map<PsCmdFormat, String>> processTree = listProcessUtil.listProcessTree(pid);
@@ -594,10 +594,10 @@ public class Cmd {
       killBuilder.addProcessId(pid);
       return Cmd.executeCommand(killBuilder.build().getCommandLine(), new File(".")) != null
     } else {
-      int[] processTreePidArray = new int[processTree.size()];
+      long[] processTreePidArray = new long[processTree.size()];
       int i = 0;
       for(Map<PsCmdFormat, String> processTreeRecord: processTree) {
-        processTreePidArray[i++] = Integer.valueOf(processTreeRecord.get(PsCmdFormat.PROCESS_ID));
+        processTreePidArray[i++] = Long.valueOf(processTreeRecord.get(PsCmdFormat.PROCESS_ID));
       }
       log.debug("*nix platform: destroying process tree of {} as list of pids {}",
               pid, processTreePidArray);
@@ -742,8 +742,8 @@ public class Cmd {
   }
 
 
-  static Set<Integer> retrievePidsByRegexpFromProcOutput(Process proc, regexp) {
-    Set<Integer> pids = new HashSet<>()
+  static Set<Long> retrievePidsByRegexpFromProcOutput(Process proc, regexp) {
+    Set<Long> pids = new HashSet<>()
 
     proc.in.eachLine { line ->
       log.debug("Found process to matching ${regexp}: ${line}")
@@ -751,7 +751,7 @@ public class Cmd {
       if (match.groupCount() > 0 && match.size() > 0 && match[0].size() > 0) {
         String pid = match[0][1]
         try {
-          pids.add(Integer.parseInt(pid))
+          pids.add(Long.parseLong(pid))
         } catch (NumberFormatException ex) {
           log.debug("We don't care that line contained an invalid processCode to parse: ${pid}. Continuing...")
         }
@@ -761,9 +761,9 @@ public class Cmd {
   }
 
 
-  static Integer extractPid(identifier) {
+  static Long extractPid(identifier) {
     log.debug("Extracting pid using identifier ${identifier}")
-    List<Integer> pids = extractPids(identifier, false)
+    List<Long> pids = extractPids(identifier, false)
     if (pids.isEmpty()) {
       return null
     }
@@ -788,8 +788,8 @@ public class Cmd {
     }
   }
 
-  static List<Integer> extractUNIXPids(identifier, getAll = true) {
-    List<Integer> pids = []
+  static List<Long> extractUNIXPids(identifier, getAll = true) {
+    List<Long> pids = []
     final String ALL_FAILED = "All pid extraction options have failed, including the last resort 'pargs' one. This means that the application the pid of which we were trying to" +
         "extract hadn't been started in a supported way. Hint: domain.sh? any custom launch script?"
     /**
@@ -841,7 +841,7 @@ public class Cmd {
       /**
        * Now, we will collect all java processes.
        */
-      List<Integer> javaPids = []
+      List<Long> javaPids = []
       proc2.in.eachLine { line ->
         def match = line =~ psRegExp
         log.trace("Java processes match.groupCount(): ${match.groupCount()}")
@@ -852,7 +852,7 @@ public class Cmd {
         }
         String pid = match[0][1]
         try {
-          javaPids.add(Integer.parseInt(pid))
+          javaPids.add(Long.parseLong(pid))
         } catch (NumberFormatException ex) {
           log.error("Error trying to parse process ID from: \"${pid}\"")
           throw ex
@@ -896,7 +896,7 @@ public class Cmd {
       log.trace("1) match proc4.text: ${line}")
       String pid = match[0][1]
       try {
-        pids.add(Integer.parseInt(pid))
+        pids.add(Long.parseLong(pid))
       } catch (NumberFormatException ex) {
         log.error("Error trying to parse process ID from: \"${pid}\"")
         throw ex
@@ -906,8 +906,8 @@ public class Cmd {
     return pids
   }
 
-  static List<Integer> extractWindowsPids(identifier, getAll = true) {
-    List<Integer> pids = []
+  static List<Long> extractWindowsPids(identifier, getAll = true) {
+    List<Long> pids = []
 
     /**
      * WINDOWS STUFF
@@ -952,7 +952,7 @@ public class Cmd {
         if (match.size() > 0 && match[0].size() >= 2 && possibleWindowTitlesIds.any { it == match[0][2]}) {
           String pid = match[0][1]
           try {
-            pids.add(Integer.parseInt(pid))
+            pids.add(Long.parseLong(pid))
           } catch (NumberFormatException ex) {
             log.error("Error trying to parse process ID from: \"${pid}\"")
             throw ex
@@ -968,7 +968,7 @@ public class Cmd {
     return pids
   }
 
-  static boolean killSpecifiedProcesses(Collection<Integer> pidList = []) {
+  static boolean killSpecifiedProcesses(Collection<Long> pidList = []) {
     if (!pidList) {
       log.debug("No process IDs given => nothing to kill")
       return false
@@ -1012,7 +1012,7 @@ public class Cmd {
   /**
    * Wait until is PID removed from system - at max. timeout
    */
-  static boolean waitForPidRemoved(Integer pid, int timeout = 30) {
+  static boolean waitForPidRemoved(Long pid, int timeout = 30) {
     if (!pid) return true
     int now = 0
 
@@ -1036,11 +1036,11 @@ public class Cmd {
   /**
    * Check if PID exists in a system - process is present in system
    */
-  static boolean pidExists(Integer pid) {
+  static boolean pidExists(Long pid) {
     def res = false
 
     try {
-      res = getPidList().contains(Integer.valueOf(pid))
+      res = getPidList().contains(pid)
     }
     catch (e) {
     }
@@ -1054,7 +1054,7 @@ public class Cmd {
    *
    * @return true if none of the pids provided exist in the system, false otherwise
    */
-  static boolean waitForPidsRemoved(List<Integer> pids, int timeout, TimeUnit timeUnit) {
+  static boolean waitForPidsRemoved(List<Long> pids, int timeout, TimeUnit timeUnit) {
     long maxTime = System.currentTimeMillis() + timeUnit.toMillis(timeout)
     boolean anyPidExist = !getPidList().intersect(pids).isEmpty()
     while (anyPidExist && System.currentTimeMillis() <= maxTime) {
@@ -1096,7 +1096,7 @@ public class Cmd {
   /**
    * Extract all PIDS from the underlying system
    */
-  static List<Integer> getPidList() {
+  static List<Long> getPidList() {
     def res = []
     def row = []
     def command
@@ -1118,7 +1118,7 @@ public class Cmd {
       else row = line.split() as List
 
       // on all tested system is PID in 2nd col
-      if (!row[1].contains("PID")) res << Integer.parseInt(row[1].replaceAll('"', ''))
+      if (!row[1].contains("PID")) res << Long.parseLong(row[1].replaceAll('"', ''))
     }
 
     return res

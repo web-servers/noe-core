@@ -64,13 +64,13 @@ class HttpdRpm extends Httpd {
     return new File("/var/run/${serviceName}/${serviceName}.pid")
   }
 
-  Integer extractPid() {
+  Long extractPid() {
     def pidAsStr = new ByteArrayOutputStream()
     if (Cmd.executeCommandRedirectIO("sudo cat ${getPidFile()}", null, null, pidAsStr, System.err) == 0) {
       pidAsStr = pidAsStr.toString()
       pidAsStr = pidAsStr.trim()
       pidAsStr = pidAsStr.replaceAll('"', '')
-      pid = Integer.valueOf(pidAsStr)
+      pid = Long.valueOf(pidAsStr)
 
       return pid
     } else {
