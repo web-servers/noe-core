@@ -13,7 +13,7 @@
 
     <properties>
         <!--byteman-->
-        <version.byteman>4.0.5</version.byteman>
+        <version.byteman>4.0.19</version.byteman>
     </properties>
 
     <dependencies>
