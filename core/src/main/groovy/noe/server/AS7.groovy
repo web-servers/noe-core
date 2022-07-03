@@ -34,7 +34,7 @@ import javax.net.ssl.SSLSocketFactory
 @Slf4j
 class AS7 extends ServerAbstract implements WorkerServer {
 
-  public static final String WELCOME_ROOT_CONTEXT = "Welcome to"
+  public static final String WELCOME_ROOT_CONTEXT = ".*(Welcome to|HAL Management Console).*"
   public static final String ADDITIONAL_PARAMETERS_LIST = "ADDITIONAL_PARAMETERS_LIST"
   public static final String ADDITIONAL_ENV_VARIABLES_LIST = "ADDITIONAL_ENV_VARIABLES_LIST"
 
@@ -314,6 +314,7 @@ class AS7 extends ServerAbstract implements WorkerServer {
           it.url super.getUrl('', true)
           it.code 200
           it.content WELCOME_ROOT_CONTEXT
+          it.contentAsRegex true
           it.timeout timeout * 1000
           it.webClient webClient
           it.swallowIOExceptions true
@@ -329,6 +330,7 @@ class AS7 extends ServerAbstract implements WorkerServer {
         it.url super.getUrl('', false, port)
         it.code 200
         it.content WELCOME_ROOT_CONTEXT
+        it.contentAsRegex true
         it.timeout timeout*1000
         it.swallowIOExceptions true
         it.webConnectionTimeout 25000
