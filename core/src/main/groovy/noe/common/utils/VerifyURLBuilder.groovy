@@ -24,6 +24,7 @@ public final class VerifyURLBuilder {
   private String reqKey = ""
   private String reqValue = ""
   private WebClient webClient = null
+  private boolean enableJavaScript = true
   private boolean clearWebClientCache = false
   private boolean reThrowAnyException = false
   private boolean contentAsRegex = false
@@ -144,6 +145,14 @@ public final class VerifyURLBuilder {
   }
 
   /**
+   *  Enable/disable JavaScript support in WebClient instance.
+   */
+  VerifyURLBuilder enableJavaScript(boolean enableJS) {
+    this.enableJavaScript = enableJS
+    return this
+  }
+
+  /**
    * Explicitly clear WebClient's cache?
    */
   VerifyURLBuilder clearWebClientCache(boolean clearWebClientCache) {
@@ -258,6 +267,7 @@ public final class VerifyURLBuilder {
     // mbabacek: We need 404, 403 and others as well :-)
     webClient.getOptions().setThrowExceptionOnFailingStatusCode(false)
     webClient.getOptions().setRedirectEnabled(allowRedirects)
+    webClient.getOptions().setJavaScriptEnabled(enableJavaScript)
     if (webConnectionTimeout != null) {
       webClient.getOptions().setTimeout(webConnectionTimeout)
     }
