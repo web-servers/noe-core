@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jboss.qa.noe</groupId>
     <artifactId>noe-core-parent</artifactId>
-    <version>0.16.34-SNAPSHOT</version>
+    <version>0.17.9-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Noe core: Parent</name>
@@ -21,7 +21,7 @@
     <licenses>
       <license>
         <name>Apache License, Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
         <distribution>repo</distribution>
       </license>
     </licenses>
@@ -43,7 +43,7 @@
         <connection>scm:git:git@${env.GIT_URL}:${env.GIT_USER}/noe-core.git</connection>
         <developerConnection>scm:git:git@${env.GIT_URL}:${env.GIT_USER}/noe-core.git</developerConnection>
         <url>https://${env.GIT_URL}/${env.GIT_USER}/noe-core</url>
-        <tag>HEAD</tag>
+        <tag>v0.17.7</tag>
     </scm>
 
     <distributionManagement>
@@ -58,17 +58,17 @@
         <repository>
             <id>jboss-qa-releases</id>
             <name>JBoss QA release repository</name>
-            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases/</url>
+            <url>https://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases/</url>
         </repository>
         <repository>
             <id>jboss-qa-snapshots</id>
             <name>JBoss QA snapshot repository</name>
-            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots/</url>
+            <url>https://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots/</url>
         </repository>
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
         <repository>
             <id>rh-ga-repository</id>
@@ -85,40 +85,42 @@
         <version.java>1.6</version.java>
 
 
-        <version.checkstyle-plugin>2.10</version.checkstyle-plugin>
-        <version.findbugs-plugin>2.5.5</version.findbugs-plugin>
-        <version.codenarc-plugin>0.18-1</version.codenarc-plugin>
-        <version.source-plugin>2.4</version.source-plugin>
-        <version.javadoc-plugin>2.10.3</version.javadoc-plugin>
-        <version.release-plugin>2.5.3</version.release-plugin>
-        <version.groovy-eclipse-compiler>2.9.0-01</version.groovy-eclipse-compiler>
-        <version.guava>17.0</version.guava>
-        <version.jgit>3.7.1.201504261725-r</version.jgit>
+        <version.checkstyle-plugin>3.1.1</version.checkstyle-plugin>
+        <version.findbugs-plugin>3.0.5</version.findbugs-plugin>
+        <version.codenarc-plugin>0.22-1</version.codenarc-plugin>
+        <version.source-plugin>3.2.1</version.source-plugin>
+        <version.javadoc-plugin>2.10.4</version.javadoc-plugin>
+        <version.release-plugin>3.0.0-M1</version.release-plugin>
+        <version.groovy-eclipse-compiler>3.6.0-03</version.groovy-eclipse-compiler>
+        <version.guava>29.0-jre</version.guava>
+        <version.jgit>5.8.0.202006091008-r</version.jgit>
 
-        <version.java.jna>4.1.0</version.java.jna>
+        <version.java.jna>5.6.0</version.java.jna>
 
         <net.sourceforge.htmlunit.version>2.15</net.sourceforge.htmlunit.version>
         <!-- https://github.com/Karm/okhttp/tree/add_cipher_suites -->
-        <com.squareup.okhttp3.okhttp.version>3.5.0.l</com.squareup.okhttp3.okhttp.version>
-        <org.apache.ant.version>1.9.4</org.apache.ant.version>
-        <version.org.apache.maven.plugins.maven-surefire-plugin>2.17
+        <com.squareup.okhttp3.okhttp.version>4.8.0</com.squareup.okhttp3.okhttp.version>
+        <org.apache.ant.version>1.10.8</org.apache.ant.version>
+        <version.org.apache.maven.plugins.maven-surefire-plugin>2.22.0
         </version.org.apache.maven.plugins.maven-surefire-plugin>
-        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.17
+        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.22.0
         </version.org.apache.maven.plugins.maven-failsafe-plugin>
-        <junit.version>4.12</junit.version>
-        <org.codehaus.groovy.all.version>2.4.12</org.codehaus.groovy.all.version>
-        <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
+        <version.org.apache.maven.plugins.maven-deploy-plugin>2.8.2
+        </version.org.apache.maven.plugins.maven-deploy-plugin>
+        <junit.version>4.13</junit.version>
+        <org.codehaus.groovy.all.version>2.4.19</org.codehaus.groovy.all.version>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <org.codehaus.groovy.compiler.version>2.9.2-01</org.codehaus.groovy.compiler.version>
         <org.codehaus.groovy.batch.compiler.version>2.4.3-01</org.codehaus.groovy.batch.compiler.version>
-        <org.codehaus.mojo.build.helper.maven.plugin.version>1.9.1</org.codehaus.mojo.build.helper.maven.plugin.version>
+        <org.codehaus.mojo.build.helper.maven.plugin.version>3.2.0</org.codehaus.mojo.build.helper.maven.plugin.version>
 
-        <version.slfj-api>1.7.6</version.slfj-api>
-        <version.logback>1.1.2</version.logback>
-        <version.powermock>1.6.6</version.powermock>
+        <version.slfj-api>1.7.30</version.slfj-api>
+        <version.logback>1.2.3</version.logback>
+        <version.powermock>2.0.7</version.powermock>
 
         <version.org.wildfly.extras.creaper>1.6.1</version.org.wildfly.extras.creaper>
-        <org.wildfly.core.version>4.0.0.Final</org.wildfly.core.version>
-        <org.jboss.as.creaper.dependencies.version>7.5.0.Final-redhat-21</org.jboss.as.creaper.dependencies.version>
+        <org.wildfly.core.version>12.0.3.Final</org.wildfly.core.version>
+        <org.jboss.as.creaper.dependencies.version>7.5.23.Final-redhat-00002</org.jboss.as.creaper.dependencies.version>
     </properties>
 
 
@@ -385,6 +387,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-deploy-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.groovy</groupId>

@@ -178,10 +178,10 @@ public class Eap6Utils {
     File httpdModulesDir
     if (platform.isRHEL()) {
       httpdModulesDir = new File(basedir.toString() + "${s}${jwsOrEws}-${ewsVersionMajor}${s}httpd${s}modules")
-      httpdConfDir = new File(basedir.toString() + "${s}${jwsOrEws}-${ewsVersionMajor}${s}httpd${s}conf.d")
+      httpdConfDir = new File(basedir.toString() + "${s}${jwsOrEws}-${ewsVersionMajor}${s}httpd${s}${DefaultProperties.CONF_DIRECTORY}")
     } else if (platform.isWindows() || platform.isSolaris()) {
       httpdModulesDir = new File(basedir.toString() + "${s}${jwsOrEws}-${ewsVersionMajor}${s}lib${bitArch}${s}httpd${s}modules")
-      httpdConfDir = new File(basedir.toString() + "${s}${jwsOrEws}-${ewsVersionMajor}${s}etc${s}httpd${s}conf.d")
+      httpdConfDir = new File(basedir.toString() + "${s}${jwsOrEws}-${ewsVersionMajor}${s}etc${s}httpd${s}${DefaultProperties.CONF_DIRECTORY}")
 
     } else if (platform.isHP()) {
       httpdModulesDir = new File(basedir.toString() + "${s}hpws22${s}apache${s}modules")

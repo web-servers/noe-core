@@ -1,6 +1,7 @@
 package noe.rhel.server.httpd
 
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.utils.DirStateVault
 import noe.common.utils.JBFile
 import noe.common.utils.Library
@@ -34,7 +35,7 @@ class HttpdBaseOS extends Httpd {
     this.logDirs = ['/logs']
     // what path will be taken as relative for star/stop cmd
     this.binPath = '/'
-    if (platform.isRHEL8() || platform.isRHEL7()) {
+    if (platform.isRHEL9() || platform.isRHEL8() || platform.isRHEL7()) {
       this.start = ['systemctl', 'start', serviceName]
       this.stop = ['systemctl', 'stop', serviceName]
     } else if (platform.isRHEL6()) {
@@ -47,7 +48,7 @@ class HttpdBaseOS extends Httpd {
     }
     this.apachectl = ['/usr/sbin/apachectl']
     this.deploymentPath = "/var/www/html"
-    this.confDeploymentPath = this.basedir + '/conf.d'
+    this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
     this.cgiDeploymentPath = "/var/www/cgi-bin"
     this.modClusterCacheDir = "/var/cache/mod_cluster"
     this.opensslPath = 'openssl' // openssl is on $PATH on RHEL by OS installation
@@ -63,8 +64,8 @@ class HttpdBaseOS extends Httpd {
     return new File("/var/run/${serviceName}/${serviceName}.pid")
   }
 
-  Integer extractPid() {
-    int pid
+  Long extractPid() {
+    long pid
     try {
       String pidFromFile = JBFile.read(pidFile).trim().replaceAll('"','')
       pid = Integer.valueOf(pidFromFile)

@@ -40,38 +40,104 @@ public class Java {
     "${javaVersion} ${javaVendor} ${javaVmName} ${javaVmInfo}"
   }
 
+  /**
+   * @deprecated since 0.17.2, please use {@link #isJdk6()} instead.
+   * @return true if process is running on JDK 6 AKA JDK 1.6
+   */
   static boolean isJdk16() {
+    return isJdk6()
+  }
+
+  /**
+   * @return true if process is running on JDK 6 AKA JDK 1.6
+   */
+  static boolean isJdk6() {
     return (javaVersion ==~ /^1\.6.*/)
   }
 
+  /**
+   * @deprecated since 0.17.2, please use {@link #isJdk7()} instead.
+   * @return true if process is running on JDK 7 AKA JDK 1.7
+   */
   static  boolean isJdk17() {
+    return isJdk7()
+  }
+
+  /**
+   * @return true if process is running on JDK 7 AKA JDK 1.7
+   */
+  static  boolean isJdk7() {
     return (javaVersion ==~ /^1\.7.*/)
   }
 
+  /**
+   * @deprecated since 0.17.2, please use {@link #isJdk8()} instead.
+   * @return true if process is running on JDK 8 AKA JDK 1.8
+   */
   static boolean isJdk18() {
+    return isJdk8()
+  }
+
+  /**
+   * @return true if process is running on JDK 8 AKA JDK 1.8
+   */
+  static boolean isJdk8() {
     return (javaVersion ==~ /^1\.8.*/)
   }
 
   /**
    * Relates to http://openjdk.java.net/jeps/223
    *
-   * @return true if used Java is version 9
+   * @deprecated since 0.17.2, please use {@link #isJdk9()} instead.
+   * @return true if process is running on JDK 9
    */
   static boolean isJdk19() {
+    return isJdk9()
+  }
+
+  /**
+   * Relates to http://openjdk.java.net/jeps/223
+   *
+   * @return true if process is running on JDK 9
+   */
+  static boolean isJdk9() {
     return (javaVersion ==~ /^9[\.\-\+].*/)
   }
 
+  /**
+   * @return true if process is running on JDK 11
+   */
   static boolean isJdk11() {
     return (javaVersion ==~ /^11[\.\-\+].*/)
   }
 
   /**
-   * Are we running on minimumJDKVersion ?
+   * @return true if process is running on JDK 15
+   */
+  static boolean isJdk15() {
+    return (javaVersion ==~ /^15[\.\-\+].*/)
+  }
+
+  /**
+   * Are we running on minimumJDKVersion ?. This accepts both legacy (1.6, 1.7, etc.)
+   * Java version format and also new one (7, 8, 9, etc.).
    *
    * @param minimumJDKVersion JDK version (example: '1.7')
+   * @deprecated since 0.17.2, please use {@link #isJdkXOrHigher(java.lang.String)} instead.
    * @return true if we are running on minimumJDKVersion or higher
    */
   static boolean isJdk1xOrHigher(String minimumJDKVersion) {
+    return isJdkXOrHigher(minimumJDKVersion)
+  }
+
+  /**
+   * Are we running on minimumJDKVersion ?. This accepts both legacy (1.6, 1.7, etc.)
+   * Java version format and also new one (7, 8, 9, etc.).
+   *
+   * @param minimumJDKVersion JDK version (example: '1.7' or '7')
+   * @return true if we are running on minimumJDKVersion or higher
+   */
+  static boolean isJdkXOrHigher(String minimumJDKVersion) {
     int usedJavaMajorVersion
     int minimumJavaMajorVersion
 

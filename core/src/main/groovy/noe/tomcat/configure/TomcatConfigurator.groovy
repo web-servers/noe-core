@@ -62,7 +62,9 @@ class TomcatConfigurator {
    * More http connectors is not possible to handle from code because they
    * have no unique id. *
    *
-   * If there is not http (non-secure) connector then new connector is created.
+   * If there is no secure HTTP connector, then a new secure HTTP connector is created.
+   * If there is already one, its new attributes will be added along with the old ones and old ones will be updated. Attributes are configured by methods with parameter type of java standard classes and primitive types.
+   * Inner elements have to be written to their exact form as a whole. Inner elements are configured by methods with custom classes.
    *
    * Non secure http protocol is distinguished that attribute secure=false or is not set.
    *
@@ -96,9 +98,10 @@ class TomcatConfigurator {
    * More such connectors is not possible to handle from code because they have
    * no unique id.
    *
-   * If there is no secure HTTP connector then new secure HTTP connector is created.
-   *
-   * Secure connector is distingushed that has attribute secure=true.
+   * If there is no secure HTTP connector, then a new secure HTTP connector is created.
+   * If there is already one, its new attributes will be added along with the old ones and old ones will be updated. Attributes are configured by methods with parameter type of java standard classes and primitive types.
+   * Inner elements have to be written to their exact form as a whole. Inner elements are configured by methods with custom classes.
+   * Inner elements have to be written to their exact format as a whole
    *
    * Http connector has one of the following protocols and is secured
    *   HTTP/1.1
@@ -131,6 +134,8 @@ class TomcatConfigurator {
    * no unique id.
    *
    * If there is not AJP connector then new AJP connector is created.
+   * If there is already one, the connector attributes will be updated
+   * and the inner elements will be replaced with the ones from the new AJP connector
    *
    * Http connector has one of the following protocols and is not secured
    *   AJP/1.3
@@ -363,6 +368,26 @@ class TomcatConfigurator {
       printNodeToFile(confFile, serverNode)
     } else {
       missingConfigFile(serverXml)
+    }
+    return this
+  }
+
+  /**
+   * Removes the specified listener to server.xml
+   * @param listenerFQCN the fully qualified class name of the listener
+   * @return this
+   */
+  TomcatConfigurator removeListener(String listenerFQCN) {
+    File serverXml = getServerXml()
+
+    if (serverXml?.exists()) {
+      configVault.push(serverXml)
+      Node serverNode = getParsedConfig(serverXml)
+      Node listener = serverNode.Listener.find { it.@className.contains(listenerFQCN) }
+      serverNode.remove(listener)
+      printNodeToFile(serverXml, serverNode)
+    } else {
+      missingConfigFile('server.xml')
     }
     return this
   }

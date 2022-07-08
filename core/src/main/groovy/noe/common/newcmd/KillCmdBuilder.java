@@ -67,8 +67,8 @@ public class KillCmdBuilder extends CmdBuilder<KillCmdBuilder> {
      * @param processIds  process ids to kill as integer
      * @return  this
      */
-    public KillCmdBuilder addProcessId(final int... processIds) {
-        for(int processId: processIds) {
+    public KillCmdBuilder addProcessId(final long... processIds) {
+        for(long processId: processIds) {
             String stringProcessId = String.valueOf(processId);
             addProcessId(stringProcessId);
         }

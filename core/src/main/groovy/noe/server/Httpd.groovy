@@ -67,7 +67,7 @@ abstract class Httpd extends ServerAbstract {
     this.cachePath = this.basedir + platform.sep + 'cache'
     postInstallErrFile = new File(getHttpdServerRootFull(), 'httpdPostInstallErr.log')
     postInstallOutFile = new File(getHttpdServerRootFull(), 'httpdPostInstallOut.log')
-    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "self_signed")
+    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE)
     this.sslCertDir = new File(sslStringDir)
     this.sslCertificate = new File(sslCertDir, "server.crt").absolutePath
     this.sslKey = new File(sslCertDir, "server.key").absolutePath
@@ -372,7 +372,7 @@ abstract class Httpd extends ServerAbstract {
     }
   }
 
-  Integer extractPid() {
+  Long extractPid() {
     String stringPid = null
     File pidFile = getPidFile()
     if (!pidFile.exists()) {
@@ -383,7 +383,7 @@ abstract class Httpd extends ServerAbstract {
     if ( stringPid.isEmpty() ) {
       throw new RuntimeException("Extraction of httpd PID went wrong, ${pidFile} is empty")
     }
-    pid = stringPid.toInteger()
+    pid = stringPid.toLong()
     return pid
   }
 

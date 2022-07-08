@@ -790,7 +790,17 @@ class Library {
 
   static String getMavenExecutable() {
     if (platform.isWindows()) {
-      return 'mvn.bat'
+      try {
+        Cmd.executeCommandConsumeStreams(["mvn.cmd", "-v"])
+        return 'mvn.cmd'
+      } catch (IOException ignored) {}
+
+      try {
+        Cmd.executeCommandConsumeStreams(["mvn.bat", "-v"])
+        return 'mvn.bat'
+      } catch (IOException ignored) {}
+
+      throw new FileNotFoundException("Maven not found, ending.")
     } else {
       return 'mvn'
     }

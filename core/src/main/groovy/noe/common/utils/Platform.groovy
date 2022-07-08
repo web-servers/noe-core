@@ -132,6 +132,10 @@ class Platform {
     return (isRHEL() && (osVersion ==~ /.*el8.*/)) || forceRhel8()
   }
 
+  boolean isRHEL9() {
+    return (isRHEL() && (osVersion ==~ /.*el9.*/)) || forceRhel9()
+  }
+
   boolean isSolaris11() {
     return isSolaris() && (osVersion ==~ /5\.11/)
   }
@@ -146,6 +150,21 @@ class Platform {
 
   boolean isHP11() {
     return isHP() && (osName ==~ /.*11.*/)
+  }
+
+  boolean isFips() {
+    if(isRHEL()) {
+      // Using return (['/usr/bin/fips-mode-setup', '--is-enabled'].execute().waitFor() == 0)
+      // does not work on RHEL7
+      try {
+        return (new File('/proc/sys/crypto/fips_enabled').readLines()[0]=='1')
+      } catch(Exception e) {
+        log.error("Can't detect FIPS enabled using /proc for a RHEL machine, will return false")
+        return false
+      }
+    }
+    //For the moment return false for non-RHEL targets
+    return false
   }
 
   public String getScriptSuffix() {
@@ -185,5 +204,14 @@ class Platform {
    */
   private boolean forceRhel8() {
     return Boolean.parseBoolean(Library.getUniversalProperty('force.rhel.8', 'false'))
+  }
+
+  /**
+   * As on Docker, the 'os.name' of the system is determined by the host OS and not the container one, to make tests
+   * work it is necessary to mock that we are, indeed, using RHEL9 machine.
+   * @return value of the 'force.rhel.9' property
+   */
+  private boolean forceRhel9() {
+    return Boolean.parseBoolean(Library.getUniversalProperty('force.rhel.9', 'false'))
   }
 }

@@ -2,6 +2,7 @@ package noe.ews.server.httpd
 
 import groovy.transform.TypeChecked
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.utils.Cmd
 import noe.common.utils.JBFile
 import noe.common.utils.Library
@@ -17,8 +18,8 @@ import noe.server.Httpd
 @TypeChecked
 @Slf4j
 class HttpdRpm extends Httpd {
-  protected String serviceName
-  protected String apxsPath
+  String serviceName
+  String apxsPath
 
   HttpdRpm(String basedir, version) {
     super(basedir, version)
@@ -44,9 +45,10 @@ class HttpdRpm extends Httpd {
     this.stop = "service ${serviceName} stop"  // stopping as service
     this.apachectl = ['/usr/sbin/apachectl']
     this.deploymentPath = "/var/www/html"
-    this.confDeploymentPath = this.basedir + '/conf.d'
+    this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
     this.cgiDeploymentPath = "/var/www/cgi-bin"
-    this.modClusterCacheDir = "/var/cache/mod_cluster"
+    this.cachePath = "/var/cache"
+    this.modClusterCacheDir = cachePath + "/mod_cluster"
     this.opensslPath = 'openssl' // openssl is on $PATH on RHEL by OS installation
     this.abPath = "/usr/bin/ab"
     this.htdbmPath = "/usr/bin/htdbm"
@@ -62,13 +64,13 @@ class HttpdRpm extends Httpd {
     return new File("/var/run/${serviceName}/${serviceName}.pid")
   }
 
-  Integer extractPid() {
+  Long extractPid() {
     def pidAsStr = new ByteArrayOutputStream()
     if (Cmd.executeCommandRedirectIO("sudo cat ${getPidFile()}", null, null, pidAsStr, System.err) == 0) {
       pidAsStr = pidAsStr.toString()
       pidAsStr = pidAsStr.trim()
       pidAsStr = pidAsStr.replaceAll('"', '')
-      pid = Integer.valueOf(pidAsStr)
+      pid = Long.valueOf(pidAsStr)
 
       return pid
     } else {

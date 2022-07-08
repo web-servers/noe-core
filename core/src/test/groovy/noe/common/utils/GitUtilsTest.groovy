@@ -8,7 +8,7 @@ import org.junit.Test
 
 class GitUtilsTest {
 
-    private static final String TEST_REPO_URL = "git://github.com/schacon/grit.git"
+    private static final String TEST_REPO_URL = "https://github.com/schacon/grit.git"
 
     private static File TEST_DIR
 

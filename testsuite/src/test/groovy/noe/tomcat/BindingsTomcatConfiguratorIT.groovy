@@ -2,14 +2,19 @@ package noe.tomcat
 
 import groovy.util.slurpersupport.GPathResult
 import noe.server.Tomcat
+import noe.common.DefaultProperties
 import noe.tomcat.configure.AjpConnectorTomcat
 import noe.tomcat.configure.TomcatConfigurator
+import noe.tomcat.configure.ConnectorSSLHostConfigTomcat
+import noe.tomcat.configure.ConnectorCertificateTomcat
 import noe.tomcat.configure.NonSecureHttpConnectorTomcat
 import noe.tomcat.configure.SecureHttpConnectorTomcat
 import noe.tomcat.configure.ShutdownTomcat
 import org.junit.Test
 
+import noe.common.utils.Platform
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue
 
 /**
  * Abstract class for Tomcat bindings testing.
@@ -28,7 +33,7 @@ import static org.junit.Assert.assertEquals
 abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
 
   @Test
-  void updateExistingHttpConnectorAllAttribtuesGivenSuccessExpected() {
+  void updateExistingHttpConnectorAllAttributesGivenSuccessExpected() {
     def onlyOneNonSecureConnector = 1
     Integer testHttpPort = 18080
     def testAddress = "my-test-host"
@@ -105,9 +110,6 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     assertEquals testSSLCertificateKeyFile, Server.Service.Connector.find { isSecure(it) }.@SSLCertificateKeyFile.toString()
     assertEquals testSSLPassword, Server.Service.Connector.find { isSecure(it) }.@SSLPassword.toString()
     assertEquals testScheme, Server.Service.Connector.find { isSecure(it) }.@scheme.toString()
-
-    assertEquals testHttpsPort, Integer.valueOf(Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.@redirectPort.toString())
-    assertEquals testHttpsPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
   }
 
   @Test
@@ -122,12 +124,12 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
 
     new TomcatConfigurator(tomcat)
       .ajpConnector(new AjpConnectorTomcat()
-      .setAddress(testAddress)
-      .setPort(testAjpPort)
-      .setRedirectPort(testRedirectPort)
-      .setMaxThreads(testMaxThreads)
-      .setConnectionTimeout(testConnectionTimeout)
-      .setScheme(testScheme))
+        .setAddress(testAddress)
+        .setPort(testAjpPort)
+        .setRedirectPort(testRedirectPort)
+        .setMaxThreads(testMaxThreads)
+        .setConnectionTimeout(testConnectionTimeout)
+        .setScheme(testScheme))
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
     assertEquals onlyOneAjpConnector, Server.Service.Connector.find { isAjpProtocol(it) && !isSecure(it)  }.size()
@@ -137,6 +139,33 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     assertEquals testRedirectPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
     assertEquals testConnectionTimeout, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@connectionTimeout.toString())
     assertEquals testScheme, Server.Service.Connector.find { isAjpProtocol(it) }.@scheme.toString()
+  }
+
+  @Test
+  void createNewAjpConnectorSuccessExpected() {
+    Integer testAjpPort = 18585
+    String testProtocol = "AJP/1.3"
+    Integer testRedirectPort = 18989
+    Boolean testSecretRequired = true
+    String testSecret = "mysecret"
+    String testAllowedRequestAttributesPattern = "customAttributesPattern"
+
+    new TomcatConfigurator(tomcat)
+      .ajpConnector(new AjpConnectorTomcat()
+        .setPort(testAjpPort)
+        .setProtocol(testProtocol)
+        .setRedirectPort(testRedirectPort)
+        .setSecretRequired(testSecretRequired)
+        .setSecret(testSecret)
+        .setAllowedRequestAttributesPattern(testAllowedRequestAttributesPattern))
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals testAjpPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@port.toString())
+    assertEquals testProtocol, Server.Service.Connector.find { isAjpProtocol(it) }.@protocol.toString()
+    assertEquals testRedirectPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
+    assertEquals testSecretRequired, Boolean.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@secretRequired.toString())
+    assertEquals testSecret, Server.Service.Connector.find { isAjpProtocol(it) }.@secret.toString()
+    assertEquals testAllowedRequestAttributesPattern, Server.Service.Connector.find { isAjpProtocol(it) }.@allowedRequestAttributesPattern.toString()
   }
 
   @Test
@@ -153,6 +182,33 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     assertEquals testAjpPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@port.toString())
     assertEquals Tomcat.DEFAULT_HTTPS_PORT, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
     assertEquals defAttributesCountOfAjpConnector, Server.Service.Connector.find { isAjpProtocol(it) }.attributes().size()
+  }
+
+  @Test
+  void createNewHttpConnectorSuccessExpected() {
+    Integer testAjpPort = 18585
+    String testProtocol = "AJP/1.3"
+    Integer testRedirectPort = 18989
+    Boolean testSecretRequired = true
+    String testSecret = "mysecret"
+    String testAllowedRequestAttributesPattern = "customAttributesPattern"
+
+    new TomcatConfigurator(tomcat)
+      .ajpConnector(new AjpConnectorTomcat()
+        .setPort(testAjpPort)
+        .setProtocol(testProtocol)
+        .setRedirectPort(testRedirectPort)
+        .setSecretRequired(testSecretRequired)
+        .setSecret(testSecret)
+        .setAllowedRequestAttributesPattern(testAllowedRequestAttributesPattern))
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals testAjpPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@port.toString())
+    assertEquals testProtocol, Server.Service.Connector.find { isAjpProtocol(it) }.@protocol.toString()
+    assertEquals testRedirectPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
+    assertEquals testSecretRequired, Boolean.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@secretRequired.toString())
+    assertEquals testSecret, Server.Service.Connector.find { isAjpProtocol(it) }.@secret.toString()
+    assertEquals testAllowedRequestAttributesPattern, Server.Service.Connector.find { isAjpProtocol(it) }.@allowedRequestAttributesPattern.toString()
   }
 
   @Test
@@ -201,7 +257,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     Integer shiftedAjpPort = 18009
 
     new TomcatConfigurator(tomcat)
-        .portOffset(testOffset)
+      .portOffset(testOffset)
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
     assertEquals shiftedHttpPort, Integer.valueOf(Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.@port.toString())
@@ -216,18 +272,16 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     int testOffset = 10000
     Integer testHttpsPort = 18443
 
-    new TomcatConfigurator(tomcat)
+    TomcatConfigurator tconf = new TomcatConfigurator(tomcat)
       .httpsConnector(new SecureHttpConnectorTomcat().setPort(testHttpsPort))
       .portOffset(testOffset)
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
-    assertEquals testHttpsPort + testOffset, Integer.valueOf(Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.@redirectPort.toString())
-    assertEquals testHttpsPort + testOffset, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
     assertEquals testHttpsPort + testOffset, Integer.valueOf(Server.Service.Connector.find { isSecure(it) }.@port.toString())
   }
 
   @Test
-  void shiftPortAndSetHttpsPortDefaltServerXmlChangeExpected() {
+  void shiftPortAndSetHttpsPortDefaultServerXmlChangeExpected() {
     int testOffset = 10000
     Integer testHttpsPort = 18443
 
@@ -236,10 +290,32 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
       .httpsConnector(new SecureHttpConnectorTomcat().setPort(testHttpsPort))
 
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
-    assertEquals testHttpsPort, Integer.valueOf(Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.@redirectPort.toString())
-    assertEquals testHttpsPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
     assertEquals testHttpsPort, Integer.valueOf(Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@port.toString())
     assertEquals Tomcat.DEFAULT_HTTP_PORT + testOffset, Integer.valueOf(Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.@port.toString())
+  }
+
+  @Test
+  void testCertificateDefaultsServerXmlChangeExpected() {
+    String sslRoot = new File(new Platform().getTmpDir(), "ssl").getCanonicalPath()
+    String sslStringDir = new File(sslRoot, DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE).getCanonicalPath()
+    String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
+    String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
+    String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()
+    String password = "changeit"
+    Integer testHttpsPort = 8443
+
+    new TomcatConfigurator(tomcat)
+      .httpsConnector(new SecureHttpConnectorTomcat()
+        .setPort(testHttpsPort)
+        .setDefaultCertificatesConfiguration())
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals sslCertificate, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCertificateFile.toString()
+    assertEquals sslCertificateKey, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLCertificateKeyFile.toString()
+    assertEquals keystoreFilePath, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@keystoreFile.toString()
+    assertEquals password, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@SSLPassword.toString()
+    assertEquals password, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@truststorePass.toString()
+    assertEquals password, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.@keystorePass.toString()
   }
 
   @Test
@@ -270,6 +346,143 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     newProps.load(new File(tomcat.basedir, "conf/${propFile}").newDataInputStream())
 
     assertEquals newValue, newProps.getProperty(propName)
+  }
+
+  @Test
+  void addSpecificListenerOfServerXml() {
+    String value = 'customListener'
+    new TomcatConfigurator(tomcat).addListener(value)
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals value, Server.Listener.find { it.@className=value }.@className.toString()
+  }
+
+  @Test
+  void removeSpecificListenerOfServerXml() {
+    String value = "org.apache.catalina.core.AprLifecycleListener"
+    new TomcatConfigurator(tomcat).removeListener(value)
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertTrue Server.Listener.find { it.@className.contains('AprLifecycleListener') }.toString().isEmpty()
+  }
+
+  @Test
+  void upgradeProtocolToHTTP2ProtocolSecureAndNonSecureConnector() {
+    Integer testHttpsPort = 18443
+    Integer testHttpPort = 18080
+
+    String value = "org.apache.coyote.http2.Http2Protocol"
+    new TomcatConfigurator(tomcat)
+      .httpsConnector(
+        new SecureHttpConnectorTomcat()
+          .setPort(testHttpsPort)
+          .setUpgradeProtocolToHttp2Protocol())
+      .httpConnector(
+        new NonSecureHttpConnectorTomcat()
+          .setPort(testHttpPort)
+          .setUpgradeProtocolToHttp2Protocol())
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals value, Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.UpgradeProtocol.@className.toString()
+    assertEquals value, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.UpgradeProtocol.@className.toString()
+  }
+
+  @Test
+  void sslHostConfigCreateSecureConnector() {
+    Integer testHttpsPort = 18443
+    String hostName = "myHostName"
+    String certificateVerification = "certVerification"
+    String certFile = "server.key"
+    String certPath = "path/to/cert"
+    String tType = "ttype"
+    String tFile = "tfile"
+    String tPass = "tpasswd"
+    String tProvider = "tprovider"
+    String protocols = "protocols"
+    String sslProtocol = "sslprotocol"
+    String ciphers = "several_ciphers"
+
+    ConnectorSSLHostConfigTomcat sslHostConfObj = new ConnectorSSLHostConfigTomcat()
+      .setHostName(hostName)
+      .setCertificateVerification(certificateVerification)
+      .setCaCertificateFile(certFile)
+      .setCaCertificatePath(certPath)
+      .setTruststoreType(tType)
+      .setTruststoreFile(tFile)
+      .setTruststorePassword(tPass)
+      .setTruststoreProvider(tProvider)
+      .setProtocols(protocols)
+      .setSSLProtocol(sslProtocol)
+      .setCiphers(ciphers)
+
+    new TomcatConfigurator(tomcat)
+      .httpsConnector(
+        new SecureHttpConnectorTomcat()
+          .setPort(testHttpsPort)
+          .setSSLHostConfigs(sslHostConfObj)
+      )
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals hostName, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@hostName.toString()
+    assertEquals certificateVerification, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@certificateVerification.toString()
+    assertEquals certFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@caCertificateFile.toString()
+    assertEquals certPath, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@caCertificatePath.toString()
+    assertEquals tFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreFile.toString()
+    assertEquals tPass, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststorePassword.toString()
+    assertEquals tType, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreType.toString()
+    assertEquals tProvider, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@truststoreProvider.toString()
+    assertEquals protocols, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@protocols.toString()
+    assertEquals sslProtocol, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@sslProtocol.toString()
+    assertEquals ciphers, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.@ciphers.toString()
+  }
+
+  @Test
+  void certificateCreateSecureConnector() {
+    Integer testHttpsPort = 18443
+    String certFile = "certfile"
+    String chain = "chain"
+    String keyAlias = "keyalias"
+    String keyFile = "keyfile"
+    String keyPass = "keypass"
+    String keystoreFile = "tprovider"
+    String keystorePass = "protocols"
+    String keystoreType = "sslprotocol"
+    String keystoreProvider = "several_ciphers"
+    String certType = "certType"
+
+    ConnectorCertificateTomcat certificateObj = new ConnectorCertificateTomcat()
+      .setCertificateFile(certFile)
+      .setCertificateChainFile(chain)
+      .setCertificateKeyAlias(keyAlias)
+      .setCertificateKeyFile(keyFile)
+      .setCertificateKeyPassword(keyPass)
+      .setCertificateKeystoreFile(keystoreFile)
+      .setCertificateKeystorePassword(keystorePass)
+      .setCertificateKeystoreType(keystoreType)
+      .setCertificateKeystoreProvider(keystoreProvider)
+      .setCertificateType(certType)
+
+    ConnectorSSLHostConfigTomcat sslHostConfObj = new ConnectorSSLHostConfigTomcat()
+      .setCertificate(certificateObj)
+
+    new TomcatConfigurator(tomcat)
+      .httpsConnector(
+        new SecureHttpConnectorTomcat()
+          .setPort(testHttpsPort)
+          .setSSLHostConfigs(sslHostConfObj)
+      )
+
+    GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
+    assertEquals certFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateFile.toString()
+    assertEquals chain, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateChainFile.toString()
+    assertEquals keyAlias, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateKeyAlias.toString()
+    assertEquals keyFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateKeyFile.toString()
+    assertEquals keyPass, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateKeyPassword.toString()
+    assertEquals keystoreFile, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateKeystoreFile.toString()
+    assertEquals keystorePass, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateKeystorePassword.toString()
+    assertEquals keystoreProvider, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateKeystoreProvider.toString()
+    assertEquals keystoreType, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateKeystoreType.toString()
+    assertEquals certType, Server.Service.Connector.find { isSecuredHttpProtocol(it) }.SSLHostConfig.Certificate.@certificateType.toString()
   }
 
   boolean isSecuredHttpProtocol(GPathResult connector) {

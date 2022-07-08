@@ -180,7 +180,7 @@ public class ListProcess {
      * @return list of map where information about processes in the tree is saved
      * @throws IOException when not possible to run the process list command
      */
-    public List<Map<PsCmdFormat, String>> listProcessTree(final int processId) throws IOException {
+    public List<Map<PsCmdFormat, String>> listProcessTree(final long processId) throws IOException {
         ListProcessData data = listAll(PsCmdFormat.PROCESS_ID, PsCmdFormat.PARENT_PROCESS_ID, PsCmdFormat.COMMAND);
 
         ImmutableList.Builder<Map<PsCmdFormat, String>> psTreeBuilder = ImmutableList.<Map<PsCmdFormat, String>>builder();
@@ -196,7 +196,7 @@ public class ListProcess {
 
         List<String> listOfIdsToCheck = new ArrayList<String>();
         List<String> listOfIdsInProgress = new ArrayList<String>();
-        listOfIdsToCheck.add(Integer.toString(processId));
+        listOfIdsToCheck.add(Long.toString(processId));
 
         // passing through ps results to get all the process three (filter returns filtered copy of data)
         while (!listOfIdsToCheck.isEmpty()) {
@@ -246,7 +246,7 @@ public class ListProcess {
      * @return process info
      * @throws IOException when some error on execution happens
      */
-    public String printProcessInfo(final int processId) throws IOException, InterruptedException {
+    public String printProcessInfo(final long processId) throws IOException, InterruptedException {
         CmdBuilder<SimpleCmdBuilder> builder = new CmdBuilder<SimpleCmdBuilder>("");
         if (platform.isWindows()) {
             builder.setBaseCommand("wmic");

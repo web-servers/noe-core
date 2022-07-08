@@ -196,7 +196,7 @@ public final class VerifyURLBuilder {
    * Whether response should be logged on response, by default it is logged on trace level.
    */
   VerifyURLBuilder logResponse(boolean logResponse) {
-    this.logResponse = this.logResponse
+    this.logResponse = logResponse
     return this
   }
 

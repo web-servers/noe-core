@@ -27,11 +27,11 @@ class ConnectorConfiguratorTomcat {
     int httpConnectorSize = loadHttpConnectorSize()
 
     if (httpConnectorSize > 1) {
-      throw new IllegalStateException("Unexpected server.xml format - one secure connector expected at most")
+      throw new IllegalStateException("Unexpected server.xml format - one non secure connector expected at most")
     }
     if (httpConnectorSize == 1) {
-      Node Connector = loadExistingHttpConnector()
-      updateExistingConnector(Connector, new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
+      Node ConnectorElement = loadExistingHttpConnector()
+      updateExistingConnector(ConnectorElement, new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
     } else {
       createNewConnector(new ConnectorAttributesTransformer(connector).nonSecureHttpConnector())
     }
@@ -56,8 +56,6 @@ class ConnectorConfiguratorTomcat {
       createNewConnector(new ConnectorAttributesTransformer(connector).secureHttpConnector())
     }
 
-    defineRedirectPorts(connector.getPort())
-
     return server
   }
 
@@ -81,11 +79,6 @@ class ConnectorConfiguratorTomcat {
     return server
   }
 
-  private void defineRedirectPorts(Integer port) {
-    defineHttpConnector(new NonSecureHttpConnectorTomcat().setRedirectPort(port))
-    defineAjpConnector(new AjpConnectorTomcat().setRedirectPort(port))
-  }
-
   private Node loadExistingHttpConnector() {
     def connectors = server.Service.Connector.findAll { connector -> hasHttpProtocol(connector) && !isSecured(connector) }
     if (connectors.size() == 1) {
@@ -104,7 +97,7 @@ class ConnectorConfiguratorTomcat {
     } else if (connectors.size() < 1) {
       return null
     } else {
-      throw new IllegalStateException("Unexpected server.xml format - one http connector expected")
+      throw new IllegalStateException("Unexpected server.xml format - one https connector expected at most")
     }
   }
 
@@ -115,7 +108,7 @@ class ConnectorConfiguratorTomcat {
     } else if (connectors.size() < 1) {
       return null
     } else {
-      throw new IllegalStateException("Unexpected server.xml format - one http connector expected at most")
+      throw new IllegalStateException("Unexpected server.xml format - one ajp connector expected at most")
     }
   }
 
@@ -123,16 +116,40 @@ class ConnectorConfiguratorTomcat {
     return connector.@secure.toString().toLowerCase().trim() == "true"
   }
 
-  private void createNewConnector(Map<String, Object> attributes) {
-    server.Service.each { service ->
-      service.appendNode ("Connector", attributes)
+
+  private void createNewConnector(Node element) {
+    server.Service.each { Node service ->
+      service.appendNode(element, element.attributes(), element.value())
     }
   }
 
-  private void updateExistingConnector(Node Connector, Map<String, Object> attributes) {
-    attributes.each { attribute ->
-      Connector.@"${attribute.key}" = attribute.value
+  private void updateExistingConnector(Node connector, Node newConnector) {
+    // update connector attributes
+    newConnector.attributes().each { attribute ->
+      connector.@"${attribute.key}" = attribute.value
     }
+
+    newConnector.each { Node newSubelement ->
+      replaceInnerElements(connector, newSubelement)
+    }
+  }
+
+  /**
+   *
+   * @param connector
+   * @param newSubElement
+   *
+   * Search for existing inner element to remove and replace with new one
+   */
+  private void replaceInnerElements(Node connector, Node newSubElement) {
+    if (connector.find { it.name() == newSubElement.name() } != null) {
+      List<Node> innerElements = connector.findAll { it.name() == newSubElement.name()}
+      innerElements.each { element ->
+        connector.remove(element)
+      }
+    }
+
+    connector.appendNode(newSubElement, newSubElement.attributes(), newSubElement.value())
   }
 
   /**

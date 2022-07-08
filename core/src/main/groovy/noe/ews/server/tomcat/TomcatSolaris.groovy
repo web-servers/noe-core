@@ -101,10 +101,10 @@ class TomcatSolaris extends Tomcat {
     return result
   }
 
-  Integer extractPid() {
+  Long extractPid() {
     try {
       String pidFromFile = JBFile.read(pidFile).trim().replaceAll('"', '')
-      pid = Integer.valueOf(pidFromFile)
+      pid = Long.valueOf(pidFromFile)
     } catch (e) {
       pid = super.extractPid()
     }

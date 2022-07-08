@@ -14,25 +14,25 @@ class ConnectorAttributesTransformer {
 
   /**
    * Provides attributes for non secure HTTP connector.
-   * Returns map of key:value corresponding with attributes in Tomcat server.xml.
+   * Returns Node applicable into Tomcat server.xml.
    */
-  Map<String, Object> nonSecureHttpConnector() {
+  Node nonSecureHttpConnector() {
     return new CommonConnectorTransformer(connector).transform()
   }
 
   /**
    * Provides attributes for secure HTTP connector.
-   * Returns map of key:value corresponding with attributes in Tomcat server.xml.
+   * Returns Node applicable into Tomcat server.xml.
    */
-  Map<String, Object> secureHttpConnector() {
+  Node secureHttpConnector() {
     return new SecureHttpTransformer(connector).transform()
   }
 
   /**
    * Provides attributes for AJP connector.
-   * Returns map of key:value corresponding with attributes in Tomcat server.xml.
+   * Returns Node applicable into Tomcat server.xml.
    */
-  Map<String, Object> ajpConnector() {
+  Node ajpConnector() {
     return new CommonConnectorTransformer(connector).transform()
   }
 
@@ -47,51 +47,64 @@ class ConnectorAttributesTransformer {
       this.connector = connector
     }
 
-    Map<String, Object> transform() {
-      Map<String, Object> res = [:]
+    Node transform() {
+      Map<String, Object> attributes = [:]
 
+      // -- attributes -------------------------
       if (connector.getPort() != null && connector.getPort() > 0) {
-        res.put('port', connector.getPort())
+        attributes.put('port', connector.getPort())
       }
       if (connector.getProtocol() != null && !connector.getProtocol().isEmpty()) {
-        res.put('protocol', connector.getProtocol())
+        attributes.put('protocol', connector.getProtocol())
       }
       if (connector.getSecure() != null) {
-        res.put('secure', connector.getSecure())
+        attributes.put('secure', connector.getSecure())
       }
       if (connector.getScheme() != null && !connector.getScheme().isEmpty()) {
-        res.put('scheme', connector.getScheme())
+        attributes.put('scheme', connector.getScheme())
       }
 
       if (connector.getMaxThreads() != null && connector.getMaxThreads() > 0) {
-        res.put('maxThreads', connector.getMaxThreads())
+        attributes.put('maxThreads', connector.getMaxThreads())
       }
       if (connector.getAddress() != null && !connector.getAddress().isEmpty()) {
-        res.put('address', connector.getAddress())
+        attributes.put('address', connector.getAddress())
       }
       if (connector.getConnectionTimeout() != null && connector.getConnectionTimeout() > 0) {
-        res.put('connectionTimeout', connector.getConnectionTimeout())
+        attributes.put('connectionTimeout', connector.getConnectionTimeout())
       }
       if (connector.getRedirectPort() != null && connector.getRedirectPort() > 0) {
-        res.put('redirectPort', connector.getRedirectPort())
+        attributes.put('redirectPort', connector.getRedirectPort())
       }
 
       if(connector instanceof AjpConnectorTomcat) {
         if (connector.getSecretRequired() != null) {
-          res.put('secretRequired', connector.getSecretRequired())
+          attributes.put('secretRequired', connector.getSecretRequired())
         }
 
         if (connector.getSecret() != null && !connector.getSecret().isEmpty()) {
-          res.put('secret', connector.getSecret())
+          attributes.put('secret', connector.getSecret())
         }
 
-        if (connector.getAllowedRequestAttributesPattern() != null
-                && !connector.getAllowedRequestAttributesPattern().isEmpty()) {
-          res.put('allowedRequestAttributesPattern', connector.getAllowedRequestAttributesPattern())
+        if (connector.getAllowedRequestAttributesPattern() != null && !connector.getAllowedRequestAttributesPattern().isEmpty()) {
+          attributes.put('allowedRequestAttributesPattern', connector.getAllowedRequestAttributesPattern())
         }
       }
+      // ---------------------
 
-      return res
+
+      Node node = new Node(null, "Connector", attributes)
+
+
+      // -- sub elements -----
+      if (connector instanceof NonSecureHttpConnectorTomcat) {
+        if (connector.getUpgradeProtocol() != null) {
+          node.appendNode("UpgradeProtocol", ['className': connector.getUpgradeProtocol().getClassName()])
+        }
+      }
+      // --------------------
+
+      return node
     }
   }
 
@@ -102,39 +115,150 @@ class ConnectorAttributesTransformer {
       this.connector = connector
     }
 
-    Map<String, Object> transform() {
-      Map<String, Object> res = new CommonConnectorTransformer(connector).transform()
+    Node transform() {
+      Node node = new CommonConnectorTransformer(connector).transform()
+      Map<String, Object> attributes = node.attributes()
 
+      // -- attributes -------------------------
       if (connector.getSslEnabled() != null) {
-        res.put('SSLEnabled', connector.getSslEnabled())
+        attributes.put('SSLEnabled', connector.getSslEnabled())
       }
 
       // SSL BIO and NIO
       if (connector.getSslProtocol() != null && !connector.getSslProtocol().isEmpty()) {
-        res.put('sslProtocol', connector.getSslProtocol())
+        attributes.put('sslProtocol', connector.getSslProtocol())
       }
       if (connector.getKeystoreFile() != null && !connector.getKeystoreFile().isEmpty()) {
-        res.put('keystoreFile', connector.getKeystoreFile())
+        attributes.put('keystoreFile', connector.getKeystoreFile())
       }
       if (connector.getKeystorePass() != null && !connector.getKeystorePass().isEmpty()) {
-        res.put('keystorePass', connector.getKeystorePass())
+        attributes.put('keystorePass', connector.getKeystorePass())
+      }
+      if (connector.getKeystoreType() != null && !connector.getKeystoreType().isEmpty()) {
+        attributes.put('keystoreType', connector.getKeystoreType())
+      }
+      if (connector.getTruststoreFile() != null && !connector.getTruststoreFile().isEmpty()) {
+        attributes.put('truststoreFile', connector.getTruststoreFile())
+      }
+      if (connector.getTruststorePass() != null && !connector.getTruststorePass().isEmpty()) {
+        attributes.put('truststorePass', connector.getTruststorePass())
+      }
+      if (connector.getTruststoreType() != null && !connector.getTruststoreType().isEmpty()) {
+        attributes.put('truststoreType', connector.getTruststoreType())
       }
       if (connector.getClientAuth() != null) {
-        res.put('clientAuth', connector.getClientAuth())
+        attributes.put('clientAuth', connector.getClientAuth())
+      }
+
+      // HTTP2
+      if (connector.getSslImplementationName() != null && !connector.getSslImplementationName().isEmpty()) {
+        attributes.put('sslImplementationName', connector.getSslImplementationName())
       }
 
       // SSL APR
       if (connector.getSslCertificateFile() != null && !connector.getSslCertificateFile().isEmpty()) {
-        res.put('SSLCertificateFile', connector.getSslCertificateFile())
+        attributes.put('SSLCertificateFile', connector.getSslCertificateFile())
+      }
+      if (connector.getSslCACertificateFile() != null && !connector.getSslCACertificateFile().isEmpty()) {
+        attributes.put('SSLCACertificateFile', connector.getSslCACertificateFile())
       }
       if (connector.getSslCertificateKeyFile() != null && !connector.getSslCertificateKeyFile().isEmpty()) {
-        res.put('SSLCertificateKeyFile', connector.getSslCertificateKeyFile())
+        attributes.put('SSLCertificateKeyFile', connector.getSslCertificateKeyFile())
       }
       if (connector.getSslPassword() != null && !connector.getSslPassword().isEmpty()) {
-        res.put('SSLPassword', connector.getSslPassword())
+        attributes.put('SSLPassword', connector.getSslPassword())
+      }
+      if (connector.getSslEnabledProtocols() != null && !connector.getSslEnabledProtocols().isEmpty()) {
+        attributes.put('sslEnabledProtocols', connector.getSslEnabledProtocols())
+      }
+      // ---------------------
+
+      if (connector.getUpgradeProtocol() != null) {
+        node.appendNode("UpgradeProtocol", ['className': connector.getUpgradeProtocol().getClassName()])
       }
 
-      return res
+      if (connector.getSSLHostConfigs() != null) {
+        for (ConnectorSSLHostConfigTomcat sslHostConfig : connector.getSSLHostConfigs()) {
+
+          Map<String, Object> sslHostConfigAttributes = [:]
+
+          if (sslHostConfig.getHostName() != null && !sslHostConfig.getHostName().isEmpty()) {
+            sslHostConfigAttributes.put('hostName', sslHostConfig.getHostName())
+          }
+          if (sslHostConfig.getCertificateVerification() != null && !sslHostConfig.getCertificateVerification().isEmpty()) {
+            sslHostConfigAttributes.put('certificateVerification', sslHostConfig.getCertificateVerification())
+          }
+          if (sslHostConfig.getCaCertificateFile() != null && !sslHostConfig.getCaCertificateFile().isEmpty()) {
+            sslHostConfigAttributes.put('caCertificateFile', sslHostConfig.getCaCertificateFile())
+          }
+          if (sslHostConfig.getCaCertificatePath() != null && !sslHostConfig.getCaCertificatePath().isEmpty()) {
+            sslHostConfigAttributes.put('caCertificatePath', sslHostConfig.getCaCertificatePath())
+          }
+          if (sslHostConfig.getCiphers() != null && !sslHostConfig.getCiphers().isEmpty()) {
+            sslHostConfigAttributes.put('ciphers', sslHostConfig.getCiphers())
+          }
+          if (sslHostConfig.getSslProtocol() != null && !sslHostConfig.getSslProtocol().isEmpty()) {
+            sslHostConfigAttributes.put('sslProtocol', sslHostConfig.getSslProtocol())
+          }
+          if (sslHostConfig.getProtocols() != null && !sslHostConfig.getProtocols().isEmpty()) {
+            sslHostConfigAttributes.put('protocols', sslHostConfig.getProtocols())
+          }
+          if (sslHostConfig.getTruststoreFile() != null && !sslHostConfig.getTruststoreFile().isEmpty()) {
+            sslHostConfigAttributes.put('truststoreFile', sslHostConfig.getTruststoreFile())
+          }
+          if (sslHostConfig.getTruststorePassword() != null && !sslHostConfig.getTruststorePassword().isEmpty()) {
+            sslHostConfigAttributes.put('truststorePassword', sslHostConfig.getTruststorePassword())
+          }
+          if (sslHostConfig.getTruststoreProvider() != null && !sslHostConfig.getTruststoreProvider().isEmpty()) {
+            sslHostConfigAttributes.put('truststoreProvider', sslHostConfig.getTruststoreProvider())
+          }
+          if (sslHostConfig.getTruststoreType() != null && !sslHostConfig.getTruststoreType().isEmpty()) {
+            sslHostConfigAttributes.put('truststoreType', sslHostConfig.getTruststoreType())
+          }
+
+          Node sslHostConfigNode = node.appendNode("SSLHostConfig", sslHostConfigAttributes)
+
+          if (sslHostConfig.getCertificate() != null ) {
+            Map<String, Object> certificateAttributes = [:]
+            ConnectorCertificateTomcat certificate = sslHostConfig.getCertificate()
+
+            if (certificate.getCertificateFile() != null && !certificate.getCertificateFile().isEmpty()) {
+              certificateAttributes.put('certificateFile', certificate.getCertificateFile())
+            }
+            if (certificate.getCertificateChainFile() != null && !certificate.getCertificateChainFile().isEmpty()) {
+              certificateAttributes.put('certificateChainFile', certificate.getCertificateChainFile())
+            }
+            if (certificate.getCertificateKeyAlias() != null && !certificate.getCertificateKeyAlias().isEmpty()) {
+              certificateAttributes.put('certificateKeyAlias', certificate.getCertificateKeyAlias())
+            }
+            if (certificate.getCertificateKeyFile() != null && !certificate.getCertificateKeyFile().isEmpty()) {
+              certificateAttributes.put('certificateKeyFile', certificate.getCertificateKeyFile())
+            }
+            if (certificate.getCertificateKeyPassword() != null && !certificate.getCertificateKeyPassword().isEmpty()) {
+              certificateAttributes.put('certificateKeyPassword', certificate.getCertificateKeyPassword())
+            }
+            if (certificate.getCertificateKeystoreFile() != null && !certificate.getCertificateKeystoreFile().isEmpty()) {
+              certificateAttributes.put('certificateKeystoreFile', certificate.getCertificateKeystoreFile())
+            }
+            if (certificate.getCertificateKeystorePassword() != null && !certificate.getCertificateKeystorePassword().isEmpty()) {
+              certificateAttributes.put('certificateKeystorePassword', certificate.getCertificateKeystorePassword())
+            }
+            if (certificate.getCertificateKeystoreProvider() != null && !certificate.getCertificateKeystoreProvider().isEmpty()) {
+              certificateAttributes.put('certificateKeystoreProvider', certificate.getCertificateKeystoreProvider())
+            }
+            if (certificate.getCertificateKeystoreType() != null && !certificate.getCertificateKeystoreType().isEmpty()) {
+              certificateAttributes.put('certificateKeystoreType', certificate.getCertificateKeystoreType())
+            }
+            if (certificate.getCertificateType() != null && !certificate.getCertificateType().isEmpty()) {
+              certificateAttributes.put('certificateType', certificate.getCertificateType())
+            }
+
+            sslHostConfigNode.appendNode("Certificate", certificateAttributes)
+          }
+        }
+      }
+
+      return node
     }
   }
 
