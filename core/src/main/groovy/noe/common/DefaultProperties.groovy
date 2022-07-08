@@ -134,14 +134,11 @@ class DefaultProperties {
   public static final String UDP_MCAST_ADDRESS = Library.getUniversalProperty('udp.mcast.address', Library.getUniversalProperty("MCAST_ADDR", '228.11.11.11'))
   public static final String JGROUPS_MCAST_PORT = Library.getUniversalProperty('jgroups.mcast.port', Library.getUniversalProperty("MCAST_PORT", '45688'))
 
-  // From 2.4.51 onwards all the file that contain the LoadModule directive were moved from conf.d to conf.modules.d
-  private static final boolean ConfigDirectoryChange = new Version(apacheCoreVersion().toString()) >= new Version("2.4.51.DR0")
 
   // Added to allow for the new naming convention used in RHEL9
-  static final String MOD_CLUSTER_CONFIG_FILE = new Platform().isRHEL9() || ConfigDirectoryChange ? Library.getUniversalProperty('mod.proxy.cluster.config.file', "mod_proxy_cluster.conf") : Library.getUniversalProperty('modcluster.config.file', "mod_cluster.conf")
+  public static final String MOD_CLUSTER_CONFIG_FILE = Library.getUniversalProperty('mod.proxy.cluster.config.file', "mod_proxy_cluster.conf")
   // Same as above but naming reflects the new changed file name
-  static final String MOD_PROXY_CLUSTER_CONFIG_FILE = MOD_CLUSTER_CONFIG_FILE
-
-  // From 2.4.51 onwards all the file that contain the LoadModule directive were moved from conf.d to conf.modules.d
-  public static final String CONF_DIRECTORY = ConfigDirectoryChange ? Library.getUniversalProperty('jbcs.conf.d.directory', "conf.modules.d") : Library.getUniversalProperty('jbcs.conf.d.directory', "conf.d")
+  public static final String MOD_PROXY_CLUSTER_CONFIG_FILE = MOD_CLUSTER_CONFIG_FILE
+  // Making the conf directory configurable
+  public static final String CONF_DIRECTORY = Library.getUniversalProperty('jbcs.conf.d.directory', "conf.d")
 }
