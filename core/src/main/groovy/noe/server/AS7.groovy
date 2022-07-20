@@ -313,6 +313,7 @@ class AS7 extends ServerAbstract implements WorkerServer {
         if (!VerifyURLBuilder.verifyURL {
           it.url super.getUrl('', true)
           it.code 200
+          it.enableJavaScript false
           it.content WELCOME_ROOT_CONTEXT
           it.timeout timeout * 1000
           it.webClient webClient
@@ -328,6 +329,7 @@ class AS7 extends ServerAbstract implements WorkerServer {
       if (!VerifyURLBuilder.verifyURL {
         it.url super.getUrl('', false, port)
         it.code 200
+        it.enableJavaScript false
         it.content WELCOME_ROOT_CONTEXT
         it.timeout timeout*1000
         it.swallowIOExceptions true
