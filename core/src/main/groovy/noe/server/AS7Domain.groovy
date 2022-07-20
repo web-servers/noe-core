@@ -26,7 +26,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException
 @Slf4j
 class AS7Domain extends ServerAbstract {
 
-  def static final WELCOME_ROOT_CONTEXT = '.*(Welcome to|JBoss Management).*'
+  def static final WELCOME_ROOT_CONTEXT = '.*(Welcome to|JBoss Management|HAL Management Console).*'
 
   AS7Cli as7Cli // cliClient abstraction for running cli commands and generating cli
   Version eapVersion // eap version
