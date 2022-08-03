@@ -19,7 +19,6 @@ import noe.workspace.WorkspaceTomcat
  * This workspace allow you to have multiple tomcats and a single httpd
  * @author Paul Lodge
  */
-
 @Slf4j
 class WorkspaceMultipleTomcatsHttpd extends WorkspaceMultipleTomcats {
 
@@ -38,7 +37,7 @@ class WorkspaceMultipleTomcatsHttpd extends WorkspaceMultipleTomcats {
   String hostIpAddress = DefaultProperties.HOST
   Map originalTomcatHosts = [:]
 
- WorkspaceHttpdEws(int numberOfAdditionalTomcats = 0) {
+    WorkspaceMultipleTomcatsHttpd(int numberOfAdditionalTomcats = 0) {
     super()
     this.numberOfAdditionalTomcats = numberOfAdditionalTomcats
 
