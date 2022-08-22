@@ -60,7 +60,7 @@ class RpmTomcatEnvVarsFileFactory {
   private static class Jws5RpmTomcatEnvVarsFile extends RpmTomcatEnvVarsFileBase {
     Jws5RpmTomcatEnvVarsFile() {
       Platform platform = new Platform()
-      if (platform.isRHEL8()) {
+      if (platform.isRHEL8() || platform.isRHEL9()) {
         this.envFile = new File('/etc/opt/rh/scls/jws5/sysconfig/tomcat')
       } else {
         this.envFile = new File('/etc/opt/rh/jws5/sysconfig/tomcat')
