@@ -198,7 +198,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     final List<String> defaultFilteredLines = platform.isFips() ? Arrays.asList(
             "Creation of SecureRandom instance for session ID generation using \\[.*\\] took \\[",
             "Exception initializing random number generator using algorithm \\[SHA1PRNG\\]",
-            "WARNING [main] org.apache.catalina.util.SessionIdGeneratorBase.<clinit> The default SHA1PRNG algorithm for SecureRandom is not supported by this JVM. Using the platform default.",
+            "WARNING \\[main\\] org\\.apache\\.catalina\\.util\\.SessionIdGeneratorBase\\.<clinit> The default SHA1PRNG algorithm for SecureRandom is not supported by this JVM\\. Using the platform default\\.",
             "ErrorReportValve\\.java"
     ) : Arrays.asList(
             "Creation of SecureRandom instance for session ID generation using \\[.*\\] took \\[")
