@@ -297,8 +297,7 @@ abstract class ServerAbstract implements IApp {
     File fullDeplSrcPath = new File(getDeplSrcPath(), appPath)
     def destDirName = contextName ?: fullDeplSrcPath.getName()
 
-    // war
-    if (fullDeplSrcPath.isFile() && fullDeplSrcPath.toString().endsWith('.war')) {
+    if (fullDeplSrcPath.isFile()) {
       if (explodeFirst) {
         //TODO: Ad "0..-5": Removes .war from the name... :-(
         JBFile.nativeUnzip(fullDeplSrcPath, new File(getDeploymentPath() + "${platform.sep}" + fullDeplSrcPath.getName()[0..-5]), JBFile.useAdminPrivileges, true)
