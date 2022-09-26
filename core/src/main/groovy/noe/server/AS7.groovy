@@ -458,13 +458,21 @@ class AS7 extends ServerAbstract implements WorkerServer {
 
   @Override
   void undeployByDeleting(String appName) {
+    final List<String> knownArchiveExtensions = [ "war", "ear" ]
+
     super.undeployByDeleting(appName)
-    //AS7 Specific clean-up, yes we use .war with AS7.
-    AS7Properties.DEPLOYMENT_SCANNER_MARKER_FILES.each { postfix ->
-      File scannerHintFilePath = new File(getDeploymentPath(), appName + ".war" + postfix)
-      if (scannerHintFilePath.exists()) {
-        log.debug("Deleting: " + scannerHintFilePath.toString())
-        JBFile.delete(scannerHintFilePath)
+
+    //AS7 Specific clean-up
+    AS7Properties.DEPLOYMENT_SCANNER_MARKER_FILES.each { suffix ->
+      final File[] allDeploymentFiles = new File(getDeploymentPath()).listFiles()
+      System.out.println(allDeploymentFiles)
+      allDeploymentFiles.each { file ->
+        final String fileName = file.getName()
+        knownArchiveExtensions.each { archiveExtension ->
+          if (fileName.contains(appName + "." + archiveExtension) && fileName.endsWith(suffix)) {
+            JBFile.delete(file)
+          }
+        }
       }
     }
   }
