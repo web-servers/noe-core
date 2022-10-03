@@ -583,6 +583,7 @@ class EwsUtils extends InstallerUtils {
       else if (platform.isRHEL6()) fn += "${version}-RHEL6-"
       else if (platform.isRHEL7()) fn += "${version}-RHEL7-"
       else if (platform.isRHEL8()) fn += "${version}-RHEL8-"
+      else if (platform.isRHEL9()) fn += "${version}-RHEL9-"
       if (platform.isX86()) {
         fn += "i386"
       } else if (platform.isX64()) {
