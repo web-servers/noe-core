@@ -36,6 +36,7 @@ class PlatformSuffixHelper {
       else if (platform.isRHEL6()) platformName += "RHEL6-"
       else if (platform.isRHEL7()) platformName += "RHEL7-"
       else if (platform.isRHEL8()) platformName += "RHEL8-"
+      else if (platform.isRHEL9()) platformName += "RHEL9-"
       if (platform.isX86()) {
         platformName += "i686"
       } else if (platform.isX64()) {
@@ -113,6 +114,7 @@ class PlatformSuffixHelper {
       else if (platform.isRHEL6()) platformName += "RHEL6-"
       else if (platform.isRHEL7()) platformName += "RHEL7-"
       else if (platform.isRHEL8()) platformName += "RHEL8-"
+      else if (platform.isRHEL9()) platformName += "RHEL9-"
       if (platform.isX86()) {
         platformName += "i386"
       } else if (platform.isX64()) {
