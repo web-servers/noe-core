@@ -23,8 +23,8 @@ class AS7UndeployTest {
         baseDir = File.createTempDir('noe', 'ServerAbstract')
         assertNotNull(baseDir)
         deploymentsDir = new File(baseDir, "${as7Dir}/standalone/deployments")
-        deploymentsDir.mkdirs()
         assertNotNull(deploymentsDir)
+        deploymentsDir.mkdirs()
 
         //some random value, necessary for AS7 to instantiate (not optimal)
         System.setProperty("eap.version", "7.0.0")
@@ -33,10 +33,8 @@ class AS7UndeployTest {
 
     @AfterClass
     static void cleanUp() {
-        if (testServer != null) {
-            testServer.kill()
-        }
-        baseDir.deleteDir()
+        testServer?.kill()
+        baseDir?.deleteDir()
         System.clearProperty("eap.version")
     }
 
