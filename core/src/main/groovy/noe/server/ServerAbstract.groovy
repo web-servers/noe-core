@@ -359,13 +359,15 @@ abstract class ServerAbstract implements IApp {
     File appDirPath = new File(getDeploymentPath(), appName)
     log.debug("appDirPath: " + appDirPath)
 
-    File appWarPath = new File(getDeploymentPath(), appName + ".war")
+    [ "war", "ear" ].each { extension ->
+      File appWarPath = new File(getDeploymentPath(), "${appName}.${extension}")
 
-    if (appDirPath.isDirectory() || appDirPath.isFile()) {
-      JBFile.delete(appDirPath)
-    }
-    if (appWarPath.isFile() || appWarPath.isDirectory()) {
-      JBFile.delete(appWarPath)
+      if (appDirPath.isDirectory() || appDirPath.isFile()) {
+        JBFile.delete(appDirPath)
+      }
+      if (appWarPath.isFile() || appWarPath.isDirectory()) {
+        JBFile.delete(appWarPath)
+      }
     }
 
     log.debug("Finished undeploying by deleting for app: ${appName}")
