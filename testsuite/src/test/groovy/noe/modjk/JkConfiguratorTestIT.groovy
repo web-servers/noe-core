@@ -530,7 +530,11 @@ class JkConfiguratorTestIT extends TestAbstract {
     }
 
     String retrievePropertiesFileName() {
-      if (workerServerClass == Tomcat.class) return "ews-test.properties"
+      if (workerServerClass == Tomcat.class) {
+        Platform platform = new Platform()
+        if (platform.isRHEL7()) return "ews-rhel7-test.properties"
+        else return "ews-test.properties"
+      }
       else return "eap6-test.properties"
     }
 
