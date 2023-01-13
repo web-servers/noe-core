@@ -526,6 +526,11 @@ class JkConfiguratorTestIT extends TestAbstract {
         def sslConfFile = new File(facingServer.getConfDeploymentPath(), "ssl.conf")
         log.debug("Deleting ssl.conf: $sslConfFile.absolutePath")
         JBFile.delete(sslConfFile)
+        // we are not testing cgid here, lets remove cgi.conf (requires cgid with worker/event)
+        def cgiConfFile = new File(facingServer.getConfModulesDeploymentPath(), "01-cgi.conf")
+        log.debug("Deleting cgi.conf: $cgiConfFile.absolutePath")
+        JBFile.delete(cgiConfFile)
+
       }
     }
 

@@ -44,6 +44,7 @@ class HttpdWindows extends Httpd {
     this.stop = apachectl + ["-k", "stop"]
     this.deploymentPath = this.basedir + "\\var\\www\\html"
     this.confDeploymentPath = this.basedir + httpdServerRoot + "\\${DefaultProperties.CONF_DIRECTORY}"
+    this.confModulesDeploymentPath = this.basedir + httpdServerRoot + "\\${DefaultProperties.CONF_MODULES_DIRECTORY}"
     this.cgiDeploymentPath = this.basedir + "\\var\\www\\cgi-bin"
     this.modClusterCacheDir = this.basedir + "\\var\\cache\\mod_cluster"
     this.opensslPath = this.binDir + "\\openssl.exe"

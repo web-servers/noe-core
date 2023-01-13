@@ -34,6 +34,7 @@ class HttpdRhel extends Httpd {
     configureApachectl()
     this.deploymentPath = this.basedir + "/www/html"
     this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
+    this.confModulesDeploymentPath = this.basedir + "/${DefaultProperties.CONF_MODULES_DIRECTORY}"
     this.cgiDeploymentPath = this.basedir + "/www/cgi-bin"
     this.modClusterCacheDir = this.basedir + "/cache/mod_cluster"
     this.opensslPath = 'openssl' // openssl is in $PATH on RHEL by OS installation

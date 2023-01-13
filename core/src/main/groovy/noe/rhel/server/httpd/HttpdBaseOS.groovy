@@ -49,6 +49,7 @@ class HttpdBaseOS extends Httpd {
     this.apachectl = ['/usr/sbin/apachectl']
     this.deploymentPath = "/var/www/html"
     this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
+    this.confModulesDeploymentPath = this.basedir + "/${DefaultProperties.CONF_MODULES_DIRECTORY}"
     this.cgiDeploymentPath = "/var/www/cgi-bin"
     this.modClusterCacheDir = "/var/cache/mod_cluster"
     this.opensslPath = 'openssl' // openssl is on $PATH on RHEL by OS installation

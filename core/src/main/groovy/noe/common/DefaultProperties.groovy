@@ -141,4 +141,6 @@ class DefaultProperties {
   public static final String MOD_PROXY_CLUSTER_CONFIG_FILE = MOD_CLUSTER_CONFIG_FILE
   // Making the conf directory configurable
   public static final String CONF_DIRECTORY = Library.getUniversalProperty('jbcs.conf.d.directory', "conf.d")
+  public static final String CONF_MODULES_DIRECTORY = Library.getUniversalProperty('jbcs.conf.modules.d.directory', "conf.modules.d")
+
 }

@@ -33,7 +33,8 @@ abstract class Httpd extends ServerAbstract {
   List<String> apachectl       // apachectl Script/Binary
   String httpdevent = "sudo ./httpd.event"
   String httpdworker = "sudo ./httpd.worker"
-  String cgiDeploymentPath   // CGI scripts deplyment path for httpd
+  String confModulesDeploymentPath   // modules configuration deployment path for httpd
+  String cgiDeploymentPath   // CGI scripts deployment path for httpd
   String modClusterCacheDir  // directory for storing cached data
   int mainClusterManagementPort = 6666
   String opensslPath         // openssl PATH
@@ -76,7 +77,7 @@ abstract class Httpd extends ServerAbstract {
   }
 
   static ServerAbstract getInstance(String basedir, version, String httpdDir = '', NoeContext context = NoeContext.forCurrentContext()) {
-    def server
+    ServerAbstract server
 
     if (context.areInSingleGroup(['ews', 'rpm']) || DefaultProperties.USE_HTTPD_RPM) {
       if (DefaultProperties.apacheCoreVersion()) {
