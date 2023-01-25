@@ -33,6 +33,7 @@ class Httpd24Rpm extends HttpdRpm {
     this.apachectl = ['/usr/sbin/apachectl24']
     this.deploymentPath = "/var/www/${serviceName}"
     this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
+    this.confModulesDeploymentPath = this.basedir + "/${DefaultProperties.CONF_MODULES_DIRECTORY}"
     this.cgiDeploymentPath = this.deploymentPath + "/cgi-bin"
     this.abPath = "/usr/bin/ab24"
     this.htdbmPath = "/usr/bin/htdbm24"

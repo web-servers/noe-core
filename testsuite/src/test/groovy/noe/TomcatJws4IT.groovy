@@ -18,7 +18,7 @@ class TomcatJws4IT extends TestAbstract {
   public static void beforeClass() {
     Platform platform = new Platform()
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
-    Assume.assumeFalse("JWS 4 is not supported on RHEL5 => skipping", platform.isRHEL5())
+    Assume.assumeTrue("JWS 4 is not supported on RHEL8+ => skipping", platform.isRHEL7())
     Assume.assumeTrue("Tomcat from JWS 4 requires at least Java 1.8", Java.isJdk1xOrHigher('1.8'))
     Assume.assumeTrue("We have currently only builds for RHEL, skipping for other platforms",
             platform.isRHEL())

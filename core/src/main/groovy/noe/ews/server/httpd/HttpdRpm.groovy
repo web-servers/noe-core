@@ -46,6 +46,7 @@ class HttpdRpm extends Httpd {
     this.apachectl = ['/usr/sbin/apachectl']
     this.deploymentPath = "/var/www/html"
     this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
+    this.confModulesDeploymentPath = this.basedir + "/${DefaultProperties.CONF_MODULES_DIRECTORY}"
     this.cgiDeploymentPath = "/var/www/cgi-bin"
     this.cachePath = "/var/cache"
     this.modClusterCacheDir = cachePath + "/mod_cluster"

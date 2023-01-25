@@ -39,6 +39,10 @@ class HttpdKillTestIT extends TestAbstract {
       def mod_clusterConfFile = new File(httpdServer.getConfDeploymentPath(), DefaultProperties.MOD_CLUSTER_CONFIG_FILE)
       log.debug("Deleting ${DefaultProperties.MOD_CLUSTER_CONFIG_FILE}: $mod_clusterConfFile.absolutePath")
       JBFile.delete(mod_clusterConfFile)
+      // remove mod_proxy_cluster too
+      mod_clusterConfFile = new File(httpdServer.getConfDeploymentPath(), DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE)
+      log.debug("Deleting ${DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE}: $mod_clusterConfFile.absolutePath")
+      JBFile.delete(mod_clusterConfFile)
     }
   }
 
