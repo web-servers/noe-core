@@ -28,13 +28,18 @@
 
     <developers>
       <developer>
-          <id>mczernek</id>
-          <name>Marek Czernek</name>
+          <id>plodge</id>
+          <name>Paul Lodge</name>
           <organization>Red Hat</organization>
       </developer>
+        <developer>
+            <id>akrajcik</id>
+            <name>Adam Krajcik</name>
+            <organization>Red Hat</organization>
+        </developer>
       <developer>
-          <id>karm</id>
-          <name>Michal Karm Babacek</name>
+          <id>sgala</id>
+          <name>Santiago Gala</name>
           <organization>Red Hat</organization>
       </developer>
     </developers>
