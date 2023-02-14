@@ -18,7 +18,7 @@ class JBFileTest {
   static Platform platform = new Platform()
   static String sep = platform.sep
 
-  static File resourceDir = new File(new File(".").getCanonicalFile(), "src${sep}test${sep}resources${sep}" + JBFileTest.class.name.replace('.', sep))
+  static File resourceDir = new File(new File(".").getCanonicalFile(), "src${sep}test${sep}resources${sep}" + JBFileTest.class.name.replace('.', sep)+"Dir")
   static File fileLoremIpsum = new File(resourceDir, "lorem_ipsum.txt")
   static File fileMd5 = new File(resourceDir, "lorem_ipsum.md5")
   static File fileZip = new File(resourceDir, "lorem_ipsum.zip")
