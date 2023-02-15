@@ -799,10 +799,10 @@ public class Cmd {
     Pattern psRegExp
     if (platform.isHP()) {
       psCommand = ['ps', '-elfx']
-      psRegExp = ~/^[0-9]*[ ]*[A-Z][ ]*[a-z]*[ ]*([0-9]*).*/
+      psRegExp = ~/^[0-9]*[ ]*[A-Z][ ]*[a-z]*[ ]*([0-9]+).*/
     } else {
       psCommand = ['ps', '-ef']
-      psRegExp = ~/^[ a-z]*[ ]*([0-9]*)[ ]*[0-9]*.*/
+      psRegExp = ~/^[ a-z+]*[ ]*([0-9]+)[ ]*[0-9]*.*/
     }
 
     /**
@@ -855,7 +855,8 @@ public class Cmd {
           javaPids.add(Long.parseLong(pid))
         } catch (NumberFormatException ex) {
           log.error("Error trying to parse process ID from: \"${pid}\"")
-          throw ex
+          //ignore non-pid matches, consider the rest
+          //throw ex
         }
       }
 
@@ -899,7 +900,8 @@ public class Cmd {
         pids.add(Long.parseLong(pid))
       } catch (NumberFormatException ex) {
         log.error("Error trying to parse process ID from: \"${pid}\"")
-        throw ex
+        //ignore non-pid match
+        //throw ex
       }
     }
 
