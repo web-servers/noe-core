@@ -75,12 +75,14 @@ security.provider.12=SunPKCS11
 #security.provider.1=SunPKCS11 ${java.home}/lib/security/nss.cfg
 
 #
-# Security providers used when global crypto-policies are set to FIPS.
+# Security providers used when FIPS mode support is active
 #
 fips.provider.1=SunPKCS11 /tmp/ssl/self_signed_fips/nss.fips.cfg
 fips.provider.2=SUN
 fips.provider.3=SunEC
 fips.provider.4=SunJSSE
+fips.provider.5=SunJCE
+fips.provider.6=SunRsaSign
 
 #
 # A list of preferred providers for specific algorithms. These providers will
@@ -290,7 +292,43 @@ keystore.type=pkcs12
 #
 # Default keystore type used when global crypto-policies are set to FIPS.
 #
-fips.keystore.type=PKCS11
+fips.keystore.type=pkcs12
+
+#
+# Location of the NSS DB keystore (PKCS11) in FIPS mode.
+#
+# The syntax for this property is identical to the 'nssSecmodDirectory'
+# attribute available in the SunPKCS11 NSS configuration file. Use the
+# 'sql:' prefix to refer to an SQLite DB.
+#
+# If the system property fips.nssdb.path is also specified, it supersedes
+# the security property value defined here.
+#
+# Note: the default value for this property points to an NSS DB that might be
+# readable by multiple operating system users and unsuitable to store keys.
+#
+fips.nssdb.path=sql:/etc/pki/nssdb
+
+#
+# PIN for the NSS DB keystore (PKCS11) in FIPS mode.
+#
+# Values must take any of the following forms:
+#   1) pin:<value>
+#        Value: clear text PIN value.
+#   2) env:<value>
+#        Value: environment variable containing the PIN value.
+#   3) file:<value>
+#        Value: path to a file containing the PIN value in its first
+#        line.
+#
+# If the system property fips.nssdb.pin is also specified, it supersedes
+# the security property value defined here.
+#
+# When used as a system property, UTF-8 encoded values are valid. When
+# used as a security property (such as in this file), encode non-Basic
+# Latin Unicode characters with \uXXXX.
+#
+fips.nssdb.pin=pin:
 
 #
 # Controls compatibility mode for JKS and PKCS12 keystore types.
@@ -572,7 +610,7 @@ sun.security.krb5.maxReferrals=5
 # can be included in the disabledAlgorithms properties.  These properties are
 # to help manage common actions easier across multiple disabledAlgorithm
 # properties.
-# There is one defined security property:  jdk.disabled.NamedCurves
+# There is one defined security property:  jdk.disabled.namedCurves
 # See the property for more specific details.
 #
 #
@@ -648,7 +686,8 @@ sun.security.krb5.maxReferrals=5
 #
 #
 jdk.certpath.disabledAlgorithms=MD2, MD5, SHA1 jdkCA & usage TLSServer, \
-    RSA keySize < 1024, DSA keySize < 1024, EC keySize < 224
+    RSA keySize < 1024, DSA keySize < 1024, EC keySize < 224, \
+    SHA1 usage SignedJAR & denyAfter 2019-01-01
 
 #
 # Legacy algorithms for certification path (CertPath) processing and
@@ -712,7 +751,7 @@ jdk.security.legacyAlgorithms=SHA1, \
 # See "jdk.certpath.disabledAlgorithms" for syntax descriptions.
 #
 jdk.jar.disabledAlgorithms=MD2, MD5, RSA keySize < 1024, \
-      DSA keySize < 1024
+      DSA keySize < 1024, SHA1 denyAfter 2019-01-01
 
 #
 # Algorithm restrictions for Secure Socket Layer/Transport Layer Security
