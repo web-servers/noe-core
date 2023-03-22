@@ -319,8 +319,8 @@ abstract class Httpd extends ServerAbstract {
     log.debug('New Listen: ' + listen)
     updateConfReplaceRegExp(DefaultProperties.MOD_CLUSTER_CONFIG_FILE, 'Listen (.*)', listen, true)
     updateConfReplaceRegExp(DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE, 'Listen (.*)', listen, true)
-    updateConfReplaceRegExp(DefaultProperties.MOD_CLUSTER_CONFIG_FILE, '<VirtualHost \\*:(.*)', "<VirtualHost \\*:${port}>", true)
-    updateConfReplaceRegExp(DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE, '<VirtualHost \\*:(.*)', "<VirtualHost \\*:${port}>", true)
+    updateConfReplaceRegExp(DefaultProperties.MOD_CLUSTER_CONFIG_FILE, /<VirtualHost [*]:(.*)>/, /<VirtualHost *:${port}>/, true)
+    updateConfReplaceRegExp(DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE, /<VirtualHost [*]:(.*)>/, /<VirtualHost *:${port}>/, true)
     mainClusterManagementPort = port
 
   }
