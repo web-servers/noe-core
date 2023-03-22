@@ -599,7 +599,7 @@ abstract class ServerAbstract implements IApp {
 
       fileText = JBFile.read(file)
 
-      if (fileText.contains(replace)) {
+      if ( (useSimpleReplace && fileText.contains(replace)) || fileText.find(replace)) {
         log.trace('AFTER UPDATE:')
         log.trace('-----------------------------------------------')
         // show only text after change
