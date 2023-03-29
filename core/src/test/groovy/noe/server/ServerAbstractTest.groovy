@@ -47,7 +47,7 @@ class ServerAbstractTest {
       JBFile.mkdir(new File(PathHelper.join(baseDir.getAbsolutePath(), logDir)))
     }
 
-    server = new TestServer(baseDir.getAbsolutePath(), '2.4.23')
+    server = new TestServer(baseDir.getAbsolutePath(), '2.4.51')
     server.setLogDirs(logDirs)
   }
 

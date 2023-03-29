@@ -34,7 +34,8 @@ class HttpdCoreRpm extends HttpdRpm {
     this.stop = "service ${serviceName} stop"  // stopping as service
     this.apachectl = [this.baseSCLdir + '/usr/sbin/apachectl']
     this.deploymentPath = this.baseSCLdir + "/var/www/html"
-    this.confDeploymentPath = this.basedir + '/conf.d'
+    this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
+    this.confModulesDeploymentPath = this.basedir + "/${DefaultProperties.CONF_MODULES_DIRECTORY}"
     this.cgiDeploymentPath = this.baseSCLdir + "/var/www/cgi-bin"
     this.abPath = this.baseSCLdir + '/usr/bin/ab'
     this.htdbmPath = this.baseSCLdir + '/usr/bin/htdbm'

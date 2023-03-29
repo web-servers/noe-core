@@ -152,6 +152,21 @@ class Platform {
     return isHP() && (osName ==~ /.*11.*/)
   }
 
+  boolean isFips() {
+    if(isRHEL()) {
+      // Using return (['/usr/bin/fips-mode-setup', '--is-enabled'].execute().waitFor() == 0)
+      // does not work on RHEL7
+      try {
+        return (new File('/proc/sys/crypto/fips_enabled').readLines()[0]=='1')
+      } catch(Exception e) {
+        log.error("Can't detect FIPS enabled using /proc for a RHEL machine, will return false")
+        return false
+      }
+    }
+    //For the moment return false for non-RHEL targets
+    return false
+  }
+
   public String getScriptSuffix() {
     return isWindows() ? 'bat' : 'sh'
   }

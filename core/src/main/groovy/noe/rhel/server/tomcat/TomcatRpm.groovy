@@ -81,7 +81,7 @@ class TomcatRpm extends Tomcat {
         // Try to search for 'CATALINA_PID' in file content
         def m = fileText =~ /CATALINA_PID=(.*)/
 
-        // Get value - actually we want last occurence of CATALINA_PID as that
+        // Get value - actually we want last occurrence of CATALINA_PID as that
         // possibly rewrites all preceding occurrences.
         for (int i = m.size()-1; i >= 0; i--) {
           if (m[i].size() > 1) {
@@ -108,12 +108,12 @@ class TomcatRpm extends Tomcat {
     }
   }
 
-  Integer extractPid() {
+  Long extractPid() {
     try {
       def pidAsStr = pidFile.text
       pidAsStr = pidAsStr.trim()
       pidAsStr = pidAsStr.replaceAll('"', '')
-      pid = Integer.valueOf(pidAsStr)
+      pid = Long.valueOf(pidAsStr)
     }
     catch (e) {
       log.debug("PID file is not accessible. But continuing ...")

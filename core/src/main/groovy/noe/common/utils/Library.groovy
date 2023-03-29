@@ -211,7 +211,7 @@ class Library {
         socket?.close()
       }
       Library.letsSleep(1000)
-      now += 1000
+      now = new Date().getTime()
     }
     // still port not ready, failing
     return false
@@ -257,7 +257,7 @@ class Library {
         socket?.close()
       }
       Library.letsSleep(1000)
-      now += 1000
+      now = new Date().getTime()
     }
     // still port opened
     log.trace("Returning, still opened :-(")

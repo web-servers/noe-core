@@ -1,6 +1,7 @@
 package noe.ews.server.httpd
 
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.utils.Cmd
 import noe.common.utils.Library
 import noe.common.utils.Version
@@ -42,7 +43,8 @@ class HttpdWindows extends Httpd {
     this.start =  apachectl + ["-k", "start"]
     this.stop = apachectl + ["-k", "stop"]
     this.deploymentPath = this.basedir + "\\var\\www\\html"
-    this.confDeploymentPath = this.basedir + httpdServerRoot + "\\conf.d"
+    this.confDeploymentPath = this.basedir + httpdServerRoot + "\\${DefaultProperties.CONF_DIRECTORY}"
+    this.confModulesDeploymentPath = this.basedir + httpdServerRoot + "\\${DefaultProperties.CONF_MODULES_DIRECTORY}"
     this.cgiDeploymentPath = this.basedir + "\\var\\www\\cgi-bin"
     this.modClusterCacheDir = this.basedir + "\\var\\cache\\mod_cluster"
     this.opensslPath = this.binDir + "\\openssl.exe"

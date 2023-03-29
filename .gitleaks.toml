@@ -1,0 +1,8 @@
+[allowlist]
+  description = "Allowlist"
+  paths = [
+    '''core/src/main/resources/ssl/self_signed''',
+    '''core/src/main/resources/ssl/self_signed_fips'''
+  ]
+
+

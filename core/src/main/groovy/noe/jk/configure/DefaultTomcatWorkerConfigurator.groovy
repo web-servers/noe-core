@@ -47,7 +47,7 @@ class DefaultTomcatWorkerConfigurator implements Configurator<DefaultTomcatWorke
   DefaultTomcatWorkerConfigurator configure() {
     configurator
         .httpConnector(new NonSecureHttpConnectorTomcat().setAddress(workerNode.getHost()))
-        .ajpConnector(new AjpConnectorTomcat().setPort(workerNode.getAjpPort()))
+        .ajpConnector(new AjpConnectorTomcat().setPort(workerNode.getAjpPort()).setSecretRequired(false))
         .jvmRoute(workerNode.getId())
 
     return this

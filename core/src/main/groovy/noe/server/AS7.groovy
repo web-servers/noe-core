@@ -34,7 +34,7 @@ import javax.net.ssl.SSLSocketFactory
 @Slf4j
 class AS7 extends ServerAbstract implements WorkerServer {
 
-  public static final String WELCOME_ROOT_CONTEXT = "Welcome to"
+  public static final String WELCOME_ROOT_CONTEXT = ".*(Welcome to|HAL Management Console).*"
   public static final String ADDITIONAL_PARAMETERS_LIST = "ADDITIONAL_PARAMETERS_LIST"
   public static final String ADDITIONAL_ENV_VARIABLES_LIST = "ADDITIONAL_ENV_VARIABLES_LIST"
 
@@ -313,7 +313,9 @@ class AS7 extends ServerAbstract implements WorkerServer {
         if (!VerifyURLBuilder.verifyURL {
           it.url super.getUrl('', true)
           it.code 200
+          it.enableJavaScript false
           it.content WELCOME_ROOT_CONTEXT
+          it.contentAsRegex true
           it.timeout timeout * 1000
           it.webClient webClient
           it.swallowIOExceptions true
@@ -328,7 +330,9 @@ class AS7 extends ServerAbstract implements WorkerServer {
       if (!VerifyURLBuilder.verifyURL {
         it.url super.getUrl('', false, port)
         it.code 200
+        it.enableJavaScript false
         it.content WELCOME_ROOT_CONTEXT
+        it.contentAsRegex true
         it.timeout timeout*1000
         it.swallowIOExceptions true
         it.webConnectionTimeout 25000
@@ -454,13 +458,21 @@ class AS7 extends ServerAbstract implements WorkerServer {
 
   @Override
   void undeployByDeleting(String appName) {
+    final List<String> knownArchiveExtensions = [ "war", "ear" ]
+
     super.undeployByDeleting(appName)
-    //AS7 Specific clean-up, yes we use .war with AS7.
-    AS7Properties.DEPLOYMENT_SCANNER_MARKER_FILES.each { postfix ->
-      File scannerHintFilePath = new File(getDeploymentPath(), appName + ".war" + postfix)
-      if (scannerHintFilePath.exists()) {
-        log.debug("Deleting: " + scannerHintFilePath.toString())
-        JBFile.delete(scannerHintFilePath)
+
+    //AS7 Specific clean-up
+    AS7Properties.DEPLOYMENT_SCANNER_MARKER_FILES.each { suffix ->
+      final File[] allDeploymentFiles = new File(getDeploymentPath()).listFiles()
+      System.out.println(allDeploymentFiles)
+      allDeploymentFiles.each { file ->
+        final String fileName = file.getName()
+        knownArchiveExtensions.each { archiveExtension ->
+          if (fileName.contains(appName + "." + archiveExtension) && fileName.endsWith(suffix)) {
+            JBFile.delete(file)
+          }
+        }
       }
     }
   }

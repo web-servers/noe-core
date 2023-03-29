@@ -33,8 +33,10 @@ abstract class Httpd extends ServerAbstract {
   List<String> apachectl       // apachectl Script/Binary
   String httpdevent = "sudo ./httpd.event"
   String httpdworker = "sudo ./httpd.worker"
-  String cgiDeploymentPath   // CGI scripts deplyment path for httpd
+  String confModulesDeploymentPath   // modules configuration deployment path for httpd
+  String cgiDeploymentPath   // CGI scripts deployment path for httpd
   String modClusterCacheDir  // directory for storing cached data
+  int mainClusterManagementPort = 6666
   String opensslPath         // openssl PATH
   String abPath         // path for the ApacheBench
   String htdbmPath      // path Manipulate DBM password databases
@@ -67,7 +69,7 @@ abstract class Httpd extends ServerAbstract {
     this.cachePath = this.basedir + platform.sep + 'cache'
     postInstallErrFile = new File(getHttpdServerRootFull(), 'httpdPostInstallErr.log')
     postInstallOutFile = new File(getHttpdServerRootFull(), 'httpdPostInstallOut.log')
-    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", "self_signed")
+    String sslStringDir = PathHelper.join(platform.tmpDir, "ssl", DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE)
     this.sslCertDir = new File(sslStringDir)
     this.sslCertificate = new File(sslCertDir, "server.crt").absolutePath
     this.sslKey = new File(sslCertDir, "server.key").absolutePath
@@ -75,7 +77,7 @@ abstract class Httpd extends ServerAbstract {
   }
 
   static ServerAbstract getInstance(String basedir, version, String httpdDir = '', NoeContext context = NoeContext.forCurrentContext()) {
-    def server
+    ServerAbstract server
 
     if (context.areInSingleGroup(['ews', 'rpm']) || DefaultProperties.USE_HTTPD_RPM) {
       if (DefaultProperties.apacheCoreVersion()) {
@@ -309,6 +311,18 @@ abstract class Httpd extends ServerAbstract {
     serverName = 'ServerName ' + ((DefaultProperties.HTTPD_SERVER_NAME.contains(':') && !DefaultProperties.HTTPD_SERVER_NAME.contains(']')) ? '[' + DefaultProperties.HTTPD_SERVER_NAME + ']' : DefaultProperties.HTTPD_SERVER_NAME) + ':' + port
     updateConfReplaceRegExp('ssl.conf', 'ServerName (.*)', serverName, true)
     mainHttpsPort = port
+
+    // CLUSTER MANAGER
+    log.debug("mainClusterManagementPort:${mainClusterManagementPort}, offset:${offset}")
+    port = offset + mainClusterManagementPort
+    listen = 'Listen ' + ((host.contains(':') && !host.contains(']')) ? '[' + host + ']' : host) + ':' + port
+    log.debug('New Listen: ' + listen)
+    updateConfReplaceRegExp(DefaultProperties.MOD_CLUSTER_CONFIG_FILE, 'Listen (.*)', listen, true)
+    updateConfReplaceRegExp(DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE, 'Listen (.*)', listen, true)
+    updateConfReplaceRegExp(DefaultProperties.MOD_CLUSTER_CONFIG_FILE, '<VirtualHost \\*:(.*)', "<VirtualHost \\*:${port}>", true)
+    updateConfReplaceRegExp(DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE, '<VirtualHost \\*:(.*)', "<VirtualHost \\*:${port}>", true)
+    mainClusterManagementPort = port
+
   }
 
   void modJkSetSticky(value, boolean restart = true) {
@@ -372,7 +386,7 @@ abstract class Httpd extends ServerAbstract {
     }
   }
 
-  Integer extractPid() {
+  Long extractPid() {
     String stringPid = null
     File pidFile = getPidFile()
     if (!pidFile.exists()) {
@@ -383,7 +397,7 @@ abstract class Httpd extends ServerAbstract {
     if ( stringPid.isEmpty() ) {
       throw new RuntimeException("Extraction of httpd PID went wrong, ${pidFile} is empty")
     }
-    pid = stringPid.toInteger()
+    pid = stringPid.toLong()
     return pid
   }
 

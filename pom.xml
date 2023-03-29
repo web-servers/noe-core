@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.jboss.qa.noe</groupId>
     <artifactId>noe-core-parent</artifactId>
-    <version>0.17.8-sgala-SNAPSHOT</version>
+    <version>0.17.12-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Noe core: Parent</name>
@@ -21,20 +21,25 @@
     <licenses>
       <license>
         <name>Apache License, Version 2.0</name>
-        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
         <distribution>repo</distribution>
       </license>
     </licenses>
 
     <developers>
       <developer>
-          <id>mczernek</id>
-          <name>Marek Czernek</name>
+          <id>plodge</id>
+          <name>Paul Lodge</name>
           <organization>Red Hat</organization>
       </developer>
+        <developer>
+            <id>akrajcik</id>
+            <name>Adam Krajcik</name>
+            <organization>Red Hat</organization>
+        </developer>
       <developer>
-          <id>karm</id>
-          <name>Michal Karm Babacek</name>
+          <id>sgala</id>
+          <name>Santiago Gala</name>
           <organization>Red Hat</organization>
       </developer>
     </developers>
@@ -58,17 +63,17 @@
         <repository>
             <id>jboss-qa-releases</id>
             <name>JBoss QA release repository</name>
-            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases/</url>
+            <url>https://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-releases/</url>
         </repository>
         <repository>
             <id>jboss-qa-snapshots</id>
             <name>JBoss QA snapshot repository</name>
-            <url>http://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots/</url>
+            <url>https://${env.NEXUS_HOST}/nexus/content/repositories/jboss-qa-snapshots/</url>
         </repository>
         <repository>
             <id>jboss-public-repository-group</id>
             <name>JBoss Public Maven Repository Group</name>
-            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
         </repository>
         <repository>
             <id>rh-ga-repository</id>
@@ -105,6 +110,8 @@
         </version.org.apache.maven.plugins.maven-surefire-plugin>
         <version.org.apache.maven.plugins.maven-failsafe-plugin>2.22.0
         </version.org.apache.maven.plugins.maven-failsafe-plugin>
+        <version.org.apache.maven.plugins.maven-deploy-plugin>2.8.2
+        </version.org.apache.maven.plugins.maven-deploy-plugin>
         <junit.version>4.13</junit.version>
         <org.codehaus.groovy.all.version>2.4.19</org.codehaus.groovy.all.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
@@ -385,6 +392,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${version.org.apache.maven.plugins.maven-deploy-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.groovy</groupId>

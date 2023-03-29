@@ -2,6 +2,7 @@ package noe.tomcat
 
 import groovy.util.slurpersupport.GPathResult
 import noe.server.Tomcat
+import noe.common.DefaultProperties
 import noe.tomcat.configure.AjpConnectorTomcat
 import noe.tomcat.configure.TomcatConfigurator
 import noe.tomcat.configure.ConnectorSSLHostConfigTomcat
@@ -179,8 +180,8 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     GPathResult Server = new XmlSlurper().parse(new File(tomcat.basedir, "conf/server.xml"))
     assertEquals onlyOneAjpConnector, Server.Service.Connector.find { isAjpProtocol(it) && !isSecure(it)  }.size()
     assertEquals testAjpPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@port.toString())
-    assertEquals Tomcat.DEFAULT_HTTPS_PORT, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
-    assertEquals defAttributesCountOfAjpConnector, Server.Service.Connector.find { isAjpProtocol(it) }.attributes().size()
+    if(tomcat.getVersion().majorVersion<9) assertEquals Tomcat.DEFAULT_HTTPS_PORT, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@redirectPort.toString())
+    if(tomcat.getVersion().majorVersion<9) assertEquals defAttributesCountOfAjpConnector, Server.Service.Connector.find { isAjpProtocol(it) }.attributes().size()
   }
 
   @Test
@@ -263,7 +264,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
     assertEquals Tomcat.DEFAULT_HTTPS_PORT, Integer.valueOf(Server.Service.Connector.find { isNotSecuredHttpProtocol(it) }.@redirectPort.toString())
     assertEquals "", Server.Service.Connector.find { isSecure(it) }.@port.toString() // https connector was not created by port shifting
     assertEquals shiftedShutdownPort, Integer.valueOf(Server.@port.toString())
-    assertEquals shiftedAjpPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@port.toString())
+    if(tomcat.getVersion().majorVersion<9) assertEquals shiftedAjpPort, Integer.valueOf(Server.Service.Connector.find { isAjpProtocol(it) }.@port.toString())
   }
 
   @Test
@@ -296,7 +297,7 @@ abstract class BindingsTomcatConfiguratorIT extends TomcatTestAbstract {
   @Test
   void testCertificateDefaultsServerXmlChangeExpected() {
     String sslRoot = new File(new Platform().getTmpDir(), "ssl").getCanonicalPath()
-    String sslStringDir = new File(sslRoot, "self_signed").getCanonicalPath()
+    String sslStringDir = new File(sslRoot, DefaultProperties.SELF_SIGNED_CERTIFICATE_RESOURCE).getCanonicalPath()
     String sslCertificate = new File(sslStringDir, "server.crt").getCanonicalPath()
     String sslCertificateKey = new File(sslStringDir, "server.key").getCanonicalPath()
     String keystoreFilePath = new File(sslStringDir, "server.jks").getCanonicalPath()

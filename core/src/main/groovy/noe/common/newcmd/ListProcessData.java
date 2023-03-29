@@ -116,7 +116,7 @@ public class ListProcessData {
      * @param processId  process id that should be search in data
      * @return info on data
      */
-    public Map<PsCmdFormat,String> get(final int processId) {
+    public Map<PsCmdFormat,String> get(final long processId) {
         String processIdAsString = String.valueOf(processId);
         if(listing.get(processIdAsString) == null) {
             return null;
@@ -328,14 +328,35 @@ public class ListProcessData {
                     int2 = Integer.valueOf(str2);
                 } catch (NumberFormatException nfe) {
                     // if string from left is not possible to convert to int
-                    // then in case of right is not possible to convert do string comparision
-                    // otherwise left was possible to convert but right is not posible to convert (returns 1)
+                    // then in case of right is not possible to convert do string comparison
+                    // otherwise left was possible to convert but right is not possible to convert (returns 1)
                     return int1error ? str1.compareTo(str2) : 1;
                 }
                 // if string from left is not possible to convert to int
                 // then we know that right was converted fine and we return -1
-                // otherwise both were converted without problem and returning integer comparision
+                // otherwise both were converted without problem and returning integer comparison
                 return int1error ? -1 : int1.compareTo(int2);
+            }
+            if(dataType.isInstance(Long.valueOf(0))) {
+                boolean long1error = false;
+                Long long1 = null, long2 = null;
+                try {
+                    long1 = Long.valueOf(str1);
+                } catch (NumberFormatException nfe) {
+                    long1error = true;
+                }
+                try {
+                    long2 = Long.valueOf(str2);
+                } catch (NumberFormatException nfe) {
+                    // if string from left is not possible to convert to long
+                    // then in case of right is not possible to convert do string comparison
+                    // otherwise left was possible to convert but right is not possible to convert (returns 1)
+                    return long1error ? str1.compareTo(str2) : 1;
+                }
+                // if string from left is not possible to convert to long
+                // then we know that right was converted fine and we return -1
+                // otherwise both were converted without problem and returning integer comparison
+                return long1error ? -1 : long1.compareTo(long2);
             }
             return str1.compareTo(str2);
         }

@@ -1,6 +1,7 @@
 package noe.ews.server.httpd
 
 import groovy.util.logging.Slf4j
+import noe.common.DefaultProperties
 import noe.common.utils.JBFile
 import noe.common.utils.Version
 import noe.ews.server.ServerEws
@@ -32,7 +33,8 @@ class HttpdRhel extends Httpd {
     this.binPath = '/sbin'
     configureApachectl()
     this.deploymentPath = this.basedir + "/www/html"
-    this.confDeploymentPath = this.basedir + '/conf.d'
+    this.confDeploymentPath = this.basedir + "/${DefaultProperties.CONF_DIRECTORY}"
+    this.confModulesDeploymentPath = this.basedir + "/${DefaultProperties.CONF_MODULES_DIRECTORY}"
     this.cgiDeploymentPath = this.basedir + "/www/cgi-bin"
     this.modClusterCacheDir = this.basedir + "/cache/mod_cluster"
     this.opensslPath = 'openssl' // openssl is in $PATH on RHEL by OS installation
