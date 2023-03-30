@@ -599,7 +599,9 @@ abstract class ServerAbstract implements IApp {
 
       fileText = JBFile.read(file)
 
-      if ( (useSimpleReplace && fileText.contains(replace)) || fileText.find(replace)) {
+      // in theory the condition should be "(usesSimpleReplace && (fileText.contains(replace)) || fileText.find(replace)"
+      // but often replace is an illegal regex, so checking por any of those conditions works better
+      if ( fileText.contains(replace) || fileText.find(replace)) {
         log.trace('AFTER UPDATE:')
         log.trace('-----------------------------------------------')
         // show only text after change
