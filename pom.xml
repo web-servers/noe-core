@@ -113,7 +113,7 @@
         <version.org.apache.maven.plugins.maven-deploy-plugin>2.8.2
         </version.org.apache.maven.plugins.maven-deploy-plugin>
         <junit.version>4.13.1</junit.version>
-        <org.codehaus.groovy.all.version>2.4.19</org.codehaus.groovy.all.version>
+        <org.codehaus.groovy.all.version>2.4.21</org.codehaus.groovy.all.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <org.codehaus.groovy.compiler.version>2.9.2-01</org.codehaus.groovy.compiler.version>
         <org.codehaus.groovy.batch.compiler.version>2.4.3-01</org.codehaus.groovy.batch.compiler.version>
@@ -126,6 +126,13 @@
         <version.org.wildfly.extras.creaper>1.6.1</version.org.wildfly.extras.creaper>
         <org.wildfly.core.version>12.0.3.Final</org.wildfly.core.version>
         <org.jboss.as.creaper.dependencies.version>7.5.23.Final-redhat-00002</org.jboss.as.creaper.dependencies.version>
+
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <commons-io.version>2.4</commons-io.version>
+
+        <xml-apis.version>1.4.01</xml-apis.version>
+
     </properties>
 
 
@@ -220,6 +227,12 @@
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
+                <artifactId>powermock-core</artifactId>
+                <version>${version.powermock}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito2</artifactId>
                 <version>${version.powermock}</version>
                 <scope>test</scope>
@@ -236,6 +249,30 @@
                 <artifactId>creaper-commands</artifactId>
                 <version>${version.org.wildfly.extras.creaper}</version>
             </dependency>
+
+            <!-- CLI dependency -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>${xml-apis.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

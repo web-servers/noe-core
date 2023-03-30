@@ -7,7 +7,7 @@ import noe.common.utils.Version
 import noe.eap.creaper.ManagementClientProvider
 import noe.eap.creaper.ServerVerProvider
 import noe.server.AS7
-import org.apache.commons.collections.CollectionUtils
+import org.apache.commons.collections4.CollectionUtils
 import org.apache.commons.lang3.StringUtils
 import org.wildfly.extras.creaper.core.online.ModelNodeResult
 import org.wildfly.extras.creaper.core.online.OnlineManagementClient
