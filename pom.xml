@@ -97,22 +97,22 @@
         <version.javadoc-plugin>2.10.4</version.javadoc-plugin>
         <version.release-plugin>3.0.0-M1</version.release-plugin>
         <version.groovy-eclipse-compiler>3.6.0-03</version.groovy-eclipse-compiler>
-        <version.guava>29.0-jre</version.guava>
+        <version.guava>31.0-jre</version.guava>
         <version.jgit>5.8.0.202006091008-r</version.jgit>
 
         <version.java.jna>5.6.0</version.java.jna>
 
-        <net.sourceforge.htmlunit.version>2.15</net.sourceforge.htmlunit.version>
+        <net.sourceforge.htmlunit.version>2.37.0</net.sourceforge.htmlunit.version>
         <!-- https://github.com/Karm/okhttp/tree/add_cipher_suites -->
         <com.squareup.okhttp3.okhttp.version>4.8.0</com.squareup.okhttp3.okhttp.version>
-        <org.apache.ant.version>1.10.8</org.apache.ant.version>
+        <org.apache.ant.version>1.10.9</org.apache.ant.version>
         <version.org.apache.maven.plugins.maven-surefire-plugin>2.22.0
         </version.org.apache.maven.plugins.maven-surefire-plugin>
         <version.org.apache.maven.plugins.maven-failsafe-plugin>2.22.0
         </version.org.apache.maven.plugins.maven-failsafe-plugin>
         <version.org.apache.maven.plugins.maven-deploy-plugin>2.8.2
         </version.org.apache.maven.plugins.maven-deploy-plugin>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <org.codehaus.groovy.all.version>2.4.19</org.codehaus.groovy.all.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <org.codehaus.groovy.compiler.version>2.9.2-01</org.codehaus.groovy.compiler.version>
