@@ -102,7 +102,7 @@
 
         <version.java.jna>5.6.0</version.java.jna>
 
-        <net.sourceforge.htmlunit.version>2.37.0</net.sourceforge.htmlunit.version>
+        <net.sourceforge.htmlunit.version>2.38.0</net.sourceforge.htmlunit.version>
         <!-- https://github.com/Karm/okhttp/tree/add_cipher_suites -->
         <com.squareup.okhttp3.okhttp.version>4.8.0</com.squareup.okhttp3.okhttp.version>
         <org.apache.ant.version>1.10.9</org.apache.ant.version>
