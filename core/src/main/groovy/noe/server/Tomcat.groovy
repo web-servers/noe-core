@@ -655,6 +655,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
       enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1"' + nl +
               '          SSLEnabled="true" maxThreads="150" scheme="https" secure="true"' + nl +
               '          clientAuth="false" sslEnabledProtocols="TLSv1.1+TLSv1.2"' + nl +
+              '          keystoreFile="' + this.keystorePath + '"' + nl +
               '          keystorePass="' + this.sslKeystorePassword + '"' + nl +
               '          keystoreType="' + this.keystoreType + '"' + nl +
               '          ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS+ '" />'
