@@ -152,6 +152,18 @@ class Platform {
     return isHP() && (osName ==~ /.*11.*/)
   }
 
+  boolean isWindows2016() {
+    return isWindows() && osName.contains("Server 2016")
+  }
+
+  boolean isWindows2019() {
+    return isWindows() && osName.contains("Server 2019")
+  }
+
+  boolean isWindows2022() {
+    return isWindows() && osName.contains("Server 2022")
+  }
+
   boolean isFips() {
     if(isRHEL()) {
       // Using return (['/usr/bin/fips-mode-setup', '--is-enabled'].execute().waitFor() == 0)

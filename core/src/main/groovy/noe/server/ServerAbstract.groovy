@@ -359,12 +359,12 @@ abstract class ServerAbstract implements IApp {
     File appDirPath = new File(getDeploymentPath(), appName)
     log.debug("appDirPath: " + appDirPath)
 
+    if (appDirPath.isDirectory() || appDirPath.isFile()) {
+      JBFile.delete(appDirPath)
+    }
+
     [ "war", "ear" ].each { extension ->
       File appWarPath = new File(getDeploymentPath(), "${appName}.${extension}")
-
-      if (appDirPath.isDirectory() || appDirPath.isFile()) {
-        JBFile.delete(appDirPath)
-      }
       if (appWarPath.isFile() || appWarPath.isDirectory()) {
         JBFile.delete(appWarPath)
       }
@@ -599,7 +599,9 @@ abstract class ServerAbstract implements IApp {
 
       fileText = JBFile.read(file)
 
-      if (fileText.contains(replace)) {
+      // in theory the condition should be "(usesSimpleReplace && (fileText.contains(replace)) || fileText.find(replace)"
+      // but often replace is an illegal regex, so checking por any of those conditions works better
+      if ( fileText.contains(replace) || fileText.find(replace)) {
         log.trace('AFTER UPDATE:')
         log.trace('-----------------------------------------------')
         // show only text after change

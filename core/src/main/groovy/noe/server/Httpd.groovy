@@ -319,8 +319,8 @@ abstract class Httpd extends ServerAbstract {
     log.debug('New Listen: ' + listen)
     updateConfReplaceRegExp(DefaultProperties.MOD_CLUSTER_CONFIG_FILE, 'Listen (.*)', listen, true)
     updateConfReplaceRegExp(DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE, 'Listen (.*)', listen, true)
-    updateConfReplaceRegExp(DefaultProperties.MOD_CLUSTER_CONFIG_FILE, '<VirtualHost \\*:(.*)', "<VirtualHost \\*:${port}>", true)
-    updateConfReplaceRegExp(DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE, '<VirtualHost \\*:(.*)', "<VirtualHost \\*:${port}>", true)
+    updateConfReplaceRegExp(DefaultProperties.MOD_CLUSTER_CONFIG_FILE, /<VirtualHost [*]:(.*)>/, /<VirtualHost *:${port}>/, true)
+    updateConfReplaceRegExp(DefaultProperties.MOD_PROXY_CLUSTER_CONFIG_FILE, /<VirtualHost [*]:(.*)>/, /<VirtualHost *:${port}>/, true)
     mainClusterManagementPort = port
 
   }
@@ -357,32 +357,38 @@ abstract class Httpd extends ServerAbstract {
    */
   File getPidFile() {
     File httpdConfFile = null
-    configDirs.each { configDir ->
-      def confToCheckFile = new File("${basedir}${platform.sep}${configDir}${platform.sep}httpd.conf")
-      if (confToCheckFile.exists()) {
-        httpdConfFile = confToCheckFile
-      }
-    }
     def pidPattern = "^PidFile\\s+(.*)"
     Pattern pattern = Pattern.compile(pidPattern)
     String line
-    httpdConfFile?.withReader { reader ->
-      while ((line = reader.readLine()) != null) {
-        Matcher matcher = pattern.matcher(line)
-        if (matcher.matches()) {
-          String pidFilePath = matcher.group(1)
-          matcher = (pidFilePath =~ /(.*)\s+/) //Take care of any spaces after path
-          if (matcher.matches()) {
-            pidFilePath = matcher.group(1)
+    def results = configDirs.findResults { configDir ->
+      def confToCheckFile = new File("${basedir}${platform.sep}${configDir}${platform.sep}httpd.conf")
+      if (confToCheckFile.exists()) {
+        httpdConfFile = confToCheckFile
+        return httpdConfFile?.withReader { reader ->
+          while ((line = reader.readLine()) != null) {
+            Matcher matcher = pattern.matcher(line)
+            if (matcher.matches()) {
+              String pidFilePath = matcher.group(1)
+              matcher = (pidFilePath =~ /(.*)\s+/) //Take care of any spaces after path
+              if (matcher.matches()) {
+                pidFilePath = matcher.group(1)
+              }
+              matcher = (pidFilePath =~ /"(.*)"/)
+              if (matcher.matches()) {
+                pidFilePath = matcher.group(1)
+              }
+              def pidFile = new File(pidFilePath)
+              return (pidFile.isAbsolute() ? pidFile : new File(getHttpdServerRootFull(), pidFilePath))
+            }
           }
-          matcher = (pidFilePath =~ /"(.*)"/)
-          if (matcher.matches()) {
-            pidFilePath = matcher.group(1)
-          }
-          File pidFile = new File(pidFilePath)
-          return pidFile.isAbsolute() ? pidFile : new File(getHttpdServerRootFull(), pidFilePath)
         }
       }
+    }
+    if(results.isEmpty()) {
+      // Default if option is missing in configuration. RHEL7 and RHEL8 use '/logs/httpd.pid', RHEL9 '/run/httpd.pid'
+      return new File(getHttpdServerRootFull(), platform.isRHEL9() ? '/run/httpd.pid' : '/logs/httpd.pid')
+    } else {
+      return results.first()
     }
   }
 
