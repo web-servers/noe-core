@@ -88,9 +88,11 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <version.java>1.6</version.java>
+        <version.min-maven>3.2.5</version.min-maven>
 
 
         <version.checkstyle-plugin>3.1.1</version.checkstyle-plugin>
+        <version.enforcer-plugin>3.3.0</version.enforcer-plugin>
         <version.findbugs-plugin>3.0.5</version.findbugs-plugin>
         <version.codenarc-plugin>0.22-1</version.codenarc-plugin>
         <version.source-plugin>3.2.1</version.source-plugin>
@@ -440,8 +442,35 @@
                     <artifactId>groovy-eclipse-compiler</artifactId>
                     <version>${version.groovy-eclipse-compiler}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${version.enforcer-plugin}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>${version.min-maven}</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 
     </build>
     <reporting>
