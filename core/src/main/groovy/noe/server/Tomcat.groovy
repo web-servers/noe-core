@@ -647,7 +647,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     def aprListener = '<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />'
     def commentAprListener = '<!-- <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /> -->'
     def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1" SSLEnabled="true"' + nl +
+    def enableJavaSsl = dummyComment + nl + '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1" SSLEnabled="true"' + nl +
         'maxThreads="150" scheme="https" secure="true"' + nl +
         'keystoreFile="' + this.keystorePath + '" keystoreType="' + this.keystoreType + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
         'clientAuth="false" sslProtocol="TLS" />'
@@ -668,7 +668,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
   void enableSslOpenSsl() {
     def nl = platform.nl
     def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableOpenSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" SSLEnabled="true"' + nl +
+    def enableOpenSsl = dummyComment + nl + '<Connector port="' + this.mainHttpsPort.toString() + '" SSLEnabled="true"' + nl +
         'maxThreads="200" scheme="https" secure="true"' + nl +
         'SSLCertificateFile="' + this.sslCertificate + '"' + nl +
         'SSLCertificateKeyFile="' + this.sslKey + '"' + nl +
