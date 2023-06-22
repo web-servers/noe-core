@@ -16,7 +16,7 @@ class JwsNameHelper_Current extends AbstractJwsNameHelper{
     this.version = version
     this.jwsMajorVersion = version.majorVersion
     this.platform = new Platform()
-    productName = "Red-Hat-JBoss-Web-Server"
+    productName = "jws"
     archSeparator = "."
   }
 
@@ -24,6 +24,6 @@ class JwsNameHelper_Current extends AbstractJwsNameHelper{
    * Returns Optional-Native-Components-for
    */
   String applicationServerBaseName() {
-    return "Optional-Native-Components-for"
+    return "optional-native-components"
   }
 }
