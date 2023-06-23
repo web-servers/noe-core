@@ -35,7 +35,7 @@ class TomcatRhel extends Tomcat {
   void setDefault() {
     super.setDefault()
     this.deploymentPath = this.basedir + "/webapps"
-    this.javaEEdeploymentPath = this.basedir + "/webapps-javaee"
+    this.javaEEDeploymentPath = this.basedir + "/webapps-javaee"
     this.binPath = "/bin"
     this.start = Cmd.makeCommand(runContext, this.basedir + binPath + "/startup.sh $processCode")
     this.startSecurity = Cmd.makeCommand(runContext, getBinDirFullPath() + '/catalina.sh start -security')

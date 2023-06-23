@@ -40,8 +40,8 @@ abstract class ServerAbstract implements IApp {
   String binDir // where binary files are stored
   //TODO: Remove misleading comments about tomcat, we have EAP in the house now :-)
   String deploymentPath // common for tomcat and httpd
-  String javaEEDeploymentPath // common for tomcat and httpd
-  String confDep:loymentPath // common for tomcat and httpd (conf.d)
+  String javaEEDeploymentPath // common for tomcat and httpd using the old javaEE
+  String confDeploymentPath // common for tomcat and httpd (conf.d)
   String confMainPath // common for tomcat and httpd (conf)
   String serverRoot // Root path to basedir from which is counted path to server instance specific for each platform
   String refBasedir // from what path create another server nodes
@@ -100,6 +100,7 @@ abstract class ServerAbstract implements IApp {
   void setDefault() {
     this.ant = (ant) ?: new AntBuilder()
     this.ant.property(environment: 'env')
+    this.serverRoot = basedir
     this.serverRoot = basedir
     this.host = (host) ?: DefaultProperties.HOST
     this.ignoreShutdownPort = true
@@ -294,18 +295,23 @@ abstract class ServerAbstract implements IApp {
    *
    * TODO: context name for war
    */
-  void deployByCopying(String appPath, Boolean explodeFirst = false, String contextName = '', Boolean zipAsWar = false) {
+  void deployByCopying(String appPath, Boolean explodeFirst = false, String contextName = '', Boolean zipAsWar = false, Boolean useJavaEE = false) {
     File fullDeplSrcPath = new File(getDeplSrcPath(), appPath)
     def destDirName = contextName ?: fullDeplSrcPath.getName()
+    
+    String deployPath = getDeploymentPath()
+    if(useJavaEE) {
+      deployPath = getJavaEEDeploymentPath()
+    }
 
     if (fullDeplSrcPath.isFile()) {
       if (explodeFirst) {
         //TODO: Ad "0..-5": Removes .war from the name... :-(
-        JBFile.nativeUnzip(fullDeplSrcPath, new File(getDeploymentPath() + "${platform.sep}" + fullDeplSrcPath.getName()[0..-5]), JBFile.useAdminPrivileges, true)
+        JBFile.nativeUnzip(fullDeplSrcPath, new File(deployPath + "${platform.sep}" + fullDeplSrcPath.getName()[0..-5]), JBFile.useAdminPrivileges, true)
       } else {
-        File destPathFile = new File(getDeploymentPath())
+        File destPathFile = new File(deployPath)
         if (destPathFile.canWrite()) {
-          ant.copy(file: fullDeplSrcPath.getAbsolutePath(), todir: getDeploymentPath(), overwrite: true)
+          ant.copy(file: fullDeplSrcPath.getAbsolutePath(), todir: deployPath, overwrite: true)
         } else {
           if (!platform.isWindows() && JBFile.useAdminPrivileges) Cmd.executeSudoCommand("cp -r ${fullDeplSrcPath.getAbsolutePath()} ${destPathFile.getAbsolutePath()}", new File(getServerRoot()))
           else throw new RuntimeException("Missing rights to deploy application")
@@ -318,9 +324,9 @@ abstract class ServerAbstract implements IApp {
         if (!destDirName.endsWith(".war")) {
           destDirName += ".war"
         }
-        new AntBuilder().zip(destFile: new File(getDeploymentPath(), destDirName), basedir: fullDeplSrcPath)
+        new AntBuilder().zip(destFile: new File(deployPath, destDirName), basedir: fullDeplSrcPath)
       } else {
-        JBFile.copyDirectoryContent(fullDeplSrcPath, new File(getDeploymentPath(), destDirName))
+        JBFile.copyDirectoryContent(fullDeplSrcPath, new File(deployPath, destDirName))
       }
     }
     // not valid path
@@ -335,7 +341,7 @@ abstract class ServerAbstract implements IApp {
   void deployConfsByCopying(String confPath) {
     File fullConfDeplSrcPath = new File(getDeplSrcPath(), confPath)
     log.trace('fullConfDeplSrcPath: ' + fullConfDeplSrcPath)
-
+    
     // file
     if (fullConfDeplSrcPath.isFile()) {
       JBFile.copy(fullConfDeplSrcPath, new File(getConfDeploymentPath()))
@@ -354,10 +360,15 @@ abstract class ServerAbstract implements IApp {
    * Undeploy application by deleting it's directory and .war file
    * WARNING: This method is overridden in ews.server.Tomcat
    */
-  void undeployByDeleting(String appName) {
+  void undeployByDeleting(String appName, Boolean useJavaEE = false) {
     log.debug("Undeploying of ${appName} by deleting")
 
-    File appDirPath = new File(getDeploymentPath(), appName)
+    String deployPath = getDeploymentPath()
+    if(useJavaEE) {
+      deployPath = getJavaEEDeploymentPath()
+    }
+
+    File appDirPath = new File(deployPath, appName)
     log.debug("appDirPath: " + appDirPath)
 
     if (appDirPath.isDirectory() || appDirPath.isFile()) {
@@ -365,7 +376,7 @@ abstract class ServerAbstract implements IApp {
     }
 
     [ "war", "ear" ].each { extension ->
-      File appWarPath = new File(getDeploymentPath(), "${appName}.${extension}")
+      File appWarPath = new File(deployPath, "${appName}.${extension}")
       if (appWarPath.isFile() || appWarPath.isDirectory()) {
         JBFile.delete(appWarPath)
       }
@@ -952,7 +963,6 @@ abstract class ServerAbstract implements IApp {
   double actualCPULoad(boolean ppid = true) {
     if (platform.isRHEL()) {
       log.debug("Gonna run ps. with $pid to retrieve actual CPU load")
-      String ppidOrPid = ppid ? '--ppid' : '--pid'
       Process p = ["ps", "--no-heading", "-o", "pcpu", ppidOrPid, getPid()].execute()
       p.waitFor()
       double load = 0d
