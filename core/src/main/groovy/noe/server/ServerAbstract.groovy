@@ -40,7 +40,8 @@ abstract class ServerAbstract implements IApp {
   String binDir // where binary files are stored
   //TODO: Remove misleading comments about tomcat, we have EAP in the house now :-)
   String deploymentPath // common for tomcat and httpd
-  String confDeploymentPath // common for tomcat and httpd (conf.d)
+  String javaEEDeploymentPath // common for tomcat and httpd
+  String confDep:loymentPath // common for tomcat and httpd (conf.d)
   String confMainPath // common for tomcat and httpd (conf)
   String serverRoot // Root path to basedir from which is counted path to server instance specific for each platform
   String refBasedir // from what path create another server nodes

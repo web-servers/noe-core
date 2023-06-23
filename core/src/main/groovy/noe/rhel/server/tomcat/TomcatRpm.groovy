@@ -44,6 +44,7 @@ class TomcatRpm extends Tomcat {
     this.stop = ['sudo', 'service', serviceName, 'stop']
     this.confDeploymentPath = this.basedir + "/conf"
     this.deploymentPath = this.basedir + "/webapps"
+    this.javaEEdeploymentPath = this.basedir + "/webapps-javaee"
     this.libDir = this.basedir + "/lib"
     this.extrasDir = this.libDir + "/extras"
     this.extrasDirs = [this.extrasDir, this.basedir + '/extras']
