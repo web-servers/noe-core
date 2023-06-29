@@ -647,19 +647,18 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     def aprListener = '<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />'
     def commentAprListener = '<!-- <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /> -->'
     def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1" SSLEnabled="true"' + nl +
-        'maxThreads="150" scheme="https" secure="true"' + nl +
-        'keystoreFile="' + this.keystorePath + '" keystoreType="' + this.keystoreType + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
-        'clientAuth="false" sslProtocol="TLS" />'
-    if (platform.isFips()) {
-      enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1"' + nl +
-              '          SSLEnabled="true" maxThreads="150" scheme="https" secure="true"' + nl +
-              '          clientAuth="false" sslEnabledProtocols="TLSv1.1+TLSv1.2"' + nl +
-              '          keystoreFile="' + this.keystorePath + '"' + nl +
-              '          keystorePass="' + this.sslKeystorePassword + '"' + nl +
-              '          keystoreType="' + this.keystoreType + '"' + nl +
-              '          ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS+ '" />'
-      }
+    def ciphers = ''
+    if(platform.isFips()) {
+      ciphers = 'Protocols="TLSv1.1+TLSv1.2" ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS+ '"'
+    }
+    def enableJavaSsl =
+      '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"' +
+      'maxThreads="150" scheme="https" secure="true" maxParameterCount="1000"' +
+      'sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation" >' + nl +
+      '\t<SSLHostConfig ' + ciphers + '>' + nl +
+      '\t\t<Certificate certificateKeystoreFile="' + this.keystorePath + '" certificateKeystorePassword="' + this.sslKeystorePassword + '" certificateKeystoreType="' + this.keystoreType + '" type="RSA" />' +
+      '\t</SSLHostConfig>' + nl +
+      '</Connector>'
     updateConfReplaceRegExp('server.xml', aprListener, commentAprListener, true, true)
     updateConfReplaceRegExp('server.xml', dummyComment, enableJavaSsl, true, true)
   }
@@ -668,38 +667,25 @@ class Tomcat extends ServerAbstract implements WorkerServer {
   void enableSslOpenSsl() {
     def nl = platform.nl
     def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableOpenSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" SSLEnabled="true"' + nl +
-        'maxThreads="200" scheme="https" secure="true"' + nl +
-        'SSLCertificateFile="' + this.sslCertificate + '"' + nl +
-        'SSLCertificateKeyFile="' + this.sslKey + '"' + nl +
-        'SSLPassword="' + this.sslKeystorePassword + '"' + nl
+    def enableOpenSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" SSLEnabled="true" maxThreads="200" scheme="https" secure="true" sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"'
+
+    def ciphers = ''
     if(platform.isFips()) {
-      enableOpenSsl += 'ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS + '"'
+      ciphers += ' ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS + '"'
     }
-    enableOpenSsl += '/>'
+    enableOpenSsl += '>' + nl +
+            '\t<SSLHostConfig' + ciphers + '>' + nl +
+            '\t\t<Certificate certificateFile="' + this.sslCertificate + '" certificateKeyFile="' + this.sslKey + '" certificateKeyPassword="' + this.sslKeystorePassword + '" type="RSA" />' + nl +
+            '\t</SSLHostConfig>' + nl +
+            '</Connector>'
 
     updateConfReplaceRegExp('server.xml', dummyComment, enableOpenSsl, true, true)
   }
 
   @Deprecated
   void enableSslNIOProtocol() {
-    def nl = platform.nl
-    def aprListener = '<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />'
-    def commentAprListener = '<!-- <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /> -->'
-    def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableNIOSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"' + nl +
-        'maxThreads="150" scheme="https" secure="true"' + nl +
-        'keystoreFile="' + this.keystorePath + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
-        'clientAuth="false" '
-    if(platform.isFips()) {
-      enableNIOSsl += 'sslEnabledProtocols="TLSv1.1+TLSv1.2" '
-    } else {
-      enableNIOSsl += 'sslProtocol="TLS" '
-    }
-    enableNIOSsl +=  'keystoreType="' + this.keystoreType + '" />'
-
-    updateConfReplaceRegExp('server.xml', aprListener, commentAprListener, true, true)
-    updateConfReplaceRegExp('server.xml', dummyComment, enableNIOSsl, true, true)
+    // Keeping the name for backwards compatibility
+    enableSslJsse()
   }
 
   Map defaultSslProps = [
