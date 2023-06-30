@@ -27,4 +27,11 @@ class JwsNameHelper_Legacy extends AbstractJwsNameHelper{
   String applicationServerBaseName() {
     return jwsMajorVersion <= 3 ? "application-servers" : "application-server"
   }
+  
+  /**
+   * Returns Optional-Native-Components-for
+   */
+  String applicationServerNativeName() {
+    return applicationServerBaseName() 
+  }
 }

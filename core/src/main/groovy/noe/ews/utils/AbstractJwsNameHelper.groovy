@@ -38,9 +38,9 @@ abstract class AbstractJwsNameHelper {
     zipNameBuilder.append(productName)
 
     if(compatibilityMode) {
-      zipNameBuilder.append("-${applicationServerBaseName()}-${version}-")
+      zipNameBuilder.append("-${applicationServerNativeName()}-${version}-")
     } else {
-      zipNameBuilder.append("-${version}-${applicationServerBaseName()}-")
+      zipNameBuilder.append("-${version}-${applicationServerNativeName()}-")
     }
 
     zipNameBuilder.append("${getOsAndArchitecture()}.zip")

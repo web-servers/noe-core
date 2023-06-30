@@ -24,6 +24,13 @@ class JwsNameHelper_Current extends AbstractJwsNameHelper{
    * Returns Optional-Native-Components-for
    */
   String applicationServerBaseName() {
+    return "application-server"
+  }
+  
+  /**
+   * Returns Optional-Native-Components-for
+   */
+  String applicationServerNativeName() {
     return "optional-native-components"
   }
 }

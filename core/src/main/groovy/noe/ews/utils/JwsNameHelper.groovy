@@ -27,7 +27,7 @@ class JwsNameHelper {
 
   /**
    * Returns the zip name for the Hibernate zip, based on the JWS version and compatibility mode toggle
-   */
+  */
   String getHibernateZipName() {
     return helper.getHibernateZipName()
   }
