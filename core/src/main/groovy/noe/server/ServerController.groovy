@@ -6,6 +6,8 @@ import noe.common.utils.Platform
 
 import noe.ews.server.tomcat.TomcatProperties
 
+import java.util.stream.Collectors
+
 /**
  * Global class for management of servers
  * It is a singleton.
@@ -56,6 +58,24 @@ class ServerController {
 
   ServerAbstract removeServer(String id) {
     return servers.remove(id)
+  }
+
+  int numberOfTomcatServers() {
+    return servers.entrySet()
+            .stream()
+            .filter(
+                    { Map.Entry<String, ServerAbstract> x ->
+                      x.getKey().contains("tomcat")
+                    }).count()
+  }
+
+  int numberOfHttpdServers() {
+    return servers.entrySet()
+            .stream()
+            .filter(
+                    { Map.Entry<String, ServerAbstract> x ->
+                      x.getKey().contains("httpd")
+                    }).count()
   }
 
   @Deprecated

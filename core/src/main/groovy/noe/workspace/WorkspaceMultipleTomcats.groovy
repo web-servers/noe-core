@@ -16,8 +16,8 @@ class WorkspaceMultipleTomcats extends WorkspaceAbstract{
   }
 
   void createAdditionalTomcatsWithRegistrations(int numberOfAdditionalTomcats) {
-    for (int i = 2; i < numberOfAdditionalTomcats + 2; i++) {
-      // We start tests always with only one tomcat
+    int initialNumberOfTomcats = serverController.numberOfTomcatServers()
+    for (int i = initialNumberOfTomcats; i <= (initialNumberOfTomcats + numberOfAdditionalTomcats); i++) {
       String tomcatVersion = TomcatProperties.TOMCAT_MAJOR_VERSION
       String id = "tomcat-$tomcatVersion-${i}"
       log.info("Creating new tomcat server instance: ${id}")
@@ -25,7 +25,7 @@ class WorkspaceMultipleTomcats extends WorkspaceAbstract{
       if (!serverController.getTomcatServerIds([TomcatProperties.TOMCAT_MAJOR_VERSION]).contains(id)) {
         String tomcatDir = id
         Tomcat nextServer = (Tomcat) Tomcat.getInstance(basedir, tomcatVersion.toString(), tomcatDir, context)
-        nextServer.createNewServerInstance(id, DefaultProperties.DEFAULT_SHIFT_PORT_OFFSET * (i - 1))
+        nextServer.createNewServerInstance(id, DefaultProperties.DEFAULT_SHIFT_PORT_OFFSET * (i + 1))
 
         serverController.addServer(id, nextServer)
       }

@@ -39,7 +39,10 @@ class WorkspaceMultipleHttpdTomcats extends WorkspaceHttpd {
 
     // Tomcats
     workspaceTomcat.prepare(true)
-    workspaceMultipleTomcats.createAdditionalTomcatsWithRegistrations(numberOfTomcatInstances)
+
+    // As there is already a single tomcat that has been created we need to pass in the total number
+    // of tomcats needed minus the ones that have already been created, in the case just the one ie -1
+    workspaceMultipleTomcats.createAdditionalTomcatsWithRegistrations((numberOfTomcatInstances -1))
 
     // Additional Httpds
     String id = ""
