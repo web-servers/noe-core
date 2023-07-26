@@ -22,7 +22,7 @@ class JwsNameHelper {
   }
 
   void setArchSeparator(String archSeparator) {
-    helper.archSeparator = archSeparator
+    helper.setArchSeparator(archSeparator)
   }
 
   /**

@@ -7,7 +7,8 @@ import noe.common.utils.Version
 /**
  * JWS Name helper provides logic behind JWS ZIP filenames. These filenames differ based on the EWS version, as well as
  * old vs new naming. If you require old naming, toggle compatibility mode. Otherwise, new naming will be provided.
- * naming example 2: Red-Hat-JBoss-Web-Server-5.0.0-Optional-Native-Components-for-RHEL7-x86_64.zip
+ * naming example 1: jws-6.0.0-application-server-RHEL8-x86_64.zip
+ * naming example 2: jws-6.0.0-optional-native-components-RHEL8-x86_64.zip
  */
 @Slf4j
 class JwsNameHelper_Current extends AbstractJwsNameHelper{
@@ -16,19 +17,19 @@ class JwsNameHelper_Current extends AbstractJwsNameHelper{
     this.version = version
     this.jwsMajorVersion = version.majorVersion
     this.platform = new Platform()
-    productName = "jws"
-    archSeparator = "."
+    this.productName = "jws"
+    this.archSeparator = "."
   }
 
   /**
-   * Returns Optional-Native-Components-for
+   * Returns application-server
    */
   String applicationServerBaseName() {
     return "application-server"
   }
   
   /**
-   * Returns Optional-Native-Components-for
+   * Returns optional-native-components
    */
   String applicationServerNativeName() {
     return "optional-native-components"

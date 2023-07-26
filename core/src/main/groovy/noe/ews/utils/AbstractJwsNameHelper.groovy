@@ -8,7 +8,7 @@ import noe.common.utils.Version
  * JWS Name helper provides logic behind JWS ZIP filenames. These filenames differ based on the EWS version, as well as
  * old vs new naming. If you require old naming, toggle compatibility mode. Otherwise, new naming will be provided.
  * Old naming example: jws-application-server-5.0.0-RHEL7-x86_64.zip
- * New naming example: jws-5.0.0-application-server-RHEL7-x86_64.zip
+ * New naming example: jws-6.0.0-application-server-RHEL8-x86_64.zip
  */
 @Slf4j
 abstract class AbstractJwsNameHelper {
@@ -22,9 +22,14 @@ abstract class AbstractJwsNameHelper {
   String archSeparator = "."
 
   /**
-   * Returns either application-server, or application-servers based on how many tomcats are in the given JWS version
+   * Returns either application-server, or application-servers based on the given JWS version
    */
   abstract String applicationServerBaseName()
+
+  /**
+   * Returns one of: optional-native-components, application-servers, or application-server based on the given JWS version
+   */
+  abstract String applicationServerNativeName()
 
   void setArchSeparator(String archSeparator) {
     this.archSeparator = archSeparator

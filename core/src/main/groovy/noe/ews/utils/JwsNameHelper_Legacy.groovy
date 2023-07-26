@@ -17,21 +17,21 @@ class JwsNameHelper_Legacy extends AbstractJwsNameHelper{
     this.version = version
     this.jwsMajorVersion = version.majorVersion
     this.platform = new Platform()
-    productName = jwsMajorVersion <= 2 ? "jboss-ews" : "jws"
-    archSeparator = "."
+    this.productName = jwsMajorVersion <= 2 ? "jboss-ews" : "jws"
+    this.archSeparator = "."
   }
 
   /**
-   * Returns either application-server, or application-servers based on how many tomcats are in the given JWS version
+   * Returns either application-server, or application-servers based on the given JWS version
    */
   String applicationServerBaseName() {
     return jwsMajorVersion <= 3 ? "application-servers" : "application-server"
   }
   
   /**
-   * Returns Optional-Native-Components-for
+   * Returns either "application-servers" or "application-server"
    */
   String applicationServerNativeName() {
-    return applicationServerBaseName() 
+    return applicationServerBaseName()
   }
 }
