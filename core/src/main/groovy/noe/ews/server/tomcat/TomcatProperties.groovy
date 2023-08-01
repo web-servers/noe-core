@@ -26,8 +26,10 @@ class TomcatProperties {
     if (tomcatVersion == null) {
       if (ewsVersion?.getMajorVersion() == 5) {
         TOMCAT_MAJOR_VERSION = "9"
+      } else  if (ewsVersion?.getMajorVersion() == 6) {
+        TOMCAT_MAJOR_VERSION = "10"
       } else {
-        TOMCAT_MAJOR_VERSION = null
+        throw new IllegalArgumentException("Unknown EWS version ${ewsVersion?.getMajorVersion()}")
       }
     } else {
       TOMCAT_MAJOR_VERSION = tomcatVersion.getMajorVersion().toString()
