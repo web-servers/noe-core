@@ -139,12 +139,12 @@ class EwsUtils extends InstallerUtils {
 
   private void loadEwsZipNamesInCompatibilityMode() {
     try {
-      nameHelper.archSeparator = "-"
+      nameHelper.setArchSeparator("-")
       loadEwsZipNames()
       installJwsZips()
     } catch (FileNotFoundException e) {
       log.debug("Exception caught [${e.message}]")
-      nameHelper.archSeparator = "."
+      nameHelper.setArchSeparator(".")
       loadEwsZipNames(true)
       installJwsZips()
     }
