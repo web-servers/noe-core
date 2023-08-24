@@ -19,7 +19,7 @@ class WorkspaceMultipleTomcats extends WorkspaceAbstract{
     for (int i = 2; i < numberOfAdditionalTomcats + 2; i++) {
       // We start tests always with only one tomcat
       String tomcatVersion = TomcatProperties.TOMCAT_MAJOR_VERSION
-      String id = "tomcat-$tomcatVersion-${i}"
+      String id = "tomcat-${tomcatVersion}-${i}"
       log.info("Creating new tomcat server instance: ${id}")
       // if node2 is not defined - create default
       if (!serverController.getTomcatServerIds([TomcatProperties.TOMCAT_MAJOR_VERSION]).contains(id)) {
