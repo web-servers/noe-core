@@ -647,19 +647,21 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     def aprListener = '<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />'
     def commentAprListener = '<!-- <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /> -->'
     def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1" SSLEnabled="true"' + nl +
-        'maxThreads="150" scheme="https" secure="true"' + nl +
-        'keystoreFile="' + this.keystorePath + '" keystoreType="' + this.keystoreType + '" keystorePass="' + this.sslKeystorePassword + '"' + nl +
-        'clientAuth="false" sslProtocol="TLS" />'
+    def ciphers = ''
     if (platform.isFips()) {
-      enableJavaSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="HTTP/1.1"' + nl +
-              '          SSLEnabled="true" maxThreads="150" scheme="https" secure="true"' + nl +
-              '          clientAuth="false" sslEnabledProtocols="TLSv1.1+TLSv1.2"' + nl +
-              '          keystoreFile="' + this.keystorePath + '"' + nl +
-              '          keystorePass="' + this.sslKeystorePassword + '"' + nl +
-              '          keystoreType="' + this.keystoreType + '"' + nl +
-              '          ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS+ '" />'
-      }
+      ciphers = 'protocols="TLSv1.1+TLSv1.2" ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS + '" '
+    }
+    def enableJavaSsl =
+      '<Connector port="' + this.mainHttpsPort.toString() + '" protocol="org.apache.coyote.http11.Http11NioProtocol" SSLEnabled="true"' + nl +
+              '               maxThreads="150" scheme="https" secure="true"' + nl +
+              '               sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation" >' + nl +
+              '        <SSLHostConfig ' + ciphers + '>' + nl +
+              '            <Certificate certificateKeystoreFile="' + this.keystorePath + '"' + nl +
+              '                         certificateKeystorePassword="' + this.sslKeystorePassword + '"' + nl +
+              '                         certificateKeystoreType="' + this.keystoreType + '"' + nl +
+              '                         type="RSA" />' + nl +
+              '        </SSLHostConfig>' + nl +
+              '    </Connector>'
     updateConfReplaceRegExp('server.xml', aprListener, commentAprListener, true, true)
     updateConfReplaceRegExp('server.xml', dummyComment, enableJavaSsl, true, true)
   }
@@ -668,16 +670,21 @@ class Tomcat extends ServerAbstract implements WorkerServer {
   void enableSslOpenSsl() {
     def nl = platform.nl
     def dummyComment = '<!-- Define an AJP 1.3 Connector on port 8009 -->'
-    def enableOpenSsl = '<Connector port="' + this.mainHttpsPort.toString() + '" SSLEnabled="true"' + nl +
-        'maxThreads="200" scheme="https" secure="true"' + nl +
-        'SSLCertificateFile="' + this.sslCertificate + '"' + nl +
-        'SSLCertificateKeyFile="' + this.sslKey + '"' + nl +
-        'SSLPassword="' + this.sslKeystorePassword + '"' + nl
-    if(platform.isFips()) {
-      enableOpenSsl += 'ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS + '"'
+    def ciphers = ''
+    if (platform.isFips()) {
+      ciphers = 'ciphers="' + DefaultProperties.FIPS_140_2_CIPHERS + '"'
     }
-    enableOpenSsl += '/>'
-
+    def enableOpenSsl =
+            '<Connector port="' + this.mainHttpsPort.toString() + '" SSLEnabled="true"' + nl +
+                    '               maxThreads="200" scheme="https" secure="true"' + nl +
+                    '               sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"' + '>' + nl +
+                    '        <SSLHostConfig ' + ciphers + '>' + nl +
+                    '            <Certificate certificateFile="' + this.sslCertificate + '"' + nl +
+                    '                         certificateKeyFile="' + this.sslKey + '"' + nl +
+                    '                         certificateKeyPassword="' + this.sslKeystorePassword + '"' + nl +
+                    '                         type="RSA" />' + nl +
+                    '        </SSLHostConfig>' + nl +
+                    '    </Connector>'
     updateConfReplaceRegExp('server.xml', dummyComment, enableOpenSsl, true, true)
   }
 
