@@ -88,17 +88,24 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <version.java>1.6</version.java>
+        <version.min-maven>3.2.5</version.min-maven>
 
 
         <version.checkstyle-plugin>3.1.1</version.checkstyle-plugin>
-        <version.findbugs-plugin>3.0.5</version.findbugs-plugin>
         <version.codenarc-plugin>0.22-1</version.codenarc-plugin>
-        <version.source-plugin>3.2.1</version.source-plugin>
-        <version.javadoc-plugin>2.10.4</version.javadoc-plugin>
-        <version.release-plugin>3.0.0-M1</version.release-plugin>
+        <version.compiler-plugin>3.8.1</version.compiler-plugin>
+        <version.deploy-plugin>2.8.2</version.deploy-plugin>
+        <version.enforcer-plugin>3.3.0</version.enforcer-plugin>
+        <version.failsafe-plugin>2.22.0</version.failsafe-plugin>
+        <version.findbugs-plugin>3.0.5</version.findbugs-plugin>
         <version.groovy-eclipse-compiler>3.6.0-03</version.groovy-eclipse-compiler>
         <version.guava>31.0-jre</version.guava>
+        <version.javadoc-plugin>2.10.4</version.javadoc-plugin>
         <version.jgit>5.8.0.202006091008-r</version.jgit>
+        <version.release-plugin>3.0.0-M1</version.release-plugin>
+        <version.source-plugin>3.2.1</version.source-plugin>
+        <version.surefire-plugin>2.22.0</version.surefire-plugin>
+
 
         <version.java.jna>5.6.0</version.java.jna>
 
@@ -106,15 +113,8 @@
         <!-- https://github.com/Karm/okhttp/tree/add_cipher_suites -->
         <com.squareup.okhttp3.okhttp.version>4.8.0</com.squareup.okhttp3.okhttp.version>
         <org.apache.ant.version>1.10.9</org.apache.ant.version>
-        <version.org.apache.maven.plugins.maven-surefire-plugin>2.22.0
-        </version.org.apache.maven.plugins.maven-surefire-plugin>
-        <version.org.apache.maven.plugins.maven-failsafe-plugin>2.22.0
-        </version.org.apache.maven.plugins.maven-failsafe-plugin>
-        <version.org.apache.maven.plugins.maven-deploy-plugin>2.8.2
-        </version.org.apache.maven.plugins.maven-deploy-plugin>
         <junit.version>4.13.1</junit.version>
         <org.codehaus.groovy.all.version>2.4.21</org.codehaus.groovy.all.version>
-        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <org.codehaus.groovy.compiler.version>2.9.2-01</org.codehaus.groovy.compiler.version>
         <org.codehaus.groovy.batch.compiler.version>2.4.3-01</org.codehaus.groovy.batch.compiler.version>
         <org.codehaus.mojo.build.helper.maven.plugin.version>3.2.0</org.codehaus.mojo.build.helper.maven.plugin.version>
@@ -282,7 +282,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin.version}</version>
+                    <version>${version.compiler-plugin}</version>
                     <configuration>
                         <source>${version.java}</source>
                         <target>${version.java}</target>
@@ -394,7 +394,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
+                    <version>${version.surefire-plugin}</version>
                     <configuration>
                         <systemPropertyVariables combine.children="append">
                             <JDBCLoader.URL>http://exampleurl.com</JDBCLoader.URL>
@@ -404,7 +404,7 @@
                         <dependency>
                             <groupId>org.apache.maven.surefire</groupId>
                             <artifactId>surefire-junit47</artifactId>
-                            <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
+                            <version>${version.surefire-plugin}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -412,12 +412,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${version.org.apache.maven.plugins.maven-failsafe-plugin}</version>
+                    <version>${version.failsafe-plugin}</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.maven.surefire</groupId>
                             <artifactId>surefire-junit47</artifactId>
-                            <version>${version.org.apache.maven.plugins.maven-surefire-plugin}</version>
+                            <version>${version.surefire-plugin}</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -433,15 +433,42 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>${version.org.apache.maven.plugins.maven-deploy-plugin}</version>
+                    <version>${version.deploy-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.groovy</groupId>
                     <artifactId>groovy-eclipse-compiler</artifactId>
                     <version>${version.groovy-eclipse-compiler}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${version.enforcer-plugin}</version>
+                </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>${version.min-maven}</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
 
     </build>
     <reporting>
