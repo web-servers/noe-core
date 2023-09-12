@@ -29,7 +29,7 @@ class TomcatProperties {
       } else  if (ewsVersion?.getMajorVersion() == 6) {
         TOMCAT_MAJOR_VERSION = "10"
       } else {
-        throw new IllegalArgumentException("Unknown EWS version ${ewsVersion?.getMajorVersion()}")
+        TOMCAT_MAJOR_VERSION = null
       }
     } else {
       TOMCAT_MAJOR_VERSION = tomcatVersion.getMajorVersion().toString()
