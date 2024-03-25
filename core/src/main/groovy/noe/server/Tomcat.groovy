@@ -314,17 +314,17 @@ class Tomcat extends ServerAbstract implements WorkerServer {
       updateConfReplaceRegExp('server.xml', '<Connector port="' + mainHttpPort + '" maxHttpHeaderSize="8192"'
           + (cfgHost == '' ? '' : ' address="' + cfgHost + '"'),
           '<Connector port="' + mainHttpPort + '" maxHttpHeaderSize="8192" address="' + address + '"')
-      updateConfReplaceRegExp('server.xml', '<Connector port="' + ajpPort + '"'
+      updateConfReplaceRegExp('server.xml', '<Connector protocol="AJP/1.3"'
           + (cfgHost == '' ? '' : ' address="' + cfgHost + '"'),
-          '<Connector port="' + ajpPort + '" address="' + address + '"')
+          '<Connector protocol="AJP/1.3"' + ' address="' + address + '"')
     } else {
       // Tomcat 6, 7
       updateConfReplaceRegExp('server.xml', '<Connector port="' + mainHttpPort + '" protocol="HTTP/1.1"'
           + (cfgHost == '' ? '' : ' address="' + cfgHost + '"'),
           '<Connector port="' + mainHttpPort + '" protocol="HTTP/1.1" address="' + address + '"')
-      updateConfReplaceRegExp('server.xml', '<Connector port="' + ajpPort + '" protocol="AJP/1.3"'
+      updateConfReplaceRegExp('server.xml', '<Connector protocol="AJP/1.3"'
           + (cfgHost == '' ? '' : ' address="' + cfgHost + '"'),
-          '<Connector port="' + ajpPort + '" protocol="AJP/1.3" address="' + address + '"')
+          '<Connector protocol="AJP/1.3"' + ' address="' + address + '"')
 
       if (version.getMajorVersion() > 6) {
         if (version.getMajorVersion() > 7)
@@ -638,7 +638,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
       this.updateConfReplaceRegExp('server.xml', '<Connector port="8443" protocol="org.apache.coyote.http11.Http11Protocol"', '<Connector port="' + Integer.valueOf(8443 + offset) + '" protocol="org.apache.coyote.http11.Http11Protocol"', true, true)
     }
 
-    this.updateConfReplaceRegExp('server.xml', '<Connector port="8009" protocol="AJP/1.3"', '<Connector port="' + Integer.valueOf(8009 + offset) + '" protocol="AJP/1.3"', true, true)
+    this.updateConfReplaceRegExp('server.xml', '<Connector protocol="AJP/1.3"' + (cfgHost == '' ? '' : ' address="' + cfgHost + '"') + ' port="8009"', '<Connector protocol="AJP/1.3"' + (cfgHost == '' ? '' : ' address="' + cfgHost + '"') + ' port="'+ Integer.valueOf(8009 + offset) + '"', true, true)
   }
 
   @Deprecated
