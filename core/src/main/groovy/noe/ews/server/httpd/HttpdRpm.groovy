@@ -90,7 +90,7 @@ class HttpdRpm extends Httpd {
     }
     catch(RuntimeException re) {
       Map results = Cmd.executeCommandConsumeStreams(["journalctl", "-xeu", "httpd.service"])
-      log.info(e.getMessage())
+      log.info(re.getMessage())
       log.info(results.stdOut as String)
       throw new RuntimeException("${re.getMessage()}\n${results.stdOut as String}")
     }
