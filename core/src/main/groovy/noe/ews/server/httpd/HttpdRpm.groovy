@@ -84,8 +84,16 @@ class HttpdRpm extends Httpd {
    * Stop the server
    */
   void start(Map conf = [:]) {
-    super.start(conf)
-    Library.letsSleep(5000)
+    try {
+      super.start(conf)
+      Library.letsSleep(5000)
+    }
+    catch(RuntimeException re) {
+      Map results = Cmd.executeCommandConsumeStreams(["journalctl", "-xeu", "httpd.service"])
+      log.info(re.getMessage())
+      log.info(results.stdOut as String)
+      throw new RuntimeException("${re.getMessage()}\n${results.stdOut as String}")
+    }
   }
 
   /**
