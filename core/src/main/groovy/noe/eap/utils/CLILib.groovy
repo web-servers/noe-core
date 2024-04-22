@@ -8,7 +8,6 @@ import noe.eap.creaper.ManagementClientProvider
 import noe.eap.creaper.ServerVerProvider
 import noe.server.AS7
 import org.apache.commons.collections4.CollectionUtils
-import org.apache.commons.lang3.StringUtils
 import org.wildfly.extras.creaper.core.online.ModelNodeResult
 import org.wildfly.extras.creaper.core.online.OnlineManagementClient
 import org.wildfly.extras.creaper.core.online.operations.Address
@@ -59,7 +58,7 @@ class CLILib {
     public static int build(block) {
       final ExtensionBuilder extensionBuilder = new ExtensionBuilder().with block
       if (extensionBuilder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(extensionBuilder.extension)) throw new IllegalArgumentException("Extension must not be null nor empty.")
+      if (extensionBuilder.extension?.allWhitespace) throw new IllegalArgumentException("Extension must not be null nor empty.")
       return extensionBuilder.as7serverInstance.as7Cli.runArbitraryCommand("/extension=${extensionBuilder.extension}:add()").exitValue
     }
   }
@@ -135,8 +134,8 @@ class CLILib {
     static int build(block) {
       final UndertowLocationBuilder builder = new UndertowLocationBuilder().with block
       if (builder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(builder.name)) throw new IllegalArgumentException("name must not be null.")
-      if (StringUtils.isBlank(builder.handler)) throw new IllegalArgumentException("handler must not be null.")
+      if (builder.name?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
+      if (builder.handler?.allWhitespace) throw new IllegalArgumentException("handler must not be null.")
       String cmdStr
       if (builder.exists()) {
         int ret = builder.remove()
@@ -170,7 +169,7 @@ class CLILib {
 
     private boolean exists() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(name)) throw new IllegalArgumentException("name must not be null.")
+      if (name?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = "/subsystem=undertow/server=default-server/host=default-host:read-children-names(child-type=location)"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).stdOut ==~ /[\s\S]*"result" => [\s\S]*"${name.replace('\\/', '/')}"[\s\S]*/
     }
@@ -222,8 +221,8 @@ class CLILib {
     static int build(block) {
       final UndertowHandlerBuilder builder = new UndertowHandlerBuilder().with block
       if (builder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(builder.name)) throw new IllegalArgumentException("name must not be null.")
-      if (StringUtils.isBlank(builder.path)) throw new IllegalArgumentException("path must not be null.")
+      if (builder.name?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
+      if (builder.path?.allWhitespace) throw new IllegalArgumentException("path must not be null.")
       int ret = 0
       String cmdStr
       if (builder.exists()) {
@@ -287,7 +286,7 @@ class CLILib {
 
     private boolean exists() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(name)) throw new IllegalArgumentException("name must not be null.")
+      if (name?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = "/subsystem=undertow/configuration=handler:read-children-names(child-type=file)"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).stdOut ==~ /[\s\S]*"result" => [\s\S]*"${name}"[\s\S]*/
     }
@@ -349,8 +348,8 @@ class CLILib {
     static int build(block) {
       final HttpConnectorBuilder builder = new HttpConnectorBuilder().with block
       if (builder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(builder.name)) throw new IllegalArgumentException("name must not be null.")
-      if (StringUtils.isBlank(builder.socketBinding)) throw new IllegalArgumentException("socketBinding must not be null.")
+      if (builder.name?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
+      if (builder.socketBinding?.allWhitespace) throw new IllegalArgumentException("socketBinding must not be null.")
       int ret = 0
       String cmdStr
       if (builder.exists()) {
@@ -401,7 +400,7 @@ class CLILib {
 
     private boolean exists() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(name)) throw new IllegalArgumentException("name must not be null.")
+      if (name?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = "/subsystem=undertow/server=default-server:read-children-names(child-type=http-listener)"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).stdOut ==~ /[\s\S]*"result" => [\s\S]*"${name}"[\s\S]*/
     }
@@ -473,10 +472,10 @@ class CLILib {
           throw new RuntimeException("Something went wrong when removing existing https-listener")
         }
       }
-      if (!StringUtils.isBlank(httpsConnectorBuilder.securityRealm)) {
+      if (!httpsConnectorBuilder.securityRealm?.allWhitespace) {
         cmdString = "/subsystem=undertow/server=default-server/https-listener=https:add(socket-binding=https, verify-client=${httpsConnectorBuilder.verifyClient}," +
                 "security-realm=${httpsConnectorBuilder.securityRealm})"
-      } else if (!StringUtils.isBlank(httpsConnectorBuilder.sslContext)) {
+      } else if (!httpsConnectorBuilder.sslContext?.allWhitespace) {
         cmdString = "/subsystem=undertow/server=default-server/https-listener=https:add(socket-binding=https, ssl-context=${httpsConnectorBuilder.sslContext})"
       } else {
         throw new IllegalArgumentException("security-realm of ssl-context have to be set!")
@@ -873,7 +872,7 @@ class CLILib {
           justCreated = true
       }
 
-      if (!justCreated && !StringUtils.isBlank(modClusterSubsystemBuilder.advertiseSocket)) {
+      if (!justCreated && !modClusterSubsystemBuilder.advertiseSocket?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=advertise-socket, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.advertiseSocket)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -882,7 +881,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSubsystemBuilder.advertiseSecurityKey)) {
+      if (!modClusterSubsystemBuilder.advertiseSecurityKey?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=advertise-security-key, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.advertiseSecurityKey)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -909,7 +908,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSubsystemBuilder.balancer)) {
+      if (!modClusterSubsystemBuilder.balancer?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=balancer, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.balancer)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -918,7 +917,7 @@ class CLILib {
         }
       }
 
-      if (!justCreated && !StringUtils.isBlank(modClusterSubsystemBuilder.connector)) {
+      if (!justCreated && !modClusterSubsystemBuilder.connector?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=connector, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.connector)}"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -927,7 +926,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSubsystemBuilder.excludedContexts)) {
+      if (!modClusterSubsystemBuilder.excludedContexts?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=excluded-contexts, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.excludedContexts)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -954,7 +953,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSubsystemBuilder.loadBalancingGroup)) {
+      if (!modClusterSubsystemBuilder.loadBalancingGroup?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=load-balancing-group, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.loadBalancingGroup)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -999,7 +998,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSubsystemBuilder.sslContext)) {
+      if (!modClusterSubsystemBuilder.sslContext?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=ssl-context, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.sslContext)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1008,7 +1007,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSubsystemBuilder.proxyList)) {
+      if (!modClusterSubsystemBuilder.proxyList?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=proxy-list, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.proxyList)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1017,7 +1016,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSubsystemBuilder.proxyUrl)) {
+      if (!modClusterSubsystemBuilder.proxyUrl?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=proxy-url, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.proxyUrl)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1026,7 +1025,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSubsystemBuilder.sessionDrainingStrategy)) {
+      if (!modClusterSubsystemBuilder.sessionDrainingStrategy?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration:write-attribute(name=session-draining-strategy, value=${CLILib.escapeQuotes(modClusterSubsystemBuilder.sessionDrainingStrategy)})"
         rcode = modClusterSubsystemBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1191,10 +1190,10 @@ class CLILib {
       boolean justCreated = false
       final MulticastBindingBuilder multicastBindingBuilder = new MulticastBindingBuilder().with block
       if (multicastBindingBuilder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(multicastBindingBuilder.name)) throw new IllegalArgumentException("Name must not be null nor empty.")
+      if (multicastBindingBuilder.name?.allWhitespace) throw new IllegalArgumentException("Name must not be null nor empty.")
       if (!(CLILib.readSocketBindingGroup(multicastBindingBuilder.as7serverInstance) =~ /.*"${multicastBindingBuilder.name}".*/)) {
         log.info("Defining modcluster socket binding ${multicastBindingBuilder.name}")
-        if (StringUtils.isBlank(multicastBindingBuilder.multicastAddress)) throw new IllegalArgumentException("MulticastAddress must not be null nor empty.")
+        if (multicastBindingBuilder.multicastAddress?.allWhitespace) throw new IllegalArgumentException("MulticastAddress must not be null nor empty.")
         if (multicastBindingBuilder.port == null || multicastBindingBuilder.port < 0) throw new IllegalArgumentException("Port must be bigger than 0.")
         if (multicastBindingBuilder.multicastPort == null || multicastBindingBuilder.multicastPort < 0) throw new IllegalArgumentException("MulticastPort must be bigger than 0.")
         String cmdStr = "/socket-binding-group=standard-sockets/socket-binding=${multicastBindingBuilder.name}:add(multicast-address=${multicastBindingBuilder.multicastAddress}, port=${multicastBindingBuilder.port}, multicast-port=${multicastBindingBuilder.multicastPort})"
@@ -1507,8 +1506,8 @@ class CLILib {
       String cmdStr = "/subsystem=undertow/configuration=filter:read-resource(include-runtime=true, recursive=true, recursive-depth=100)"
       if (CLILib.readArbitraryCommandOutput(modClusterFilterBuilder.as7serverInstance, cmdStr) =~ /mod-cluster[" =>]*undefined/) {
         // Mandatory minimum
-        if (StringUtils.isBlank(modClusterFilterBuilder.managementSocketBinding)) throw new IllegalArgumentException("ManagementSocketBinding must not be null nor empty.")
-        if (StringUtils.isBlank(modClusterFilterBuilder.advertiseSocketBinding)) throw new IllegalArgumentException("AdvertiseSocketBinding must not be null nor empty.")
+        if (modClusterFilterBuilder.managementSocketBinding?.allWhitespace) throw new IllegalArgumentException("ManagementSocketBinding must not be null nor empty.")
+        if (modClusterFilterBuilder.advertiseSocketBinding?.allWhitespace) throw new IllegalArgumentException("AdvertiseSocketBinding must not be null nor empty.")
         // Create mod-cluster filter
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:add(management-socket-binding=${modClusterFilterBuilder.managementSocketBinding},advertise-socket-binding=${modClusterFilterBuilder.advertiseSocketBinding})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
@@ -1536,7 +1535,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterFilterBuilder.advertisePath)) {
+      if (!modClusterFilterBuilder.advertisePath?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=advertise-path,value=${modClusterFilterBuilder.advertisePath})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1545,7 +1544,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterFilterBuilder.sslContext)) {
+      if (!modClusterFilterBuilder.sslContext?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=ssl-context,value=${modClusterFilterBuilder.sslContext})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1554,7 +1553,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterFilterBuilder.advertiseProtocol)) {
+      if (!modClusterFilterBuilder.advertiseProtocol?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=advertise-protocol,value=${modClusterFilterBuilder.advertiseProtocol})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1563,7 +1562,7 @@ class CLILib {
         }
       }
 
-      if (!justCreated && !StringUtils.isBlank(modClusterFilterBuilder.advertiseSocketBinding)) {
+      if (!justCreated && !modClusterFilterBuilder.advertiseSocketBinding?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=advertise-socket-binding,value=${modClusterFilterBuilder.advertiseSocketBinding})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1572,7 +1571,7 @@ class CLILib {
         }
       }
 
-      if (!justCreated && !StringUtils.isBlank(modClusterFilterBuilder.managementSocketBinding)) {
+      if (!justCreated && !modClusterFilterBuilder.managementSocketBinding?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=management-socket-binding,value=${modClusterFilterBuilder.managementSocketBinding})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1581,7 +1580,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterFilterBuilder.managementAccessPredicate)) {
+      if (!modClusterFilterBuilder.managementAccessPredicate?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=management-access-predicate,value=${modClusterFilterBuilder.managementAccessPredicate})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1590,7 +1589,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterFilterBuilder.failoverStrategy)) {
+      if (!modClusterFilterBuilder.failoverStrategy?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=failover-strategy,value=${modClusterFilterBuilder.failoverStrategy})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1662,7 +1661,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterFilterBuilder.securityKey)) {
+      if (!modClusterFilterBuilder.securityKey?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=security-key,value=${modClusterFilterBuilder.securityKey})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1671,7 +1670,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterFilterBuilder.securityRealm)) {
+      if (!modClusterFilterBuilder.securityRealm?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=security-realm,value=${modClusterFilterBuilder.securityRealm})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1680,7 +1679,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterFilterBuilder.worker)) {
+      if (!modClusterFilterBuilder.worker?.allWhitespace) {
         cmdStr = "/subsystem=undertow/configuration=filter/mod-cluster=modcluster:write-attribute(name=worker,value=${modClusterFilterBuilder.worker})"
         rcode = modClusterFilterBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1875,7 +1874,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSSLBuilder.caCertificateFile)) {
+      if (!modClusterSSLBuilder.caCertificateFile?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration/ssl=configuration:write-attribute(name=ca-certificate-file, value=${CLILib.escapeQuotes(modClusterSSLBuilder.caCertificateFile.replace('\\','/'))})"
         rcode = modClusterSSLBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1884,7 +1883,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSSLBuilder.caRevocationUrl)) {
+      if (!modClusterSSLBuilder.caRevocationUrl?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration/ssl=configuration:write-attribute(name=ca-revocation-url, value=${CLILib.escapeQuotes(modClusterSSLBuilder.caRevocationUrl)})"
         rcode = modClusterSSLBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1893,7 +1892,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSSLBuilder.certificateKeyFile)) {
+      if (!modClusterSSLBuilder.certificateKeyFile?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration/ssl=configuration:write-attribute(name=certificate-key-file, value=${CLILib.escapeQuotes(modClusterSSLBuilder.certificateKeyFile.replace('\\','/'))})"
         rcode = modClusterSSLBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1902,7 +1901,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSSLBuilder.cipherSuite)) {
+      if (!modClusterSSLBuilder.cipherSuite?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration/ssl=configuration:write-attribute(name=cipher-suite,value=${CLILib.escapeQuotes(modClusterSSLBuilder.cipherSuite)})"
         rcode = modClusterSSLBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1911,7 +1910,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSSLBuilder.keyAlias)) {
+      if (!modClusterSSLBuilder.keyAlias?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration/ssl=configuration:write-attribute(name=key-alias, value=${CLILib.escapeQuotes(modClusterSSLBuilder.keyAlias)})"
         rcode = modClusterSSLBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1920,7 +1919,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSSLBuilder.password)) {
+      if (!modClusterSSLBuilder.password?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration/ssl=configuration:write-attribute(name=password, value=${CLILib.escapeQuotes(modClusterSSLBuilder.password)})"
         rcode = modClusterSSLBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -1929,7 +1928,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(modClusterSSLBuilder.protocol)) {
+      if (!modClusterSSLBuilder.protocol?.allWhitespace) {
         cmdStr = "/subsystem=modcluster/mod-cluster-config=configuration/ssl=configuration:write-attribute(name=protocol, value=${CLILib.escapeQuotes(modClusterSSLBuilder.protocol)})"
         rcode = modClusterSSLBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2046,9 +2045,9 @@ class CLILib {
     public static int build(block) {
       final SecurityRealmBuilder securityRealmBuilder = new SecurityRealmBuilder().with block
       if (securityRealmBuilder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(securityRealmBuilder.name)) throw new IllegalArgumentException("Name must not be null nor empty.")
-      if (StringUtils.isBlank(securityRealmBuilder.serverIdentity)) throw new IllegalArgumentException("ServerIdentity must not be null nor empty.")
-      if (StringUtils.isBlank(securityRealmBuilder.authentication)) throw new IllegalArgumentException("Authentication must not be null nor empty.")
+      if (securityRealmBuilder.name?.allWhitespace) throw new IllegalArgumentException("Name must not be null nor empty.")
+      if (securityRealmBuilder.serverIdentity?.allWhitespace) throw new IllegalArgumentException("ServerIdentity must not be null nor empty.")
+      if (securityRealmBuilder.authentication?.allWhitespace) throw new IllegalArgumentException("Authentication must not be null nor empty.")
 
       int rcode = 0
       // Isn't the Realm present? If it isn't, add it.
@@ -2067,7 +2066,7 @@ class CLILib {
       boolean authJustAdded = false
       // Is realm's authentication undefined?
       if (CLILib.readArbitraryCommandOutput(securityRealmBuilder.as7serverInstance, cmdStrReadMgt) =~ /${securityRealmBuilder.name}[[^\n]*\n]*authentication[ "=>\{\n]*undefined/) {
-        if (StringUtils.isBlank(securityRealmBuilder.truststoreAbsolutePath) || StringUtils.isBlank(securityRealmBuilder.truststorePassword)) throw new IllegalArgumentException("One must set both TruststoreAbsolutePath and TruststorePassword.")
+        if (securityRealmBuilder.truststoreAbsolutePath?.allWhitespace || securityRealmBuilder.truststorePassword?.allWhitespace) throw new IllegalArgumentException("One must set both TruststoreAbsolutePath and TruststorePassword.")
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/authentication=${securityRealmBuilder.authentication}:add(keystore-password=${CLILib.escapeQuotes(securityRealmBuilder.truststorePassword)}, keystore-path=${CLILib.escapeQuotes(securityRealmBuilder.truststoreAbsolutePath.replace('\\','/'))})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2077,7 +2076,7 @@ class CLILib {
         authJustAdded = true
       }
 
-      if (!authJustAdded && !StringUtils.isBlank(securityRealmBuilder.truststoreAbsolutePath)) {
+      if (!authJustAdded && !securityRealmBuilder.truststoreAbsolutePath?.allWhitespace) {
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/authentication=${securityRealmBuilder.authentication}:write-attribute(name=keystore-path,value=${CLILib.escapeQuotes(securityRealmBuilder.truststoreAbsolutePath.replace('\\','/'))})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2086,7 +2085,7 @@ class CLILib {
         }
       }
 
-      if (!authJustAdded && !StringUtils.isBlank(securityRealmBuilder.truststorePassword)) {
+      if (!authJustAdded && !securityRealmBuilder.truststorePassword?.allWhitespace) {
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/authentication=${securityRealmBuilder.authentication}:write-attribute(name=keystore-password,value=${CLILib.escapeQuotes(securityRealmBuilder.truststorePassword)})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2098,9 +2097,9 @@ class CLILib {
       boolean identityJustAdded = false
       // Is realm's server identity undefined?
       if (CLILib.readArbitraryCommandOutput(securityRealmBuilder.as7serverInstance, cmdStrReadMgt) =~ /${securityRealmBuilder.name}[[^\n]*\n]*server-identity[ "=>\{\n]*undefined/) {
-        if (StringUtils.isBlank(securityRealmBuilder.keystoreAbsolutePath) ||
-            StringUtils.isBlank(securityRealmBuilder.keystorePassword) ||
-            StringUtils.isBlank(securityRealmBuilder.keystoreAlias)) throw new IllegalArgumentException("One must set all KeystoreAbsolutePath, KeystoreAlias and KeystorePassword.")
+        if (securityRealmBuilder.keystoreAbsolutePath?.allWhitespace ||
+            securityRealmBuilder.keystorePassword?.allWhitespace ||
+            securityRealmBuilder.keystoreAlias?.allWhitespace) throw new IllegalArgumentException("One must set all KeystoreAbsolutePath, KeystoreAlias and KeystorePassword.")
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/server-identity=${securityRealmBuilder.serverIdentity}"
         cmdStr <<= ":add(keystore-password=${CLILib.escapeQuotes(securityRealmBuilder.keystorePassword)}, keystore-path=${CLILib.escapeQuotes(securityRealmBuilder.keystoreAbsolutePath.replace('\\','/'))}, alias=${CLILib.escapeQuotes(securityRealmBuilder.keystoreAlias)})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
@@ -2111,7 +2110,7 @@ class CLILib {
         identityJustAdded = true
       }
 
-      if (!identityJustAdded && !StringUtils.isBlank(securityRealmBuilder.keystoreAbsolutePath)) {
+      if (!identityJustAdded && !securityRealmBuilder.keystoreAbsolutePath?.allWhitespace) {
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/server-identity=${securityRealmBuilder.serverIdentity}:write-attribute(name=keystore-path, value=${CLILib.escapeQuotes(securityRealmBuilder.keystoreAbsolutePath.replace('\\','/'))})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2120,7 +2119,7 @@ class CLILib {
         }
       }
 
-      if (!identityJustAdded && !StringUtils.isBlank(securityRealmBuilder.keystorePassword)) {
+      if (!identityJustAdded && !securityRealmBuilder.keystorePassword?.allWhitespace) {
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/server-identity=${securityRealmBuilder.serverIdentity}:write-attribute(name=keystore-password, value=${CLILib.escapeQuotes(securityRealmBuilder.keystorePassword)})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2129,7 +2128,7 @@ class CLILib {
         }
       }
 
-      if (!identityJustAdded && !StringUtils.isBlank(securityRealmBuilder.keystoreAlias)) {
+      if (!identityJustAdded && !securityRealmBuilder.keystoreAlias?.allWhitespace) {
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/server-identity=${securityRealmBuilder.serverIdentity}:write-attribute(name=alias, value=${CLILib.escapeQuotes(securityRealmBuilder.keystoreAlias)})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2156,7 +2155,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(securityRealmBuilder.keystoreKeyPassword)) {
+      if (!securityRealmBuilder.keystoreKeyPassword?.allWhitespace) {
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/server-identity=${securityRealmBuilder.serverIdentity}:write-attribute(name=key-password, value=${CLILib.escapeQuotes(securityRealmBuilder.keystoreKeyPassword)})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2165,7 +2164,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(securityRealmBuilder.keystoreProvider)) {
+      if (!securityRealmBuilder.keystoreProvider?.allWhitespace) {
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/server-identity=${securityRealmBuilder.serverIdentity}:write-attribute(name=keystore-provider, value=${CLILib.escapeQuotes(securityRealmBuilder.keystoreProvider)})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2174,7 +2173,7 @@ class CLILib {
         }
       }
 
-      if (!StringUtils.isBlank(securityRealmBuilder.protocol)) {
+      if (!securityRealmBuilder.protocol?.allWhitespace) {
         cmdStr = "/core-service=management/security-realm=${securityRealmBuilder.name}/server-identity=${securityRealmBuilder.serverIdentity}:write-attribute(name=protocol, value=${CLILib.escapeQuotes(securityRealmBuilder.protocol)})"
         rcode = securityRealmBuilder.as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
         if (rcode > 0) {
@@ -2249,7 +2248,7 @@ class CLILib {
     public static int build(block) {
       final AddCustomLoadMetricBuilder addCustomLoadMetricBuilder = new AddCustomLoadMetricBuilder().with block
       if (addCustomLoadMetricBuilder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(addCustomLoadMetricBuilder.clazz)) throw new IllegalArgumentException("Class must be set.")
+      if (addCustomLoadMetricBuilder.clazz?.allWhitespace) throw new IllegalArgumentException("Class must be set.")
 
       int rcode = 0
       String cmdStr
@@ -2354,7 +2353,7 @@ class CLILib {
     public static int build(block) {
       final RemoveCustomLoadMetricBuilder removeCustomLoadMetricBuilder = new RemoveCustomLoadMetricBuilder().with block
       if (removeCustomLoadMetricBuilder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(removeCustomLoadMetricBuilder.clazz)) throw new IllegalArgumentException("Clazz must not be null nor empty.")
+      if (removeCustomLoadMetricBuilder.clazz?.allWhitespace) throw new IllegalArgumentException("Clazz must not be null nor empty.")
       return removeCustomLoadMetricBuilder.as7serverInstance.as7Cli.runArbitraryCommand("/subsystem=modcluster/mod-cluster-config=configuration:remove-custom-metric(class=${removeCustomLoadMetricBuilder.clazz})").exitValue
     }
   }
@@ -2605,14 +2604,14 @@ class CLILib {
 
     private boolean exists() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(trustManagerName)) throw new IllegalArgumentException("name must not be null.")
+      if (trustManagerName?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = " /subsystem=elytron/:read-children-names(child-type=trust-manager)"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).stdOut ==~ /[\s\S]*"result" => [\s\S]*"${trustManagerName}"[\s\S]*/
     }
 
     private int remove() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(trustManagerName)) throw new IllegalArgumentException("name must not be null.")
+      if (trustManagerName?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = " /subsystem=elytron/trust-manager=${trustManagerName}:remove()"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
     }
@@ -2763,14 +2762,14 @@ class CLILib {
 
     boolean exists() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(name)) throw new IllegalArgumentException("name must not be null.")
+      if (name?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = "/subsystem=elytron:read-children-names(child-type=key-store)"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).stdOut ==~ /[\s\S]*"result" => [\s\S]*"${name}"[\s\S]*/
     }
 
     private int remove() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(name)) throw new IllegalArgumentException("name must not be null.")
+      if (name?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = "/subsystem=elytron/key-store=${name}:remove()"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
     }
@@ -2948,14 +2947,14 @@ class CLILib {
 
     private boolean exists() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(keyManagerName)) throw new IllegalArgumentException("name must not be null.")
+      if (keyManagerName?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = " /subsystem=elytron/:read-children-names(child-type=key-manager)"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).stdOut ==~ /[\s\S]*"result" => [\s\S]*"${keyManagerName}"[\s\S]*/
     }
 
     private int remove() {
       if (as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(keyManagerName)) throw new IllegalArgumentException("name must not be null.")
+      if (keyManagerName?.allWhitespace) throw new IllegalArgumentException("name must not be null.")
       String cmdStr = "/subsystem=elytron/key-manager=${keyManagerName}:remove()"
       return as7serverInstance.as7Cli.runArbitraryCommand(cmdStr).exitValue
     }
@@ -3117,7 +3116,7 @@ class CLILib {
     public static int build(block) {
       final AddLoadMetricBuilder addLoadMetricBuilder = new AddLoadMetricBuilder().with block
       if (addLoadMetricBuilder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(addLoadMetricBuilder.type)) throw new IllegalArgumentException("Type must be set.")
+      if (addLoadMetricBuilder.type?.allWhitespace) throw new IllegalArgumentException("Type must be set.")
 
       int rcode = 0
       String cmdStr
@@ -3222,7 +3221,7 @@ class CLILib {
     public static int build(block) {
       final RemoveLoadMetricBuilder removeLoadMetricBuilder = new RemoveLoadMetricBuilder().with block
       if (removeLoadMetricBuilder.as7serverInstance == null) throw new IllegalArgumentException("AS7Instance must not be null.")
-      if (StringUtils.isBlank(removeLoadMetricBuilder.type)) throw new IllegalArgumentException("Type must not be null nor empty.")
+      if (removeLoadMetricBuilder.type?.allWhitespace) throw new IllegalArgumentException("Type must not be null nor empty.")
       return removeLoadMetricBuilder.as7serverInstance.as7Cli.runArbitraryCommand("/subsystem=modcluster/mod-cluster-config=configuration:remove-metric(type=${removeLoadMetricBuilder.type})").exitValue
     }
   }
