@@ -167,7 +167,7 @@ class Library {
       socket.shutdownOutput()
       return true
     } catch (IOException e) {
-      log.trace("checkTcpPort: TAGOTAG: host:port - ${host}:${port} is not ready", e)
+      log.trace("checkTcpPort: TAGOTAG: host:port - ${host}:${port} is not ready [${e.getMessage()}]")
       return false
     } finally {
       socket?.close()
@@ -206,7 +206,7 @@ class Library {
         socket.shutdownOutput()
         return true
       } catch (IOException e) {
-        log.trace("waitForTcp: TAGOTAG: host:port - ${host}:${port} is not ready", e)
+        log.trace("waitForTcp: TAGOTAG: host:port - ${host}:${port} is not ready [${e.getMessage()}]")
       } finally {
         socket?.close()
       }
