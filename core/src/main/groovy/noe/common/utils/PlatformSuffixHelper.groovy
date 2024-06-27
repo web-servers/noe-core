@@ -37,6 +37,7 @@ class PlatformSuffixHelper {
       else if (platform.isRHEL7()) platformName += "RHEL7-"
       else if (platform.isRHEL8()) platformName += "RHEL8-"
       else if (platform.isRHEL9()) platformName += "RHEL9-"
+      else if (platform.isRHEL10()) platformName += "RHEL10-"
       if (platform.isX86()) {
         platformName += "i686"
       } else if (platform.isX64()) {

@@ -9,7 +9,7 @@ class WorkspaceHttpdBaseOS extends WorkspaceAbstract {
 
   WorkspaceHttpdBaseOS() {
 
-    if (platform.isRHEL9() || platform.isRHEL8() || platform.isRHEL7()) {
+    if (platform.isRHEL10() || platform.isRHEL9() || platform.isRHEL8() || platform.isRHEL7()) {
       HttpdBaseOS server = new HttpdBaseOS(basedir, '2.4')
       serverController.addServer("httpd-24-1", server)
     } else if (platform.isRHEL6()) {
