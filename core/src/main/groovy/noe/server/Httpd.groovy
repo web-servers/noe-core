@@ -386,7 +386,7 @@ abstract class Httpd extends ServerAbstract {
     }
     if(results.isEmpty()) {
       // Default if option is missing in configuration. RHEL7 and RHEL8 use '/logs/httpd.pid', RHEL9 '/run/httpd.pid'
-      return new File(getHttpdServerRootFull(), platform.isRHEL9() ? '/run/httpd.pid' : '/logs/httpd.pid')
+      return new File(getHttpdServerRootFull(), platform.isRHEL9() || platform.isRHEL10() ? '/run/httpd.pid' : '/logs/httpd.pid')
     } else {
       return results.first()
     }
