@@ -107,6 +107,7 @@ abstract class AbstractJwsNameHelper {
       else if (platform.isRHEL7()) result += 'RHEL7-'
       else if (platform.isRHEL8()) result += 'RHEL8-'
       else if (platform.isRHEL9()) result += 'RHEL9-'
+      else if (platform.isRHEL10()) result += 'RHEL10-'
       if (platform.isX86()) {
         result += "i386"
       } else if (platform.isX64()) {
