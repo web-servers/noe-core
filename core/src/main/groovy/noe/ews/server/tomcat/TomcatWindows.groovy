@@ -6,7 +6,6 @@ import noe.common.utils.Library
 import noe.common.utils.Version
 import noe.ews.server.ServerEws
 import noe.server.Tomcat
-import org.apache.commons.lang3.StringUtils
 /**
  * EWS Tomcat server on Windows
  *
@@ -116,7 +115,7 @@ class TomcatWindows extends Tomcat {
    */
   private String configureTomcatWindowTitle() {
     boolean success = false
-    if (StringUtils.isNotEmpty(this.processCode) && this.processCode != '0' && this.processCode != this.windowTitle) {
+    if (this.processCode && this.processCode != '0' && this.processCode != this.windowTitle) {
       if (version == new Version("6")) {
         success = updateBinReplaceRegExp('catalina.bat', "set _EXECJAVA=start \"[^\"]*\"", "set _EXECJAVA=start \"${this.processCode}\"", true, false)
       }

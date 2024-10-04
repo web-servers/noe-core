@@ -3,7 +3,7 @@ package noe.eap.utils
 import noe.common.DefaultProperties
 import noe.common.utils.Library
 import noe.eap.server.as7.AS7Properties
-import org.apache.commons.lang3.StringEscapeUtils
+import groovy.xml.XmlUtil
 
 import javax.xml.transform.Transformer
 import javax.xml.transform.TransformerFactory
@@ -52,7 +52,7 @@ class XSLTStaticLib {
    */
   def static addOrUpdateSystemProperties(String propertyName = "evilprop", String propertyValue = "something", String absolutePathToConfig) {
     def xslt = Library.retrieveResourceAsFile(RELATIVE_XSLT_PATH + "/system-properties.xsl").getText().replace("@SYSTEM_PROPERTY_NAME@", propertyName)
-    xslt = xslt.replace("@SYSTEM_PROPERTY_VALUE@", StringEscapeUtils.escapeXml10(propertyValue))
+    xslt = xslt.replace("@SYSTEM_PROPERTY_VALUE@", XmlUtil.escapeXml(propertyValue))
     transformIt(xslt, new File(absolutePathToConfig))
   }
 
@@ -132,9 +132,9 @@ class XSLTStaticLib {
     xslt = xslt.replace("@ENABLED@", enabled.toString())
     xslt = xslt.replace("@SCHEME@", scheme)
     xslt = xslt.replace("@SECURE@", secure.toString())
-    xslt = xslt.replace("@CA_CERTIFICATE_FILE@", StringEscapeUtils.escapeXml10(caCertificateFile))
-    xslt = xslt.replace("@CERTIFICATE_KEY_FILE@", StringEscapeUtils.escapeXml10(certificateKeyFile))
-    xslt = xslt.replace("@CERTIFICATE_FILE@", StringEscapeUtils.escapeXml10(certificateFile))
+    xslt = xslt.replace("@CA_CERTIFICATE_FILE@", XmlUtil.escapeXml(caCertificateFile))
+    xslt = xslt.replace("@CERTIFICATE_KEY_FILE@", XmlUtil.escapeXml(certificateKeyFile))
+    xslt = xslt.replace("@CERTIFICATE_FILE@", XmlUtil.escapeXml(certificateFile))
     xslt = xslt.replace("@PASSWORD@", password)
     xslt = xslt.replace("@VERIFY_CLIENT@", verifyClient.toString())
     xslt = xslt.replace("@KEY_ALIAS@", keyAlias)
@@ -348,8 +348,8 @@ class XSLTStaticLib {
       String ssl_protocol = "TLS",
       String absolutePathToConfig) {
     def xslt = Library.retrieveResourceAsFile(RELATIVE_XSLT_PATH + "/mod-cluster-ssl-config.xsl").getText()
-    xslt = xslt.replace("@CA_CERTIFICATE_FILE@", StringEscapeUtils.escapeXml10(caCertificateFile))
-    xslt = xslt.replace("@CERTIFICATE_KEY_FILE@", StringEscapeUtils.escapeXml10(certificateKeyFile))
+    xslt = xslt.replace("@CA_CERTIFICATE_FILE@", XmlUtil.escapeXml(caCertificateFile))
+    xslt = xslt.replace("@CERTIFICATE_KEY_FILE@", XmlUtil.escapeXml(certificateKeyFile))
     xslt = xslt.replace("@PASSWORD@", password)
     xslt = xslt.replace("@KEY_ALIAS@", keyAlias)
     xslt = xslt.replace("@CIPHER_SUITE@", cipherSuite)
