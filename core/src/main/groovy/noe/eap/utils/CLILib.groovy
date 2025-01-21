@@ -596,10 +596,6 @@ class CLILib {
       String escapedLocation =  CLILib.escapeQuotes(addVirtualHostBuilder.location)
       String locationCommand = "/subsystem=undertow/server=${addVirtualHostBuilder.server}" +
               "/host=${addVirtualHostBuilder.hostName}/location=${escapedLocation}:add(handler=welcome-content)"
-      if (ServerVerProvider.provideFor(addVirtualHostBuilder.as7serverInstance).lessThan(ServerVerProvider.getMngmtVerOfEAP("7.0.0.DR1"))) {
-        createCommand = "/subsystem=web/virtual-server=${addVirtualHostBuilder.hostName}:add"
-        return addVirtualHostBuilder.as7serverInstance.as7Cli.runArbitraryCommand(createCommand).exitValue
-      }
       addVirtualHostBuilder.as7serverInstance.as7Cli.runArbitraryCommand(createCommand).exitValue
       return addVirtualHostBuilder.as7serverInstance.as7Cli.runArbitraryCommand(locationCommand).exitValue
     }
