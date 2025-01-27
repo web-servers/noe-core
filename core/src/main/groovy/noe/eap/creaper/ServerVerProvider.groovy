@@ -17,21 +17,21 @@ import org.wildfly.extras.creaper.core.ServerVersion
 class ServerVerProvider {
 
   /**
-   * Get management API version of target server instance
-   * @param serverInstance AS7 instance
+   * Get management API version of target started server instance
+   * @param serverInstance Running AS7 instance
    * @return Management API version wrapped in {@link ServerVersion}
    */
   static ServerVersion provideFor(ServerAbstract serverInstance) {
     if (serverInstance instanceof AS7) {
-      return ManagementClientProvider.createOfflineManagementClient(serverInstance as AS7).version()
+      return ManagementClientProvider.createOnlineManagementClient(serverInstance as AS7).version()
     } else {
       throw new IllegalArgumentException("Server instance must be an EAP/Wildfly node!")
     }
   }
 
   /**
-   * Get management API version of target server instance
-   * @param id of server fow which the management API version will be provided
+   * Get management API version of target started server instance
+   * @param id of running server fow which the management API version will be provided
    * @return Management API version wrapped in {@link ServerVersion}
    */
   static ServerVersion provideFor(String serverID) {
@@ -40,8 +40,9 @@ class ServerVerProvider {
   }
 
   /**
-   * Get management API version from list of AS7 server IDs. It is expected, that all instances have same version.
-   * @param serverIds list of AS7 server ids
+   * Get management API version from list of running AS7 server IDs. It is expected, that all instances have same
+   * version.
+   * @param serverIds list of running AS7 server ids
    * @return Management API version wrapped in {@link ServerVersion}
    */
   static ServerVersion provideFor(Set<String> serverIds) {
