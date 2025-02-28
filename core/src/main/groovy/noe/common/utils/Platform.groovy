@@ -136,6 +136,10 @@ class Platform {
     return (isRHEL() && (osVersion ==~ /.*el9.*/)) || forceRhel9()
   }
 
+  boolean isRHEL10() {
+    return (isRHEL() && (osVersion ==~ /.*el10.*/)) || forceRhel10()
+  }
+
   boolean isSolaris11() {
     return isSolaris() && (osVersion ==~ /5\.11/)
   }
@@ -225,5 +229,9 @@ class Platform {
    */
   private boolean forceRhel9() {
     return Boolean.parseBoolean(Library.getUniversalProperty('force.rhel.9', 'false'))
+  }
+
+  private boolean forceRhel10() {
+    return Boolean.parseBoolean(Library.getUniversalProperty('force.rhel.10', 'false'))
   }
 }
