@@ -53,7 +53,7 @@ class EnvVarsFileFactoryTest {
     ] as RpmTomcatEnvVarsFileFactory.RpmRun)
 
     String tomcatServicePath
-    if (platform.isRHEL8() || platform.isRHEL9()) {
+    if (platform.isRHEL8() || platform.isRHEL9() || platform.isRHEL10()) {
       tomcatServicePath = "/etc/opt/rh/scls/jws5/sysconfig/tomcat"
     } else {
       tomcatServicePath = "/etc/opt/rh/jws5/sysconfig/tomcat"
@@ -97,4 +97,3 @@ class EnvVarsFileFactoryTest {
   }
 
 }
-
