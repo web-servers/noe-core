@@ -71,7 +71,12 @@ class WorkspaceHttpdTomcatsBaseOS extends WorkspaceMultipleTomcats{
    * @param httpd Instance of `Httpd` server
    */
   private void copyModulesIfMissing(Httpd httpd) {
-    List<String> moduleNames = ["mod_jk", "mod_advertise", "mod_cluster_slotmem", "mod_manager", "mod_proxy_cluster"]
+    List<String> moduleNames = ["mod_advertise", "mod_cluster_slotmem", "mod_manager", "mod_proxy_cluster"]
+
+    if (platform.isRHEL7() || platform.isRHEL8() || platform.isRHEL9()) {
+        moduleNames.add("mod_jk")
+    }
+
     moduleNames.each() { String moduleName ->
       File modulePath = new File("${httpd.getServerRoot()}/modules/${moduleName}.so")
       File sclModulePath = new File("${DefaultProperties.HTTPD_SCL_ROOT}/usr/lib64/httpd/modules/${moduleName}.so")
