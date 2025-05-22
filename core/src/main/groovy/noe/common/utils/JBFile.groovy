@@ -186,21 +186,31 @@ class JBFile {
     }
 
     def returnValue = 0
-    try {
-      // try to copy with ant
-      ant.copy(file: src.getAbsolutePath(), tofile: dest.getAbsolutePath(), overwrite: "true")
-    } catch (e) {
-      // Try it with sudo rights
-      if (!platform.isWindows()) {
-        def args = (preserveRights) ? '-p' : ''
-        args += (dereference) ? ' -L' : ''
-        if (useAdminPrivileges) {
-          returnValue += Cmd.executeSudoCommand("cp -r ${args} ${src.absolutePath} ${dest}", new File('.'))
-        } else {
-          returnValue += Cmd.executeCommand("cp -r ${args} ${src.absolutePath} ${dest}", new File('.'))
+    if (platform.isWindows()) {
+      File absDest = src.isDirectory() ? new File(dest, src.name) : dest
+      def command = ["xcopy", "${src.absolutePath}", absDest.absolutePath, "/H", "/S", "/E", "/I", "/Y", "/C", "/F", "/R", "/K", "/X"]
+      returnValue = Cmd.executeCommand(command, new File('.'))
+      if (returnValue > 0) {
+        try {
+          // try to copy with ant
+          if (src.isDirectory()) {
+            ant.copy(todir: dest.getAbsolutePath(), overwrite: true) { fileset(dir: src.getAbsolutePath()) }
+          } else {
+            ant.copy(file: src.getAbsolutePath(), todir: dest.getAbsolutePath(), overwrite: "true")
+          }
+          returnValue = 0
+        } catch (e) {
+          log.trace("JBFIle.copy with ant failed", e)
+          returnValue = 2
         }
+      }
+    } else {
+      def args = (preserveRights) ? '-p' : ''
+      args += (dereference) ? ' -L' : ''
+      if (useAdminPrivileges) {
+        returnValue += Cmd.executeSudoCommand("cp -r ${args} ${src.absolutePath} ${dest}", new File('.'))
       } else {
-        returnValue = -1
+        returnValue += Cmd.executeCommand("cp -r ${args} ${src.absolutePath} ${dest}", new File('.'))
       }
     }
     return returnValue == 0
