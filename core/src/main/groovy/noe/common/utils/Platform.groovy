@@ -3,6 +3,9 @@ package noe.common.utils
 import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 /**
  *
  * @author Jiri Sedlacek <jsedlace@redhat.com>
@@ -46,6 +49,19 @@ class Platform {
     } else {
       this.tmpDir = System.getProperty("java.io.tmpdir")
     }
+  }
+
+  boolean OSVersionLessThan(int value) {
+    if (isRHEL()) {
+      int start = osVersion.indexOf("el") + "el".length()
+      return Integer.parseInt(osVersion.substring(start, osVersion.indexOf('_', start))) < value
+    }
+
+    if(isWindows()) {
+      int start = osVersion.indexOf("Server") + "Server ".length()
+      return Integer.parseInt(osVersion.substring(start)) < value
+    }
+    return false
   }
 
   String toString() {
