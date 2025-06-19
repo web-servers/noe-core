@@ -31,7 +31,9 @@ class RpmTomcatEnvVarsFileFactory {
       return new Jws3RpmTomcatEnvVarsFile(tomcatInstance, vault)
     } else if (run.isJws5TestsRunning()) {
       return new Jws5RpmTomcatEnvVarsFile(vault)
-    } else if (run.isBaseOsTomcatTestsRunning()) {
+    } else if (run.isJws6TestsRunning()) {
+      return new Jws6RpmTomcatEnvVarsFile(vault)
+    }  else if (run.isBaseOsTomcatTestsRunning()) {
       return new BaseOsRpmTomcatEnvVarsFile(vault, platform)
     } else {
       throw new IllegalArgumentException(
@@ -73,6 +75,22 @@ class RpmTomcatEnvVarsFileFactory {
     }
   }
 
+  private static class Jws6RpmTomcatEnvVarsFile extends RpmTomcatEnvVarsFileBase {
+    Jws6RpmTomcatEnvVarsFile() {
+      Platform platform = new Platform()
+      if (platform.isRHEL8() || platform.isRHEL9() || platform.isRHEL10()) {
+        this.envFile = new File('/etc/opt/rh/scls/jws5/sysconfig/tomcat')
+      } else {
+        this.envFile = new File('/etc/opt/rh/jws5/sysconfig/tomcat')
+      }
+    }
+
+    Jws6RpmTomcatEnvVarsFile(FileStateVault vault) {
+      this()
+      this.vault = vault
+    }
+  }
+
   private static class BaseOsRpmTomcatEnvVarsFile extends RpmTomcatEnvVarsFileBase {
 
     BaseOsRpmTomcatEnvVarsFile() {
@@ -103,6 +121,7 @@ class RpmTomcatEnvVarsFileFactory {
   protected static interface RpmRun {
     boolean isJws3TestsRunning()
     boolean isJws5TestsRunning()
+    boolean isJws6TestsRunning()
     boolean isBaseOsTomcatTestsRunning()
   }
 
@@ -116,6 +135,11 @@ class RpmTomcatEnvVarsFileFactory {
     @Override
     boolean isJws5TestsRunning(){
       return isCurrentJwsMajorVersion(5)
+    }
+
+    @Override
+    boolean isJws6TestsRunning(){
+      return isCurrentJwsMajorVersion(6)
     }
 
     @Override
