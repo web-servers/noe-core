@@ -2,6 +2,7 @@ package noe
 
 import groovy.util.logging.Slf4j
 import noe.common.TestAbstract
+import noe.common.DefaultProperties
 import noe.common.utils.Java
 import noe.common.utils.Platform
 import noe.workspace.ServersWorkspace
@@ -18,7 +19,10 @@ class TomcatJws6IT extends TestAbstract {
     public static void beforeClass() {
         Platform platform = new Platform()
         Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
-        Assume.assumeTrue("Tomcat from JWS 6 requires at least Java 11", Java.isJdk1xOrHigher('11'))
+        Assume.assumeTrue("Tomcat from JWS 6.0 requires at least Java 11",
+                (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk11')) ?: Java.isJdk1xOrHigher('11')
+        )
+
         loadTestProperties('/jws6-test.properties')
         workspace = new ServersWorkspace(
                 new WorkspaceTomcat()

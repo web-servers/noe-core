@@ -1,5 +1,6 @@
 package noe.tomcat
 
+import noe.common.DefaultProperties
 import noe.common.utils.Java
 import noe.common.utils.Platform
 import org.junit.Assume
@@ -11,7 +12,10 @@ class JvmRouteTomcat10ConfiguratorIT extends JvmRouteTomcatConfiguratorIT {
     public static void beforeClass() {
         Platform platform = new Platform()
         Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
-        Assume.assumeTrue("Tomcat from JWS 6.0 requires at least Java 11", Java.isJdk1xOrHigher('11'))
+
+        Assume.assumeTrue("Tomcat from JWS 6.0 requires at least Java 11",
+                (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk11')) ?: Java.isJdk1xOrHigher('11')
+        )
 
         loadTestProperties("/tomcat10-common-test.properties")
         prepareWorkspace()
