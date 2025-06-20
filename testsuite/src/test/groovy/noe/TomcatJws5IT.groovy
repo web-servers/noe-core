@@ -19,7 +19,7 @@ class TomcatJws5IT extends TestAbstract {
   public static void beforeClass() {
     Platform platform = new Platform()
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
-    Assume.assumeTrue("Tomcat from JWS 5 requires at least Java 1.8", Java.isJdk1xOrHigher('1.8'))
+    Assume.assumeTrue("Tomcat from JWS 5 requires at least Java 1.8", Java.isJdkXOrHigher('1.8'))
 
 
 

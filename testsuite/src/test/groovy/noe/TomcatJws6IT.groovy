@@ -16,11 +16,11 @@ class TomcatJws6IT extends TestAbstract {
 
 
     @BeforeClass
-    public static void beforeClass() {
+    static void beforeClass() {
         Platform platform = new Platform()
         Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
         Assume.assumeTrue("Tomcat from JWS 6.0 requires at least Java 11",
-                (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk11')) ?: Java.isJdk1xOrHigher('11')
+                (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk11')) ?: Java.isJdkXOrHigher('11')
         )
 
         loadTestProperties('/jws6-test.properties')

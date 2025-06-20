@@ -13,7 +13,7 @@ class BindingsTomcat9ConfiguratorIT extends BindingsTomcatConfiguratorIT {
     Platform platform = new Platform()
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
     Assume.assumeTrue("Tomcat from JWS 5.0 requires at least Java 1.8",
-            (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk1.8')) ?: Java.isJdk1xOrHigher('1.8')
+            (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk1.8')) ?: Java.isJdkXOrHigher('1.8')
     )
 
     loadTestProperties("/tomcat9-common-test.properties")

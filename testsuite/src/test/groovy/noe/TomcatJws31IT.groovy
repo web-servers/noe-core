@@ -20,7 +20,7 @@ class TomcatJws31IT extends TestAbstract {
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
     Assume.assumeTrue("JWS 3.1 is not supported on RHEL8+ => skipping", platform.isRHEL7())
     Assume.assumeTrue("Tomcat from JWS 3.1 requires at least Java 1.7",
-            (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk1.7')) ?: Java.isJdk1xOrHigher('1.7')
+            (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk1.7')) ?: Java.isJdkXOrHigher('1.7')
     )
 
     loadTestProperties('/jws31-test.properties')

@@ -21,7 +21,7 @@ class TomcatJws4IT extends TestAbstract {
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
     Assume.assumeTrue("JWS 4 is not supported on RHEL8+ => skipping", platform.isRHEL7())
     Assume.assumeTrue("Tomcat from JWS 4 requires at least Java 1.8",
-            (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk1.8')) ?: Java.isJdk1xOrHigher('1.8')
+            (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk1.8')) ?: Java.isJdkXOrHigher('1.8')
     )
 
     Assume.assumeTrue("We have currently only builds for RHEL, skipping for other platforms",
