@@ -11,9 +11,12 @@ class BindingsTomcat10ConfiguratorIT extends BindingsTomcatConfiguratorIT {
   @BeforeClass
   public static void beforeClass() {
     Platform platform = new Platform()
+    def java11Indicators = ['jdk11', 'java-11', 'openjdk-11']
+    def serverJavaHomeMatches = java11Indicators.any { DefaultProperties.SERVER_JAVA_HOME?.contains(it) }
+
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
     Assume.assumeTrue("Tomcat from JWS 6.0 requires at least Java 11",
-            (DefaultProperties.SERVER_JAVA_HOME?.contains('jdk11')) ?: Java.isJdkXOrHigher('11')
+            serverJavaHomeMatches ?: Java.isJdkXOrHigher('11')
     )
 
     loadTestProperties("/tomcat10-common-test.properties")
