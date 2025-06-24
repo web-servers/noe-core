@@ -79,9 +79,9 @@ class RpmTomcatEnvVarsFileFactory {
     Jws6RpmTomcatEnvVarsFile() {
       Platform platform = new Platform()
       if (platform.isRHEL8() || platform.isRHEL9() || platform.isRHEL10()) {
-        this.envFile = new File('/etc/opt/rh/scls/jws5/sysconfig/tomcat')
+        this.envFile = new File('/etc/opt/rh/scls/jws6/sysconfig/tomcat')
       } else {
-        this.envFile = new File('/etc/opt/rh/jws5/sysconfig/tomcat')
+        this.envFile = new File('/etc/opt/rh/jws6/sysconfig/tomcat')
       }
     }
 
