@@ -54,11 +54,11 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${version.failsafe-plugin}</version>
                 <configuration>
-                    <systemPropertyVariables>
-                        <logging.level>6</logging.level>
+                    <systemProperties>
+                        <logging.level>1</logging.level>
                         <project.root.path>.</project.root.path>
                         <host>127.0.0.1</host>
-                    </systemPropertyVariables>
+                    </systemProperties>
                     <reuseForks>false</reuseForks>
                     <trimStackTrace>false</trimStackTrace>
                     <runOrder>reversealphabetical</runOrder>
