@@ -177,7 +177,7 @@ class AS7 extends ServerAbstract implements WorkerServer {
     cmdCommand.setEnvProperties(envVariables)
 
     final String javaHome = Library.getUniversalProperty("server.java.home","")
-    if (javaHome) {
+    if (javaHome && Java.isServerJdkLowerThan('9')) {
       process = startWithJavaHome(javaHome, cmdCommand)
     } else {
       log.debug("Starting with default JAVA_HOME.")
