@@ -87,7 +87,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <version.java>1.6</version.java>
+        <version.java>1.8</version.java>
         <version.min-maven>3.9.5</version.min-maven>
 
 
