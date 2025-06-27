@@ -54,7 +54,13 @@ class Platform {
   boolean OSVersionLessThan(int value) {
     if (isRHEL()) {
       int start = osVersion.indexOf("el") + "el".length()
-      return Integer.parseInt(osVersion.substring(start, osVersion.indexOf('_', start))) < value
+
+      // works for '_' (rhel8+) or '.' (rhel7)
+      def intermediate = osVersion.substring(start,
+              [osVersion.indexOf('_', start), osVersion.indexOf('.', start), osVersion.length()]
+                      .find { it > start })
+
+      return Integer.parseInt(intermediate) < value
     }
 
     if(isWindows()) {
