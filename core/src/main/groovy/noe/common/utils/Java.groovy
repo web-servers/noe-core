@@ -24,14 +24,14 @@ public class Java {
       if (!new File(serverJavaHome, "bin").exists()) {
         return
       }
-      String javac = PathHelper.join(serverJavaHome, "bin", "javac")
-      String java = PathHelper.join(serverJavaHome, "bin", "java")
+      String serverJavac = PathHelper.join(serverJavaHome, "bin", "javac")
+      String serverJava = PathHelper.join(serverJavaHome, "bin", "java")
       Library.copyResourceTo(javaHelperClassResource, new File("."))
-      Cmd.executeCommandConsumeStreams([javac, "JavaVersion.java"])
-      javaVersion = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-version"])["stdOut"].trim()
-      javaVendor = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vendor"])["stdOut"].trim()
-      javaVmName = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vmname"])["stdOut"].trim()
-      javaVmInfo = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vminfo"])["stdOut"].trim()
+      Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion.java"])
+      def serverJavaVersion = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-version"])["stdOut"].trim()
+      def serverJavaVendor = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-vendor"])["stdOut"].trim()
+      def serverJavaVmName = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-vmname"])["stdOut"].trim()
+      def serverJavaVmInfo = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-vminfo"])["stdOut"].trim()
       initialized = true
     }
   }
