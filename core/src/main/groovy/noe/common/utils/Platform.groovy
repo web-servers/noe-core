@@ -54,10 +54,11 @@ class Platform {
   boolean OSVersionLessThan(int value) {
     if (isRHEL()) {
       int start = osVersion.indexOf("el") + "el".length()
-      return Integer.parseInt(osVersion.substring(start, osVersion.indexOf('_', start))) < value
+      int end = osVersion.indexOf(isRHEL7() ? '.' : '_', start)
+      return Integer.parseInt(osVersion.substring(start, end)) < value
     }
 
-    if(isWindows()) {
+    if (isWindows()) {
       int start = osVersion.indexOf("Server") + "Server ".length()
       return Integer.parseInt(osVersion.substring(start)) < value
     }

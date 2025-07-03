@@ -87,8 +87,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <version.java>1.6</version.java>
-        <version.min-maven>3.2.5</version.min-maven>
+        <version.java>1.8</version.java>
+        <version.min-maven>3.9.5</version.min-maven>
 
 
         <version.checkstyle-plugin>3.1.1</version.checkstyle-plugin>
@@ -104,7 +104,7 @@
 	<version.jgit>5.13.3.202401111512-r</version.jgit>
         <version.release-plugin>3.0.0-M1</version.release-plugin>
         <version.source-plugin>3.2.1</version.source-plugin>
-        <version.surefire-plugin>2.22.0</version.surefire-plugin>
+        <version.surefire-plugin>3.0.0-M9</version.surefire-plugin>
 
 
         <version.java.jna>5.6.0</version.java.jna>

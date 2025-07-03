@@ -24,14 +24,14 @@ public class Java {
       if (!new File(serverJavaHome, "bin").exists()) {
         return
       }
-      String javac = PathHelper.join(serverJavaHome, "bin", "javac")
-      String java = PathHelper.join(serverJavaHome, "bin", "java")
+      String serverJavac = PathHelper.join(serverJavaHome, "bin", "javac")
+      String serverJava = PathHelper.join(serverJavaHome, "bin", "java")
       Library.copyResourceTo(javaHelperClassResource, new File("."))
-      Cmd.executeCommandConsumeStreams([javac, "JavaVersion.java"])
-      javaVersion = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-version"])["stdOut"].trim()
-      javaVendor = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vendor"])["stdOut"].trim()
-      javaVmName = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vmname"])["stdOut"].trim()
-      javaVmInfo = Cmd.executeCommandConsumeStreams([java, "JavaVersion", "-vminfo"])["stdOut"].trim()
+      Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion.java"])
+      def serverJavaVersion = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-version"])["stdOut"].trim()
+      def serverJavaVendor = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-vendor"])["stdOut"].trim()
+      def serverJavaVmName = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-vmname"])["stdOut"].trim()
+      def serverJavaVmInfo = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-vminfo"])["stdOut"].trim()
       initialized = true
     }
   }
@@ -165,6 +165,46 @@ public class Java {
       }
 
       return (usedJavaMajorVersion >= minimumJavaMajorVersion)
+    } catch (NumberFormatException e) {
+      log.error(printStackTrace())
+      return false
+    }
+  }
+  /**
+   * Checks if SERVER_JAVA_HOME is lower than input, This accepts both legacy (1.6, 1.7, etc.)
+   * Java version format and also new one (7, 8, 9, etc.).
+   *
+   * @param maximumJDKVersion JDK version (example: '1.7' or '7')
+   * @return true if we are running lower than maximumJDKVersion
+   */
+  static boolean isServerJdkLowerThan(String maximumJDKVersion) {
+
+    if (!serverJavaHome) {
+      return false
+    }
+
+    try {
+
+      // matches both “…/java-1.X.X-openjdk” and “…/java-XX-openjdk”
+      def m = (serverJavaHome =~ /java-(\d+)(?:\.(\d+))?/)
+
+      if (!m) {
+        log.warn("Can not determine SERVER_JAVA_HOME: ${serverJavaHome}")
+        return false
+      }
+
+      int major = m[0][1] as int            // "1.8" -> 1
+      if (major == 1 && m[0][2]) {          // “1.8.0”-> 8
+        major = m[0][2] as int
+      }
+
+      // tokenize to use both input formats e.g. 1.9 and 9
+      def tokens = maximumJDKVersion.tokenize('.')
+      int maxMajor = (maximumJDKVersion.startsWith('1.') && tokens.size() > 1)
+              ? tokens[1] as int
+              : tokens[0] as int
+
+      return major < maxMajor
     } catch (NumberFormatException e) {
       log.error(printStackTrace())
       return false
