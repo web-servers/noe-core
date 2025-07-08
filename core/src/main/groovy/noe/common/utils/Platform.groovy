@@ -3,9 +3,6 @@ package noe.common.utils
 import groovy.util.logging.Slf4j
 import noe.common.DefaultProperties
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 /**
  *
  * @author Jiri Sedlacek <jsedlace@redhat.com>
@@ -59,8 +56,8 @@ class Platform {
     }
 
     if (isWindows()) {
-      int start = osVersion.indexOf("Server") + "Server ".length()
-      return Integer.parseInt(osVersion.substring(start)) < value
+      int start = osName.indexOf("Server") + "Server ".length()
+      return Integer.parseInt(osName.substring(start)) < value
     }
     return false
   }
