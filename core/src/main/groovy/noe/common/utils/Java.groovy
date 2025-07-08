@@ -17,6 +17,8 @@ public class Java {
   public static final String javaHome = System.getenv('JAVA_HOME')
   public static final String serverJavaHome = System.getenv('SERVER_JAVA_HOME')
   private static final String javaHelperClassResource = "java/JavaVersion.java"
+  private static final List<String> JAVA_11_INDICATORS = ['jdk11', 'java-11', 'openjdk-11', 'jdk-11']
+
   private static boolean initialized = false
 
   static {
@@ -27,7 +29,7 @@ public class Java {
       String serverJavac = PathHelper.join(serverJavaHome, "bin", "javac")
       String serverJava = PathHelper.join(serverJavaHome, "bin", "java")
       Library.copyResourceTo(javaHelperClassResource, new File("."))
-      Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion.java"])
+      Cmd.executeCommandConsumeStreams([serverJavac, "JavaVersion.java"])
       def serverJavaVersion = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-version"])["stdOut"].trim()
       def serverJavaVendor = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-vendor"])["stdOut"].trim()
       def serverJavaVmName = Cmd.executeCommandConsumeStreams([serverJava, "JavaVersion", "-vmname"])["stdOut"].trim()
@@ -184,10 +186,8 @@ public class Java {
     }
 
     try {
-
-      // matches both “…/java-1.X.X-openjdk” and “…/java-XX-openjdk”
-      def m = (serverJavaHome =~ /java-(\d+)(?:\.(\d+))?/)
-
+      // "java-1.8.0-openjdk", "java-11-openjdk", "oraclejdk-11.0.27", etc.
+      def m = (serverJavaHome =~ /.*(?:jdk|java)[-]?(\d+)(?:\.(\d+))?.*/)
       if (!m) {
         log.warn("Can not determine SERVER_JAVA_HOME: ${serverJavaHome}")
         return false
@@ -206,7 +206,7 @@ public class Java {
 
       return major < maxMajor
     } catch (NumberFormatException e) {
-      log.error(printStackTrace())
+      log.error("Error parsing serverJdk version: ${e.message}", e)
       return false
     }
   }
