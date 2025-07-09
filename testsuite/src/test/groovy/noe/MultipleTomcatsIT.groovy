@@ -22,7 +22,11 @@ class MultipleTomcatsIT extends TestAbstract {
         Platform platform = new Platform()
 
         loadTestProperties('/ews-test.properties')
-        Assume.assumeFalse("JWS 6.0 is officially supported on RHEL versions 8 and above", platform.OSVersionLessThan(8));
+
+        if (platform.isRHEL()) {
+            Assume.assumeFalse("JWS 6.0 is officially supported on RHEL versions 8 and above",
+                platform.OSVersionLessThan(8))
+        }
         Assume.assumeFalse("EWS is not supported on HP-UX => skipping", new Platform().isHP())
         workspace = new ServersWorkspace(
                 new WorkspaceHttpdTomcats(1)

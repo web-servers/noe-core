@@ -21,7 +21,10 @@ class TomcatJws5IT extends TestAbstract {
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
     Assume.assumeTrue("Tomcat from JWS 5 requires at least Java 1.8", Java.isJdkXOrHigher('1.8'))
 
-
+    if (platform.isRHEL()) {
+      Assume.assumeTrue("JWS 5.0 is officially supported on RHEL versions 9 and lower",
+              platform.OSVersionLessThan(10));
+    }
 
     loadTestProperties('/jws5-test.properties')
     workspace = new ServersWorkspace(

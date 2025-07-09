@@ -23,7 +23,10 @@ class HttpdKillTestIT extends TestAbstract {
     Assume.assumeFalse('JBCS Httpd is not supported on HP-UX => skipping', platform.isHP())
     Assume.assumeFalse('JBCS Httpd is not supported on older versions of RHEL than RHEL 6',
             platform.isRHEL4() || platform.isRHEL5())
-    Assume.assumeTrue("EAP 7.0.0 is officially supported on RHEL versions earlier than 9", platform.OSVersionLessThan(9));
+    if (platform.isRHEL()) {
+      Assume.assumeTrue("EAP 7.0.0 is officially supported on RHEL versions earlier than 9",
+              platform.OSVersionLessThan(9))
+    }
 
     loadTestProperties('/eap7-multiple-jbcs-httpd-test.properties')
     workspace = new ServersWorkspace(
