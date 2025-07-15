@@ -55,7 +55,7 @@
         <repository>
             <id>jboss-public-repository</id>
             <name>Public JBoss release repository</name>
-            <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2</url>
+            <url>https://repository.jboss.org/nexus/repository/releases/</url>
         </repository>
     </distributionManagement>
 
