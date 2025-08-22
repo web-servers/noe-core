@@ -22,6 +22,9 @@
 # the command line, set the key security.overridePropertiesFile
 # to false in the master security properties file. It is set to true
 # by default.
+#
+# If this properties file fails to load, the JDK implementation will throw
+# an unspecified error when initializing the java.security.Security class.
 
 # In this file, various security properties are set for use by
 # java.security classes. This is where users can statically register
@@ -306,9 +309,7 @@ keystore.type.compat=true
 # RuntimePermission("accessClassInPackage."+package) has been granted.
 #
 package.access=sun.misc.,\
-               sun.reflect.,\
-               org.GNOME.Accessibility.,\
-               org.GNOME.Bonobo.
+               sun.reflect.
 
 #
 # List of comma-separated packages that start with or equal this string
@@ -320,9 +321,7 @@ package.access=sun.misc.,\
 # checkPackageDefinition.
 #
 package.definition=sun.misc.,\
-                   sun.reflect.,\
-                   org.GNOME.Accessibility.,\
-                   org.GNOME.Bonobo.
+                   sun.reflect.
 
 #
 # Determines whether this properties file can be appended to
@@ -507,7 +506,16 @@ sun.security.krb5.maxReferrals=5
 # in the jdk.[tls|certpath|jar].disabledAlgorithms properties.  To include this
 # list in any of the disabledAlgorithms properties, add the property name as
 # an entry.
-jdk.disabled.namedCurves = secp256k1
+jdk.disabled.namedCurves = secp112r1, secp112r2, secp128r1, secp128r2, \
+    secp160k1, secp160r1, secp160r2, secp192k1, secp192r1, secp224k1, \
+    secp224r1, secp256k1, sect113r1, sect113r2, sect131r1, sect131r2, \
+    sect163k1, sect163r1, sect163r2, sect193r1, sect193r2, sect233k1, \
+    sect233r1, sect239k1, sect283k1, sect283r1, sect409k1, sect409r1, \
+    sect571k1, sect571r1, X9.62 c2tnb191v1, X9.62 c2tnb191v2, \
+    X9.62 c2tnb191v3, X9.62 c2tnb239v1, X9.62 c2tnb239v2, X9.62 c2tnb239v3, \
+    X9.62 c2tnb359v1, X9.62 c2tnb431r1, X9.62 prime192v2, X9.62 prime192v3, \
+    X9.62 prime239v1, X9.62 prime239v2, X9.62 prime239v3, brainpoolP256r1, \
+    brainpoolP320r1, brainpoolP384r1, brainpoolP512r1
 
 #
 # Algorithm restrictions for certification path (CertPath) processing
@@ -745,7 +753,7 @@ jdk.jar.disabledAlgorithms=MD2, MD5, RSA keySize < 1024, \
 #
 # Example:
 #   jdk.tls.disabledAlgorithms=MD5, SSLv3, DSA, RSA keySize < 2048, \
-#       rsa_pkcs1_sha1
+#       rsa_pkcs1_sha1, secp224r1
 jdk.tls.disabledAlgorithms=SSLv3, TLSv1, TLSv1.1, RC4, DES, MD5withRSA, \
     DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL, \
     include jdk.disabled.namedCurves
@@ -903,7 +911,8 @@ jdk.tls.legacyAlgorithms= \
 # Note: This property is currently used by OpenJDK's JSSE implementation. It
 # is not guaranteed to be examined and used by other implementations.
 #
-jdk.tls.keyLimits=AES/GCM/NoPadding KeyUpdate 2^37
+jdk.tls.keyLimits=AES/GCM/NoPadding KeyUpdate 2^37, \
+                  ChaCha20-Poly1305 KeyUpdate 2^37
 
 #
 # Cryptographic Jurisdiction Policy defaults
