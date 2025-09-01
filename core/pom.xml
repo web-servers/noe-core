@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jboss.qa.noe</groupId>
         <artifactId>noe-core-parent</artifactId>
-        <version>0.18.2-SNAPSHOT</version>
+        <version>0.18.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>noe-core</artifactId>
@@ -153,23 +153,6 @@
                             <outputDirectory>${project.build.directory}/wars</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.7</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                        <configuration>
-                            <attach>true</attach>
                         </configuration>
                     </execution>
                 </executions>
