@@ -7,7 +7,6 @@ import noe.tomcat.configure.JmxTomcat
 import noe.tomcat.configure.JmxRemoteAccessFileTomcat
 import noe.tomcat.configure.JmxRemotePasswordFileTomcat
 import noe.tomcat.configure.TomcatConfigurator
-import org.junit.After
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
@@ -29,11 +28,6 @@ import static org.junit.Assert.assertTrue
  */
 abstract class JmxTomcatConfiguratorIT extends TomcatTestAbstract {
   Platform platform = new Platform()
-
-  @After
-  void after() {
-    new File(tomcat.basedir, "bin/setenv." + platform.getScriptSuffix()).delete()
-  }
 
   @Test
   void setJmxPortOnlyChangeExpected() {

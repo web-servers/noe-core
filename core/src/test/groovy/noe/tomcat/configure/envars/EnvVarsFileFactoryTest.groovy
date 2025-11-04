@@ -38,6 +38,7 @@ class EnvVarsFileFactoryTest {
     EnvVarsFile envVars = RpmTomcatEnvVarsFileFactory.getInstance(tomcat, vault, [
       isJws3TestsRunning: { return true },
       isJws5TestsRunning: { return false },
+      isJws6TestsRunning: { return false },
       isBaseOsTomcatTestsRunning: { return false }
     ] as RpmTomcatEnvVarsFileFactory.RpmRun)
 
@@ -49,6 +50,7 @@ class EnvVarsFileFactoryTest {
     EnvVarsFile envVars = RpmTomcatEnvVarsFileFactory.getInstance(tomcat, vault, [
       isJws3TestsRunning: { return false },
       isJws5TestsRunning: { return true },
+      isJws6TestsRunning: { return false },
       isBaseOsTomcatTestsRunning: { return false }
     ] as RpmTomcatEnvVarsFileFactory.RpmRun)
 
@@ -62,10 +64,29 @@ class EnvVarsFileFactoryTest {
   }
 
   @Test
+  void getInstanceRpmJWS6() {
+    EnvVarsFile envVars = RpmTomcatEnvVarsFileFactory.getInstance(tomcat, vault, [
+            isJws3TestsRunning: { return false },
+            isJws5TestsRunning: { return false },
+            isJws6TestsRunning: { return true },
+            isBaseOsTomcatTestsRunning: { return false }
+    ] as RpmTomcatEnvVarsFileFactory.RpmRun)
+
+    String tomcatServicePath
+    if (platform.isRHEL8() || platform.isRHEL9() || platform.isRHEL10()) {
+      tomcatServicePath = "/etc/opt/rh/scls/jws6/sysconfig/tomcat"
+    } else {
+      tomcatServicePath = "/etc/opt/rh/jws6/sysconfig/tomcat"
+    }
+    Assume.assumeTrue envVars.getEnvFile().getPath() == tomcatServicePath
+  }
+
+  @Test
   void getInstanceRpmBaseOsRhel6() {
     EnvVarsFile envVars = RpmTomcatEnvVarsFileFactory.getInstance(tomcat, vault, [
       isJws3TestsRunning: { return false },
       isJws5TestsRunning: { return false },
+      isJws6TestsRunning: { return false },
       isBaseOsTomcatTestsRunning: { return true }
     ] as RpmTomcatEnvVarsFileFactory.RpmRun, [
       isRHEL6: { return true },
@@ -80,6 +101,7 @@ class EnvVarsFileFactoryTest {
     EnvVarsFile envVars = RpmTomcatEnvVarsFileFactory.getInstance(tomcat, vault, [
       isJws3TestsRunning: { return false },
       isJws5TestsRunning: { return false },
+      isJws6TestsRunning: { return false },
       isBaseOsTomcatTestsRunning: { return true }
     ] as RpmTomcatEnvVarsFileFactory.RpmRun, [
       isRHEL6: { return false },

@@ -1,7 +1,6 @@
 package noe.tomcat.configure
 
 import noe.common.utils.FileStateVault
-import noe.common.utils.Platform
 import noe.server.Tomcat
 import noe.tomcat.configure.envars.EnvVarsFile
 import noe.tomcat.configure.envars.EnvVarsFileFactory

@@ -48,6 +48,20 @@ class Platform {
     }
   }
 
+  boolean OSVersionLessThan(int value) {
+    if (isRHEL()) {
+      int start = osVersion.indexOf("el") + "el".length()
+      int end = osVersion.indexOf(isRHEL7() ? '.' : '_', start)
+      return Integer.parseInt(osVersion.substring(start, end)) < value
+    }
+
+    if (isWindows()) {
+      int start = osName.indexOf("Server") + "Server ".length()
+      return Integer.parseInt(osName.substring(start)) < value
+    }
+    return false
+  }
+
   String toString() {
     "${osName} ${osVersion} ${osArch}"
   }

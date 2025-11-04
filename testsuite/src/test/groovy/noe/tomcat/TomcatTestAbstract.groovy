@@ -2,7 +2,6 @@ package noe.tomcat
 
 import noe.common.TestAbstract
 import noe.common.utils.Platform
-import noe.ews.workspace.WorkspaceEws
 import noe.server.Tomcat
 import noe.workspace.ServersWorkspace
 import noe.workspace.WorkspaceTomcat

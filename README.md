@@ -32,6 +32,22 @@ Release a new version
 ---------------------------------------------
 Before releasing, don't forget to check, that integration tests are passing on all platforms, e.g. by checking CI job if it is set up.
 
+Signing of the artifacts has been inherently added to the project.
+Below you can find the commands you could use to sign the artifacts upon build.
+```
+echo 'export GPG_TTY=$(tty)' >> ~/.bashrc`
+
+echo "use-agent" >> ~/.gnupg/gpg.conf
+echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+gpgconf --kill gpg-agent
+gpgconf --launch gpg-agent
+gpg --full-generate-key # *RSA and RSA *4096 *name *emailAddress *expirationDate
+gpg --export -a 'your-generated-keyid' > my-nore-core-pbkey.asc # share or upload
+export NEO_CORE_GPG_KEYNAME='your-generated-keyid'
+export GPG_PASSPHRASE='your-secure-passphrase'
+```
+
 Releasing is done using the maven release plugin to internal JBoss QA maven repositories. To perform the release, use the following commands in a sequence:
 
 `mvn release:prepare -Pcomplete -Darguments="-DskipTests"`

@@ -142,5 +142,6 @@ class DefaultProperties {
   // Making the conf directory configurable
   public static final String CONF_DIRECTORY = Library.getUniversalProperty('jbcs.conf.d.directory', "conf.d")
   public static final String CONF_MODULES_DIRECTORY = Library.getUniversalProperty('jbcs.conf.modules.d.directory', "conf.modules.d")
-
+  // Value that is contained in the serverInfo.properties file in tomcat
+  public static final String JWS_SERVER_INFO_PROP_CONTENT = Library.getUniversalProperty('jws.server.info.prop.content', "Tomcat")
 }

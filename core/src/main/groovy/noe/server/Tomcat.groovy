@@ -110,6 +110,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
    * @link http://tomcat.apache.org/tomcat-6.0-doc/architecture/startup/serverStartup.txt
    */
   void waitForStartComplete(int timeout = startStopTimeout, int port = mainHttpPort) {
+    String expectedContent = DefaultProperties.JWS_SERVER_INFO_PROP_CONTENT
     super.waitForStartComplete(timeout, port)
     WebClient webClient = new WebClient()
     webClient.getOptions().setRedirectEnabled(true)
@@ -128,7 +129,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
     boolean startedInTime = VerifyURLBuilder.verifyURL {
       it.url serverUrl
       it.code 200
-      it.content "Apache Tomcat"
+      it.content "${expectedContent}"
       it.timeout (timeout * 1000)
       it.logResponse = false
       it.webClient webClient
@@ -138,7 +139,7 @@ class Tomcat extends ServerAbstract implements WorkerServer {
       VerifyURLBuilder.verifyURL {
         it.url serverUrl
         it.code 200
-        it.content "Apache Tomcat"
+        it.content "${expectedContent}"
         it.tryOnlyOnce true
         it.logResponse = true
         it.webClient webClient
