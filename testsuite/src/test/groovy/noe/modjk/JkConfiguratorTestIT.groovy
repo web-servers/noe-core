@@ -238,7 +238,7 @@ class JkConfiguratorTestIT extends TestAbstract {
     ops.startAll()
 
     String res = new StatusWorkerOperation()
-      .setAction(StatusWorkerOperation.Action.LIST)
+      .setAction(new StatusWorkerOperation.List())
       .setOutputFormat(StatusWorkerOperation.OutputFormat.TEXT)
       .setBalancerId(balancerId)
       .setAutomaticRefresh(1)
