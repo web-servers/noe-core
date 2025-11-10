@@ -32,7 +32,7 @@ abstract class ServerAbstract implements IApp {
   //TODO: EWS specific, pls remove.
   Boolean ignoreShutdownPort ///
   def start ///standard startup command (apachectl start)
-  def stop ///standard shutdown command (apachectl stop)
+  String stop ///standard shutdown command (apachectl stop)
   String binPath // relative path (server root) to dir where stop handler is stored
   List configDirs = [] // relative paths to dir where server config files are stored
   List logDirs = [] // relative paths to dir where server logs are stored
