@@ -4,7 +4,7 @@
 
     <groupId>org.jboss.qa.noe</groupId>
     <artifactId>noe-core-parent</artifactId>
-    <version>0.18.4-SNAPSHOT</version>
+    <version>0.18.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Noe core: Parent</name>
