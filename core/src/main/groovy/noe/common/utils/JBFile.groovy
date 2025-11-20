@@ -188,7 +188,7 @@ class JBFile {
     def returnValue = 0
     if (platform.isWindows()) {
       File absDest = src.isDirectory() ? new File(dest, src.name) : dest
-      def command = ["xcopy", "${src.absolutePath}", absDest.absolutePath, "/H", "/S", "/E", "/I", "/Y", "/C", "/F", "/R", "/K", "/X"]
+      def command = ["xcopy", "${src.absolutePath}", absDest.absolutePath, "/H", "/E", "/I", "/Y", "/C", "/F", "/R", "/K", "/X"]
       returnValue = Cmd.executeCommand(command, new File('.'))
       if (returnValue > 0) {
         try {
