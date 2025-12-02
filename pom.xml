@@ -57,6 +57,11 @@
             <name>Public JBoss release repository</name>
             <url>https://repository.jboss.org/nexus/repository/releases/</url>
         </repository>
+        <snapshotRepository>
+            <id>jboss-snapshot-repository</id>
+            <name>Public JBoss snapshot repository</name>
+            <url>https://repository.jboss.org/nexus/repository/snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <repositories>
