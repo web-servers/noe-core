@@ -5,6 +5,8 @@ import noe.common.Constants
 import noe.common.DefaultProperties
 import org.apache.commons.io.FileUtils
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 /**
@@ -187,22 +189,12 @@ class JBFile {
 
     def returnValue = 0
     if (platform.isWindows()) {
-      File absDest = src.isDirectory() ? new File(dest, src.name) : dest
-      def command = ["xcopy", "${src.absolutePath}", absDest.absolutePath, "/H", "/E", "/I", "/Y", "/C", "/F", "/R", "/K", "/X"]
-      returnValue = Cmd.executeCommand(command, new File('.'))
-      if (returnValue > 0) {
-        try {
-          // try to copy with ant
-          if (src.isDirectory()) {
-            ant.copy(todir: dest.getAbsolutePath(), overwrite: true) { fileset(dir: src.getAbsolutePath()) }
-          } else {
-            ant.copy(file: src.getAbsolutePath(), todir: dest.getAbsolutePath(), overwrite: "true")
-          }
-          returnValue = 0
-        } catch (e) {
-          log.trace("JBFIle.copy with ant failed", e)
-          returnValue = 2
-        }
+      try {
+        log.info("Copying ${src.absolutePath} to ${dest.absolutePath}")
+        dest << src.text
+      } catch (e) {
+        log.trace("JBFIle.copyFile failed", e)
+        returnValue = 2
       }
     } else {
       def args = (preserveRights) ? '-p' : ''
