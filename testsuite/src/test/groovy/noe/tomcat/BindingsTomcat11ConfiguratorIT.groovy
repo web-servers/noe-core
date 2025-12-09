@@ -6,7 +6,7 @@ import noe.common.utils.Platform
 import org.junit.Assume
 import org.junit.BeforeClass
 
-class BindingsTomcat10ConfiguratorIT extends BindingsTomcatConfiguratorIT {
+class BindingsTomcat11ConfiguratorIT extends BindingsTomcatConfiguratorIT {
 
   @BeforeClass
   public static void beforeClass() {
@@ -15,10 +15,10 @@ class BindingsTomcat10ConfiguratorIT extends BindingsTomcatConfiguratorIT {
 
     Assume.assumeFalse("JWS is not supported on HP-UX => skipping", platform.isHP())
     if (platform.isRHEL()) {
-      Assume.assumeFalse("JWS 6.0 is officially supported on RHEL versions 8 and above",
+      Assume.assumeFalse("JWS 7.0 is officially supported on RHEL versions 8 and above",
               platform.OSVersionLessThan(8))
     }
-    Assume.assumeTrue("Tomcat from JWS 6.0 requires at least Java 17",
+    Assume.assumeTrue("Tomcat from JWS 7.0 requires at least Java 17",
             serverJavaHomeMatches ?: Java.isJdkXOrHigher('17')
     )
 
