@@ -18,7 +18,7 @@ class JmxTomcat11ConfiguratorIT extends JmxTomcatConfiguratorIT {
       Assume.assumeFalse("JWS 7.0 is officially supported on RHEL versions 8 and above",
               platform.OSVersionLessThan(8))
     }
-  Assume.assumeTrue("Tomcat from JWS 6.0 requires at least Java 17",
+  Assume.assumeTrue("Tomcat from JWS 7.0 requires at least Java 17",
             serverJavaHomeMatches ?: Java.isJdkXOrHigher('17')
     )
 
