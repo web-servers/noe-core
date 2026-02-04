@@ -126,7 +126,7 @@
         <version.logback>1.2.3</version.logback>
         <version.powermock>2.0.7</version.powermock>
 
-        <version.org.wildfly.extras.creaper>1.6.1</version.org.wildfly.extras.creaper>
+        <version.org.wildfly.extras.creaper>2.0.3</version.org.wildfly.extras.creaper>
         <org.wildfly.core.version>12.0.3.Final</org.wildfly.core.version>
         <org.jboss.as.creaper.dependencies.version>7.5.23.Final-redhat-00002</org.jboss.as.creaper.dependencies.version>
 
