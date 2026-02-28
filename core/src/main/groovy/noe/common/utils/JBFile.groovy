@@ -95,8 +95,8 @@ class JBFile {
      */
     if (platform.isWindows()) {
       // Well, let's try it the native way instead :-)
-      def command = ["xcopy", "${dir.absolutePath}${File.separator}.", destDir.absolutePath, "/H", "/S", "/E", "/Y", "/C", "/I", "/F", "/R", "/K", "/X"]
-      return Cmd.executeCommand(command, new File('.')) == 0
+      def command = ["robocopy", "${dir.absolutePath}${File.separator}.", destDir.absolutePath, "/H", "/S", "/E", "/Y", "/C", "/I", "/F", "/R", "/K", "/X"]
+      return Cmd.executeCommand(command, new File('.')) < 8
     } else {
       def command = ["cp", "-r", "${dir.absolutePath}${File.separator}.", destDir.absolutePath]
       if (preserveRights) command.addAll(1, "-p")
@@ -142,9 +142,9 @@ class JBFile {
     if (platform.isWindows()) {
       File dest = file.isDirectory() ? new File(destDir, file.name) : destDir
 
-      def command = ["xcopy", "${file.absolutePath}", dest.absolutePath, "/H", "/S", "/E", "/I", "/Y", "/C", "/F", "/R", "/K", "/X"]
+      def command = ["robocopy", "${file.absolutePath}", dest.absolutePath, "/H", "/S", "/E", "/I", "/Y", "/C", "/F", "/R", "/K", "/X"]
       returnValue = Cmd.executeCommand(command, new File('.'))
-      if (returnValue > 0) {
+      if (returnValue >= 8) {
         try {
           // try to copy with ant
           if (file.isDirectory()) {
@@ -167,7 +167,7 @@ class JBFile {
         returnValue = Cmd.executeSudoCommand(command, new File('.'))
       }
     }
-    return returnValue == 0
+    return returnValue < 8
   }
 
   /**
