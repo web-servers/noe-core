@@ -39,6 +39,8 @@ abstract class ServerEws {
       tomcatVersions = [new Version("9")]
     } else if (ewsMajorVersion == 6) {
       tomcatVersions = [new Version("10")]
+    } else if (ewsMajorVersion == 7) {
+      tomcatVersions = [new Version("11")]
     } else {
       throw new RuntimeException("Unsupported version of EWS ${ewsMajorVersion}.")
     }
