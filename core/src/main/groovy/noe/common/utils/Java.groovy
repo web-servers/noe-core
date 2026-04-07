@@ -18,6 +18,7 @@ public class Java {
   public static final String serverJavaHome = System.getenv('SERVER_JAVA_HOME')
   private static final String javaHelperClassResource = "java/JavaVersion.java"
   private static final List<String> JAVA_11_INDICATORS = ['jdk11', 'java-11', 'openjdk-11', 'jdk-11']
+  private static final List<String> JAVA_17_INDICATORS = ['jdk17', 'java-17', 'openjdk-17', 'jdk-17']
 
   private static boolean initialized = false
 
