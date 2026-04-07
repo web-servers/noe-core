@@ -8,7 +8,7 @@ import org.junit.Test
 
 class GitUtilsTest {
 
-    private static final String TEST_REPO_URL = "https://github.com/schacon/grit.git"
+    private static final String TEST_REPO_URL = "https://github.com/web-servers/noe-core.git"
 
     private static File TEST_DIR
 
@@ -41,11 +41,11 @@ class GitUtilsTest {
 
     @Test
     void testBranchCheckout() throws Exception {
-        Assert.assertTrue(GitUtils.cloneCheckout(TEST_REPO_URL, "integration", TEST_BRANCH_DIR, ["README.txt"]))
+        Assert.assertTrue(GitUtils.cloneCheckout(TEST_REPO_URL, "master", TEST_BRANCH_DIR, ["README.md"]))
 
         Assert.assertTrue("Target directory " + TEST_BRANCH_DIR.getAbsolutePath() + " doesn't exist.", TEST_BRANCH_DIR.exists())
 
-        File fileToVerify = new File(TEST_BRANCH_DIR, "README.txt")
+        File fileToVerify = new File(TEST_BRANCH_DIR, "README.md")
         Assert.assertTrue("File " + fileToVerify.getAbsolutePath() + " doesn't exist.", fileToVerify.exists())
     }
 
