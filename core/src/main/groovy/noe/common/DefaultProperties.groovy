@@ -136,7 +136,7 @@ class DefaultProperties {
 
 
   // Added to allow for the new naming convention used in RHEL9
-  public static final String MOD_CLUSTER_CONFIG_FILE = Library.getUniversalProperty('mod.proxy.cluster.config.file', "mod_proxy_cluster.conf")
+  public static final String MOD_CLUSTER_CONFIG_FILE = (new Platform().isRHEL9() || apacheCoreVersion() >= new Version("2.4.51")) ? Library.getUniversalProperty('mod.proxy.cluster.config.file', "mod_proxy_cluster.conf") : Library.getUniversalProperty('mod.proxy.cluster.config.file', "mod_cluster.conf")
   // Same as above but naming reflects the new changed file name
   public static final String MOD_PROXY_CLUSTER_CONFIG_FILE = MOD_CLUSTER_CONFIG_FILE
   // Making the conf directory configurable
