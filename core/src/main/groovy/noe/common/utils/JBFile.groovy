@@ -5,6 +5,8 @@ import noe.common.Constants
 import noe.common.DefaultProperties
 import org.apache.commons.io.FileUtils
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 /**
@@ -186,21 +188,21 @@ class JBFile {
     }
 
     def returnValue = 0
-    try {
-      // try to copy with ant
-      ant.copy(file: src.getAbsolutePath(), tofile: dest.getAbsolutePath(), overwrite: "true")
-    } catch (e) {
-      // Try it with sudo rights
-      if (!platform.isWindows()) {
-        def args = (preserveRights) ? '-p' : ''
-        args += (dereference) ? ' -L' : ''
-        if (useAdminPrivileges) {
-          returnValue += Cmd.executeSudoCommand("cp -r ${args} ${src.absolutePath} ${dest}", new File('.'))
-        } else {
-          returnValue += Cmd.executeCommand("cp -r ${args} ${src.absolutePath} ${dest}", new File('.'))
-        }
+    if (platform.isWindows()) {
+      try {
+        log.info("Copying ${src.absolutePath} to ${dest.absolutePath}")
+        dest << src.text
+      } catch (e) {
+        log.trace("JBFIle.copyFile failed", e)
+        returnValue = 2
+      }
+    } else {
+      def args = (preserveRights) ? '-p' : ''
+      args += (dereference) ? ' -L' : ''
+      if (useAdminPrivileges) {
+        returnValue += Cmd.executeSudoCommand("cp -r ${args} ${src.absolutePath} ${dest}", new File('.'))
       } else {
-        returnValue = -1
+        returnValue += Cmd.executeCommand("cp -r ${args} ${src.absolutePath} ${dest}", new File('.'))
       }
     }
     return returnValue == 0
