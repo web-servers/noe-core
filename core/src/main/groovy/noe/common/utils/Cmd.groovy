@@ -240,8 +240,23 @@ public class Cmd {
    *
    * @deprecated args
    */
-  public static int executeCommand(command, File targetDir, Map args = null, Map tmpProps = null) {
-    return executeCommandRedirectIO(command, targetDir, null, System.out, System.err, args, tmpProps)
+  static int executeCommand(command, File targetDir, Map args = null, Map tmpProps = null) {
+
+    if (command instanceof String || command instanceof GString) {
+      if (command.length() > 2 && command[0] == "[" && command[command.length() - 1] == "]") {
+        command = command[1..command.length() - 2]
+      }
+      command = command.tokenize(", ")
+    }
+
+    Map rv = executeCommandConsumeStreams(command as List, targetDir, null, 60000L, tmpProps)
+      if (!rv.stdOut.isEmpty()) {
+        log.info(rv.stdOut)
+      }
+      if (!rv.stdErr.isEmpty()) {
+        log.trace(rv.stdErr)
+      }
+      return rv.exitValue
   }
 
   /**
