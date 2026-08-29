@@ -4,7 +4,6 @@ import com.gargoylesoftware.htmlunit.Page
 import com.gargoylesoftware.htmlunit.WebClient
 import com.gargoylesoftware.htmlunit.WebResponse
 import groovy.util.logging.Slf4j
-import org.apache.commons.lang3.StringUtils
 
 import java.util.regex.Pattern
 
@@ -252,7 +251,7 @@ public final class VerifyURLBuilder {
    */
   private Map build() {
     if (url == null) throw new IllegalArgumentException("URL must not be null.")
-    if (StringUtils.isBlank(reqKey) != StringUtils.isBlank(reqValue)) {
+    if (reqKey?.allWhitespace != reqValue?.allWhitespace) {
       throw new IllegalArgumentException("ReqKey and ReqValue have to have to be either both set or both empty.")
     }
 
