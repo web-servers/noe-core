@@ -55,7 +55,7 @@ class FacingServerNode {
     return uriWorkerMapProperties
   }
 
-  JkScenario setUriWorkerMapProperties(UriWorkerMapProperties uriWorkerMapProperties) {
+  FacingServerNode setUriWorkerMapProperties(UriWorkerMapProperties uriWorkerMapProperties) {
     this.uriWorkerMapProperties = uriWorkerMapProperties
 
     return this
@@ -65,7 +65,7 @@ class FacingServerNode {
     return workersProperties
   }
 
-  JkScenario setWorkersProperties(WorkersProperties workersProperties) {
+  FacingServerNode setWorkersProperties(WorkersProperties workersProperties) {
     this.workersProperties = workersProperties
 
     return this
